@@ -1,0 +1,41 @@
+{
+  "name": "the-turk/flarum-diff",
+  "description": "View post edit histories in Flarum.",
+  "keywords": [
+    "flarum",
+    "edit",
+    "history",
+    "tracker",
+    "logger",
+    "diff"
+  ],
+  "type": "flarum-extension",
+  "license": "MIT",
+  "authors": [{
+    "name": "Hasan Özbey",
+    "email": "hasanoozbey@gmail.com",
+    "homepage": "https://github.com/the-turk"
+  }],
+  "support": {
+    "issues": "https://github.com/the-turk/flarum-diff/issues",
+    "source": "https://github.com/the-turk/flarum-diff"
+  },
+  "require": {
+    "flarum/core": ">=0.1.0-beta.10 <0.1.0-beta.12"
+  },
+  "autoload": {
+    "psr-4": {
+      "TheTurk\\Diff\\": "src/"
+    }
+  },
+  "extra": {
+    "flarum-extension": {
+      "title": "Diff",
+      "icon": {
+        "name": "fas fa-history",
+        "backgroundColor": "#b72a2a",
+        "color": "#fff"
+      }
+    }
+  }
+}

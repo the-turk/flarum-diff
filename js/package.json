@@ -1,0 +1,19 @@
+{
+  "name": "@the-turk/flarum-diff",
+  "description": "View post edit histories in Flarum.",
+  "license": "MIT",
+  "version": "0.1.0-beta.1",
+  "dependencies": {
+    "flarum-webpack-config": "0.1.0-beta.10",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/the-turk/flarum-diff.git"
+  },
+  "scripts": {
+    "watch": "webpack --mode development --watch",
+    "build": "webpack --mode production"
+  }
+}
