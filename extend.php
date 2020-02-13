@@ -51,7 +51,7 @@ return [
                         ) === 'customHTML';
 
                     $vars = [
-                        'config-custom-html' => $customHTML ? 'true' : 'false',
+                        'diff-config-custom-html' => $customHTML ? 'true' : 'false',
                     ];
 
                     return array_reduce(array_keys($vars), function ($string, $name) use ($vars) {
