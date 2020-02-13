@@ -28,8 +28,7 @@ Also, it won't load (and cache) anything until you click the "Edited" button so 
 
 ## Requirements
 
-![php](https://img.shields.io/badge/php-%5E7.1.3-blue?style=flat-square)
-![ext-iconv](https://img.shields.io/badge/ext-iconv-brightgreen?style=flat-square)
+![php](https://img.shields.io/badge/php-%5E7.1.3-blue?style=flat-square) ![ext-iconv](https://img.shields.io/badge/ext-iconv-brightgreen?style=flat-square)
 
 You can check your php version by running `php -v` and check if `iconv` is installed by running `php --ri iconv` (which should display `iconv support => enabled`).
 
@@ -61,7 +60,7 @@ Enable the extension, set the permissions (it's only visible to members by defau
 
 ## Links
 
-- [Flarum Discuss post](https://discuss.flarum.org/)
+- [Flarum Discuss post](https://discuss.flarum.org/d/22779-diff-for-flarum)
 - [Source code on GitHub](https://github.com/the-turk/flarum-diff)
 - [Changelog](https://github.com/the-turk/flarum-diff/blob/master/CHANGELOG.md)
 - [Report an issue](https://github.com/the-turk/flarum-diff/issues)
