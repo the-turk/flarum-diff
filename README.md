@@ -2,7 +2,7 @@
 
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/the-turk/flarum-diff/blob/master/LICENSE) [![Latest Stable Version](https://img.shields.io/packagist/v/the-turk/flarum-diff.svg)](https://packagist.org/packages/the-turk/flarum-diff) [![Total Downloads](https://img.shields.io/packagist/dt/the-turk/flarum-diff.svg)](https://packagist.org/packages/the-turk/flarum-diff)
 
-This extension adds a "post revision history" feature to your [Flarum](https://github.com/flarum) forum. I did this one for my personal Flarum project and decided to share it. It's in beta stage right now, means that you may lose your previous revisions with an update until the stable release (just as in Flarum).
+This extension adds a "post revision history" feature to your [Flarum](https://github.com/flarum) forum. I did this one for my personal Flarum project and decided to share it. It's in beta stage right now, means that you may loose your previous revisions with an update until the stable release (just as in Flarum).
 
 Here are the screenshots:
 
@@ -20,10 +20,11 @@ Here are the screenshots:
 
 - Based on [jfcherng/php-diff](https://github.com/jfcherng/php-diff) repository (this one is forked from [chrisboulton/php-diff](https://github.com/chrisboulton/php-diff) since it's no longer maintained).
 - Option for **line** (default), **word** and **char** level diffs.
+- Two render modes including "Inline", "Side By Side".
 - Option for tabular view with line numbers.
-- Two render modes including "Inline" and "Side By Side".
+- Supports `fof/nightmode`.
 
-Also, it won't load anything until you click the "Edited" button so no need to worry about post stream's loading time.
+Also, it won't load (and cache) anything until you click the "Edited" button so no need to worry about loading times.
 
 ## Requirements
 
@@ -52,14 +53,7 @@ php flarum cache:clear
 
 Enable the extension, set the permissions (it's only visible to members by default) and customize the display mode if you wish.
 
-## Known Issues
-
-- Diff list is not showing up immediately after clicking the button.
-- Diff list is not showing up on `[deleted]` user's post.
-
 ## What's Next
-
-- Currently it sends a request to `/api/diff/{postId}` page _everytime_ you click on the "Edited" button. I'm thinking of using `app.cache` to prevent this behaviour but i need to improve my Mithril skills first.
 
 - `flarum/markdown`, `flarum/bbcode` and `flarum/mentions` support (it's so challanging with external libraries).
 

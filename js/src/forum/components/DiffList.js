@@ -3,6 +3,7 @@ import Component from 'flarum/Component';
 import DiffButton from './DiffButton';
 import DiffModal from './DiffModal';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
+import EditPostComposer from 'flarum/components/EditPostComposer';
 
 /**
  * The `DiffList` component displays a list of the post's diffs.
@@ -16,18 +17,18 @@ export default class DiffList extends Component {
      */
     this.loading = false;
 
-    if(!this.diffItems) {
+    if(!app.cache.diffs) {
       /**
-       * Initialize the itemList.
+       * Initialize the cache.
        *
        * @type {Array}
        */
-      this.diffItems = [];
+      app.cache.diffs = [];
     }
   }
 
   view() {
-    const largeModal = this.props.largeModal;
+    const pages = app.cache.diffs[this.props.post.id()] || [];
 
     return (
       <div className="DiffList">
@@ -41,7 +42,7 @@ export default class DiffList extends Component {
 
         <div className="DiffList-content">
           <ul>
-            {this.diffItems.length ? this.diffItems.map(diffs => {
+            {pages.length ? pages.map(diffs => {
               const items = [];
 
               diffs.forEach(diff => {
@@ -67,7 +68,7 @@ export default class DiffList extends Component {
                 LoadingIndicator.component({
                   className: 'LoadingIndicator--block'
                 })
-              : (this.diffItems.length ? '' :
+              : (pages.length ? '' :
                   <div className="DiffList-empty">
                     {app.translator.trans('the-turk-diff.forum.emptyText')}
                   </div>
@@ -85,10 +86,17 @@ export default class DiffList extends Component {
    * @public
    */
   load() {
-    this.loading = true;
-    m.redraw();
+    if (app.cache.diffs[this.props.post.id()]) {
+      m.redraw();
+      // also redraw the post because it sometimes
+      // appears and sometimes doesn't after editing a post
+      return this.postRedrawer();
+    }
 
-    this.diffItems = [];
+    this.loading = true;
+    m.redraw(); // redraw for this view()
+    this.postRedrawer();
+
     const postId = this.props.post.id();
 
     return app.store.find('diff', postId)
@@ -96,7 +104,8 @@ export default class DiffList extends Component {
       .catch(() => {})
       .then(() => {
         this.loading = false;
-        m.redraw();
+        m.redraw(); // redraw for this view()
+        this.postRedrawer();
       });
   }
 
@@ -107,8 +116,21 @@ export default class DiffList extends Component {
    * @return {Diff[]}
    */
   parseResults(results) {
-    if (results.length) this.diffItems.push(results);
+    app.cache.diffs[this.props.post.id()] = app.cache.diffs[this.props.post.id()] || [];
+
+    if (results.length) app.cache.diffs[this.props.post.id()].push(results);
 
     return results;
+  }
+
+  /**
+   * Redraw the post.
+   * Workaround for:
+   * https://discuss.flarum.org/d/22755-mithril-related-issues-on-poststream-items
+   */
+  postRedrawer() {
+    return this.props.post.save({ isHidden: false }).then(
+      () => m.redraw()
+    );
   }
 }

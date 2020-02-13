@@ -1,0 +1,97 @@
+// nightmode for Diff extension
+// we need to redefine almost all of the colors, such a shame...
+body.dark {
+  @secondary-color: @config-secondary-color;
+  @secondary-hue: hue(@secondary-color);
+  @secondary-sat: saturation(@secondary-color);
+  @control-bg: hsl(@secondary-hue, min(20%, @secondary-sat), 13%);
+  @muted-color: hsl(@secondary-hue, min(15%, @secondary-sat), 50%);
+  @body-bg: hsl(@secondary-hue, min(20%, @secondary-sat), 10%);
+  @overlay-bg: fade(darken(@body-bg, 5%), 90%);
+  @text-color: #ddd;
+
+  .DiffList {
+    .DiffList-header {
+      border-bottom-color: @control-bg;
+    }
+
+    .DiffList-empty {
+      color: @muted-color;
+    }
+
+    .DiffList-content > ul li {
+      > a,
+      > span,
+      > button {
+        color: @text-color;
+      }
+      > a,
+      > button {
+        &:hover {
+          background: @control-bg;
+        }
+      }
+      &.active {
+        > a,
+        > button {
+          background: @control-bg;
+        }
+      }
+    }
+
+    .Diff {
+      color: @muted-color;
+      &:hover {
+        background: @control-bg;
+      }
+    }
+  }
+  .DiffModal {
+    // why is this background equal to
+    // .Modal-content's background though?
+    .Modal-header {
+      background: @body-bg;
+    }
+
+    .TheTurkDiff.diff-wrapper.diff {
+      background-color: @overlay-bg;
+      color: darken(@control-color, 30%);
+
+      & tbody {
+        & th {
+          background: lighten(@control-bg, 50%);
+          border-right-color: darken(@body-bg, 2%);
+
+          &.sign {
+            background: @body-bg;
+          }
+        }
+      }
+
+      & thead th {
+        background: darken(@body-bg, 2%);
+        color: @muted-color;
+      }
+
+      & td,
+      & th {
+        background: darken(@control-bg, 5%);
+
+        & a {
+          color: darken(@control-color, 30%);
+        }
+      }
+      &.diff-html {
+        & .change {
+          &.change-eq {
+            & .new,
+            & .old {
+              background: @body-bg;
+              color: @muted-color;
+            }
+          }
+        }
+      }
+    }
+  }
+}

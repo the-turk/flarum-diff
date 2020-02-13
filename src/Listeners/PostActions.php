@@ -1,8 +1,6 @@
 <?php
 namespace TheTurk\Diff\Listeners;
 
-require(dirname(__DIR__) . '../../resources/assets/vendor/autoload.php');
-
 use TheTurk\Diff\Diff;
 use Jfcherng\Diff\DiffHelper;
 use Jfcherng\Diff\Factory\RendererFactory;

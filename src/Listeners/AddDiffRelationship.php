@@ -1,8 +1,6 @@
 <?php
 namespace TheTurk\Diff\Listeners;
 
-require(dirname(__DIR__) . '../../resources/assets/vendor/autoload.php');
-
 use Jfcherng\Diff\Factory\RendererFactory;
 use Flarum\Post\Post;
 use Flarum\Event\GetModelRelationship;
@@ -101,6 +99,7 @@ class AddDiffRelationship
                 $renderer = RendererFactory::make(
                     (string)$this->settings->get($this->settingsPrefix.'renderMode', 'Inline'),
                     [
+                        'wrapperClasses' => ['TheTurkDiff', 'diff-wrapper'],
                         'separateBlock' => (bool)$this->settings->get(
                             'the-turk-diff.seperateBlock',
                             true

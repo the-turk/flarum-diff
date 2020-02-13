@@ -6,7 +6,6 @@ import Post from 'flarum/models/Post';
 import Model from 'flarum/Model';
 import DiffDropdown from './components/DiffDropdown';
 
-
 app.initializers.add('the-turk/diff', () => {
   app.store.models.diff = Diff;
   Post.prototype.revisionCount = Model.attribute('revisionCount');
@@ -15,9 +14,16 @@ app.initializers.add('the-turk/diff', () => {
   extend(CommentPost.prototype, 'headerItems', function(items) {
     const post = this.props.post;
 
+    // replace "edited" text to "edited" button
     if (post.isEdited() && !post.isHidden()
           && post.canViewEditHistory() && post.revisionCount() > 0) {
       items.replace('edited', DiffDropdown.component({post}));
+    }
+
+    // remove diffs cache when post is editing
+    if(this.isEditing() && app.cache.diffs
+          && app.cache.diffs[this.props.post.id()]) {
+      delete app.cache.diffs[this.props.post.id()];
     }
   });
 });

@@ -328,6 +328,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _DiffModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./DiffModal */ "./src/forum/components/DiffModal.js");
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! flarum/components/LoadingIndicator */ "flarum/components/LoadingIndicator");
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var flarum_components_EditPostComposer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! flarum/components/EditPostComposer */ "flarum/components/EditPostComposer");
+/* harmony import */ var flarum_components_EditPostComposer__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(flarum_components_EditPostComposer__WEBPACK_IMPORTED_MODULE_6__);
+
 
 
 
@@ -357,18 +360,18 @@ function (_Component) {
      */
     this.loading = false;
 
-    if (!this.diffItems) {
+    if (!flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs) {
       /**
-       * Initialize the itemList.
+       * Initialize the cache.
        *
        * @type {Array}
        */
-      this.diffItems = [];
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs = [];
     }
   };
 
   _proto.view = function view() {
-    var largeModal = this.props.largeModal;
+    var pages = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()] || [];
     return m("div", {
       className: "DiffList"
     }, m("div", {
@@ -377,7 +380,7 @@ function (_Component) {
       revisionCount: this.props.post.revisionCount()
     }))), m("div", {
       className: "DiffList-content"
-    }, m("ul", null, this.diffItems.length ? this.diffItems.map(function (diffs) {
+    }, m("ul", null, pages.length ? pages.map(function (diffs) {
       var items = [];
       diffs.forEach(function (diff) {
         items.push(diff);
@@ -396,7 +399,7 @@ function (_Component) {
       });
     }) : '', this.loading ? flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_5___default.a.component({
       className: 'LoadingIndicator--block'
-    }) : this.diffItems.length ? '' : m("div", {
+    }) : pages.length ? '' : m("div", {
       className: "DiffList-empty"
     }, flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.emptyText')))));
   }
@@ -410,13 +413,23 @@ function (_Component) {
   _proto.load = function load() {
     var _this = this;
 
+    if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()]) {
+      m.redraw(); // also redraw the post because it sometimes
+      // appears and sometimes doesn't after editing a post
+
+      return this.postRedrawer();
+    }
+
     this.loading = true;
-    m.redraw();
-    this.diffItems = [];
+    m.redraw(); // redraw for this view()
+
+    this.postRedrawer();
     var postId = this.props.post.id();
     return flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.store.find('diff', postId).then(this.parseResults.bind(this))["catch"](function () {}).then(function () {
       _this.loading = false;
-      m.redraw();
+      m.redraw(); // redraw for this view()
+
+      _this.postRedrawer();
     });
   }
   /**
@@ -428,8 +441,23 @@ function (_Component) {
   ;
 
   _proto.parseResults = function parseResults(results) {
-    if (results.length) this.diffItems.push(results);
+    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()] = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()] || [];
+    if (results.length) flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()].push(results);
     return results;
+  }
+  /**
+   * Redraw the post.
+   * Workaround for:
+   * https://discuss.flarum.org/d/22755-mithril-related-issues-on-poststream-items
+   */
+  ;
+
+  _proto.postRedrawer = function postRedrawer() {
+    return this.props.post.save({
+      isHidden: false
+    }).then(function () {
+      return m.redraw();
+    });
   };
 
   return DiffList;
@@ -551,12 +579,17 @@ flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.initializers.add('the-turk/dif
   flarum_models_Post__WEBPACK_IMPORTED_MODULE_4___default.a.prototype.revisionCount = flarum_Model__WEBPACK_IMPORTED_MODULE_5___default.a.attribute('revisionCount');
   flarum_models_Post__WEBPACK_IMPORTED_MODULE_4___default.a.prototype.canViewEditHistory = flarum_Model__WEBPACK_IMPORTED_MODULE_5___default.a.attribute('canViewEditHistory');
   Object(flarum_extend__WEBPACK_IMPORTED_MODULE_1__["extend"])(flarum_components_CommentPost__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'headerItems', function (items) {
-    var post = this.props.post;
+    var post = this.props.post; // replace "edited" text to "edited" button
 
     if (post.isEdited() && !post.isHidden() && post.canViewEditHistory() && post.revisionCount() > 0) {
       items.replace('edited', _components_DiffDropdown__WEBPACK_IMPORTED_MODULE_6__["default"].component({
         post: post
       }));
+    } // remove diffs cache when post is editing
+
+
+    if (this.isEditing() && flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.cache.diffs && flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.cache.diffs[this.props.post.id()]) {
+      delete flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.cache.diffs[this.props.post.id()];
     }
   });
 });
@@ -667,6 +700,17 @@ module.exports = flarum.core.compat['components/CommentPost'];
 /***/ (function(module, exports) {
 
 module.exports = flarum.core.compat['components/Dropdown'];
+
+/***/ }),
+
+/***/ "flarum/components/EditPostComposer":
+/*!********************************************************************!*\
+  !*** external "flarum.core.compat['components/EditPostComposer']" ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = flarum.core.compat['components/EditPostComposer'];
 
 /***/ }),
 

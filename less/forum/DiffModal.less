@@ -1,0 +1,163 @@
+.DiffModal {
+  .Modal-header {
+    text-align: left;
+
+    time {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      font-size: 14px;
+    }
+
+    // fix for username links
+    // on default Flarum theme
+    @media @phone {
+      & when (@config-colored-header = true) {
+        & a {
+          color: @text-color;
+        }
+      }
+    }
+  }
+
+  .Avatar {
+    margin: -2px 5px -2px -6px;
+    .Avatar--size(24px);
+    @media @phone {
+      margin-top: 10px;
+      // fix for long usernames
+      margin-left: 6px;
+    }
+  }
+
+  // diff display
+  .TheTurkDiff.diff-wrapper.diff {
+    background-color: @overlay-bg;
+    border-collapse: collapse;
+    border-spacing: 0;
+    color: darken(@control-color, 30%);
+    empty-cells: show;
+    width: 100%;
+    word-break: break-word;
+
+    & tbody {
+      & th {
+        background: lighten(@control-bg, 50%);
+        border-right: 1px solid darken(@body-bg, 2%);
+        text-align: right;
+        vertical-align: top;
+        width: 4em;
+
+        &.sign {
+          & when (@diff-config-custom-html = true) {
+            display: none;
+          }
+          background: @body-bg;
+          border-right: none;
+          padding-right: 0;
+          text-align: center;
+          width: 1em;
+
+          &.del {
+            background: @diff-old-version-color;
+          }
+
+          &.ins {
+            background: @diff-new-version-color;
+          }
+        }
+      }
+    }
+
+    & thead {
+      & when (@diff-config-custom-html = true) {
+        display: none;
+      }
+    }
+
+    & thead th {
+      background: darken(@body-bg, 2%);
+      color: @muted-color;
+      padding: 5px;
+      text-align: left;
+    }
+
+    & td,
+    & th {
+      background: darken(@control-bg, 5%);
+      padding: 10px;
+
+      & a {
+        color: darken(@control-color, 30%);
+        cursor: inherit;
+        pointer-events: none;
+      }
+    }
+
+    &.diff-html {
+      white-space: pre-wrap;
+
+      & .change {
+        & .old {
+          & when (@diff-config-custom-html = true) {
+            border-left: 3px solid darken(@diff-old-version-color, 50%);
+          }
+          background: @diff-old-version-color;
+        }
+
+        & .new {
+          & when (@diff-config-custom-html = true) {
+            border-left: 3px solid darken(@diff-new-version-color, 50%);
+          }
+          background: @diff-new-version-color;
+        }
+
+        & .rep {
+          & when (@diff-config-custom-html = true) {
+            border-left: 3px solid darken(@diff-mixed-version-color, 50%);
+          }
+          background: @diff-mixed-version-color;
+        }
+
+        &.change-eq {
+          & .new,
+          & .old {
+            & when (@diff-config-custom-html = true) {
+              border-left: 3px solid @diff-original-lines-border-color;
+            }
+            background: @body-bg;
+            color: @muted-color;
+          }
+        }
+
+        & del,
+        & ins {
+          font-weight: bold;
+          text-decoration: none;
+        }
+
+        & ins {
+          background: darken(@diff-new-version-color, 15%);
+        }
+
+        & del {
+          background: darken(@diff-old-version-color, 15%);
+        }
+
+        & .rep {
+          & ins {
+            background:  darken(@diff-new-version-color, 5%);
+          }
+
+          & del {
+            background:  darken(@diff-old-version-color, 5%);
+            text-decoration: line-through;
+          }
+        }
+      }
+    }
+  }
+}
