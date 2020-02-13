@@ -1,3 +1,7 @@
+### 0.1.0-beta.3
+
+- **Update** directory structure.
+
 ### 0.1.0-beta.2
 
 - **Fix** diff list is not showing up immediately after clicking the "Edited" button.
