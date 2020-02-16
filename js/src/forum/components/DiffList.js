@@ -129,7 +129,7 @@ export default class DiffList extends Component {
    * https://discuss.flarum.org/d/22755-mithril-related-issues-on-poststream-items
    */
   postRedrawer() {
-    return this.props.post.save({ isHidden: false }).then(
+    return this.props.post.save({}).then(
       () => m.redraw()
     );
   }

@@ -1,3 +1,10 @@
+### 0.1.0-beta.4
+
+- **Fix** users always gets "PermissionDeniedException" when redrawing the post.
+- **Fix** table headings are missing.
+- **Fix** typos in translation keys (seperate -> separate).
+- **Update** `php-diff` library to 6.4.4
+
 ### 0.1.0-beta.3
 
 - **Update** directory structure.

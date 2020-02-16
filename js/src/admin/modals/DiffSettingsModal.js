@@ -49,10 +49,10 @@ export default class DiffSettingsModal extends SettingsModal {
       ]),
       m('.Form-group', [
         m('label', Switch.component({
-          state: this.setting(settingsPrefix + 'seperateBlock', '1')() === '1',
-          children: app.translator.trans(localePrefix + 'seperateBlock'),
+          state: this.setting(settingsPrefix + 'separateBlock', '1')() === '1',
+          children: app.translator.trans(localePrefix + 'separateBlock'),
           onchange: value => {
-            this.setting(settingsPrefix + 'seperateBlock')(value ? '1' : '0');
+            this.setting(settingsPrefix + 'separateBlock')(value ? '1' : '0');
           }
         }))
       ]),
