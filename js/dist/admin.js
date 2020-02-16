@@ -148,7 +148,7 @@ flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.initializers.add('the-turk-dif
     items.add('viewEditHistory', {
       icon: 'fas fa-history',
       label: app.translator.trans('the-turk-diff.admin.permissions.viewEditHistory'),
-      permission: 'discussion.viewEditHistory',
+      permission: 'viewEditHistory',
       allowGuest: false
     });
   });
@@ -227,10 +227,10 @@ function (_SettingsModal) {
       onchange: this.setting(settingsPrefix + 'displayMode'),
       value: this.setting(settingsPrefix + 'displayMode')() || this.setting(settingsPrefix + 'displayMode')('customHTML')
     }))]), m('.Form-group', [m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
-      state: this.setting(settingsPrefix + 'seperateBlock', '1')() === '1',
-      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'seperateBlock'),
+      state: this.setting(settingsPrefix + 'separateBlock', '1')() === '1',
+      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'separateBlock'),
       onchange: function onchange(value) {
-        _this.setting(settingsPrefix + 'seperateBlock')(value ? '1' : '0');
+        _this.setting(settingsPrefix + 'separateBlock')(value ? '1' : '0');
       }
     }))]), m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'detailLevel')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       options: {

@@ -22,7 +22,7 @@ the-turk-diff:
             lineLevel:          Satır seviyesi
             wordLevel:          Kelime seviyesi
             charLevel:          Karakter seviyesi
-            seperateBlock:      HTML işleyicilerinde uzak satırlardaki farklılıkları gösterirken birbirinden ayır
+            separateBlock:      HTML işleyicilerinde uzak satırlardaki farklılıkları gösterirken birbirinden ayır
             notice:             <strong>Detay Seviyesi</strong> & <strong>Komşu Satırlar</strong> ayarlarında yapılan değişiklikler, önceki düzenleme geçmişlerini etkilemez.
         permissions:
             viewEditHistory:    Düzenleme geçmişini görüntüle

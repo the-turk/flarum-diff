@@ -6,5 +6,5 @@ export default class Diff extends mixin(Model, {
     createdAt: Model.attribute('createdAt', Model.transformDate),
     actor: Model.hasOne('actor'),
     contentHtml: Model.attribute('contentHtml'),
-    largeModal: Model.attribute('largeModal'),
+    largeModal: Model.attribute('largeModal')
 }) {}
