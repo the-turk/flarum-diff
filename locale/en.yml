@@ -3,7 +3,7 @@ the-turk-diff:
         oldVersion:             Old
         newVersion:             New
         differences:            Differences
-        revisionInfo:           "Edited {revisionCount} times, newest at the top"
+        revisionInfo:           "Edited {revisionCount} time, newest at the top|Edited {revisionCount} times, newest at the top"
         emptyText:              No Revisions
     admin:
         settings:
