@@ -34,7 +34,7 @@ export default class DiffList extends Component {
       <div className="DiffList">
         <div className="DiffList-header">
           <h4>
-            {app.translator.trans('the-turk-diff.forum.revisionInfo', {
+            {app.translator.transChoice('the-turk-diff.forum.revisionInfo', this.props.post.revisionCount(), {
               revisionCount: this.props.post.revisionCount()
             })}
           </h4>
