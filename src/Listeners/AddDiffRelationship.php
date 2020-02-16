@@ -86,7 +86,7 @@ class AddDiffRelationship
     {
         if ($event->isSerializer(PostSerializer::class)) {
             $event->attributes['canViewEditHistory'] = (bool)
-                $event->actor->can('discussion.viewEditHistory');
+                $event->actor->can('viewEditHistory');
 
             $latestRevModel = Diff::where('post_id', $event->model->id)->latest()->first();
             $revision = ($latestRevModel ? $latestRevModel->revision : 0);
@@ -101,7 +101,7 @@ class AddDiffRelationship
                     [
                         'wrapperClasses' => ['TheTurkDiff', 'diff-wrapper'],
                         'separateBlock' => (bool)$this->settings->get(
-                            'the-turk-diff.seperateBlock',
+                            'the-turk-diff.separateBlock',
                             true
                         ),
                         'spacesToNbsp' => true,

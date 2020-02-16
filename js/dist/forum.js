@@ -453,9 +453,7 @@ function (_Component) {
   ;
 
   _proto.postRedrawer = function postRedrawer() {
-    return this.props.post.save({
-      isHidden: false
-    }).then(function () {
+    return this.props.post.save({}).then(function () {
       return m.redraw();
     });
   };

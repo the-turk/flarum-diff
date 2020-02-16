@@ -42,7 +42,7 @@ class ListDiffController extends AbstractListController
     {
         $actor = $request->getAttribute('actor');
 
-        $this->assertCan($actor, 'discussion.viewEditHistory');
+        $this->assertCan($actor, 'viewEditHistory');
 
         $postId = array_get($request->getQueryParams(), 'id');
 

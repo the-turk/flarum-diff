@@ -10,7 +10,7 @@ app.initializers.add('the-turk-diff', app => {
         items.add('viewEditHistory', {
             icon: 'fas fa-history',
             label: app.translator.trans('the-turk-diff.admin.permissions.viewEditHistory'),
-            permission: 'discussion.viewEditHistory',
+            permission: 'viewEditHistory',
             allowGuest: false
         });
     });
