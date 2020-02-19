@@ -21,8 +21,6 @@ class DiffRepository
      *
      * @param array $where
      * @param array $sort
-     * @param int $count
-     * @param int $start
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function findWhere(array $where = [], $sort = [])

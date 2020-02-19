@@ -6,15 +6,15 @@ This extension adds a "post revision history" feature to your [Flarum](https://g
 
 Here are the screenshots:
 
-- [Post-Stream Item](https://i.ibb.co/3FNX48x/post-Stream-Item.png)
-- [Dropdown List](https://i.ibb.co/hgBMpdy/Dropdown.png)
-- Inline Mode
-  - [Colored custom view without line numbers](https://i.ibb.co/3vfbtYT/custom-Inline.png) (default)
-  - [Colored tabular view with line numbers](https://i.ibb.co/qJVQBpm/tabular-Inline.png)
+- [Post-Stream Item](https://i.ibb.co/4m21pnM/post-Stream-Item.png)
+- [Dropdown List](https://i.ibb.co/PTTcWCw/dropdown-List.png)
+- Line by Line Mode
+  - [Custom view without line numbers](https://i.ibb.co/3RZWbsG/custom-Line-By-Line.png) (default)
+  - [Tabular view with line numbers](https://i.ibb.co/XtDT9Pp/tabular-Line-By-Line.png)
 - Side by Side Mode
-  - [Colored custom view without line numbers](https://i.ibb.co/Hp0rDGW/thennnn.png)
-  - [Colored tabular view with line numbers](https://i.ibb.co/d6WkMm3/tabular-Side-By-Side.png)
-- [Extension Settings](https://i.ibb.co/6JtMcfL/ext-Settings.png)
+  - [Custom view without line numbers](https://i.ibb.co/LP0x3vf/custom-Side-By-Side.png)
+  - [Tabular view with line numbers](https://i.ibb.co/d04NBS3/tabular-Side-By-Side.png)
+- [Extension Settings](https://i.ibb.co/YPBbhYT/extension-Settings.png)
 
 ## Features
 
@@ -22,6 +22,7 @@ Here are the screenshots:
 - Option for **line** (default), **word** and **char** level diffs.
 - Two render modes including "Inline", "Side By Side".
 - Option for tabular view with line numbers.
+- Delete revisions.
 - Supports `fof/nightmode`.
 
 Also, it won't load (and cache) anything until you click the "Edited" button so no need to worry about loading times.
@@ -50,7 +51,7 @@ php flarum cache:clear
 
 ## Usage
 
-Enable the extension, set the permissions (it's only visible to members by default) and customize the display mode if you wish.
+Enable the extension, set the permissions and customize the display mode if you wish.
 
 ## What's Next
 

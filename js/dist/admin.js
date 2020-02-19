@@ -152,6 +152,20 @@ flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.initializers.add('the-turk-dif
       allowGuest: false
     });
   });
+  Object(flarum_extend__WEBPACK_IMPORTED_MODULE_1__["extend"])(flarum_components_PermissionGrid__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'moderateItems', function (items) {
+    items.add('deleteEditHistory', {
+      icon: 'fas fa-times',
+      label: app.translator.trans('the-turk-diff.admin.permissions.deleteEditHistory'),
+      permission: 'deleteEditHistory',
+      allowGuest: false
+    });
+    items.add('selfDeleteEditHistory', {
+      icon: 'fas fa-times',
+      label: app.translator.trans('the-turk-diff.admin.permissions.selfDeleteEditHistory'),
+      permission: 'selfDeleteEditHistory',
+      allowGuest: false
+    });
+  });
 });
 
 /***/ }),

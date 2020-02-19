@@ -2,8 +2,8 @@
 namespace TheTurk\Diff\Listeners;
 
 use TheTurk\Diff\Diff;
-use Jfcherng\Diff\DiffHelper;
-use Jfcherng\Diff\Factory\RendererFactory;
+use TheTurk\Diff\Renderer\Html\Json as JsonRenderer;
+use Jfcherng\Diff\Differ;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Contracts\Events\Dispatcher;
 use Flarum\Post\Event\Saving as PostSaving;
@@ -79,19 +79,28 @@ class PostActions
 
         // find differences between
         // old and new posts
-        $diff = DiffHelper::calculate(
-            $this->oldContent,
-            $newContent,
-            'Json', // we will store this data in our db
+        $differ = new Differ(
+            explode("\n", $this->oldContent),
+            explode("\n", $newContent),
             [
                 'context' => (int)
-                    $this->settings->get($this->settingsPrefix.'neighborLines' , 2)
-            ],
-            [
-                'detailLevel' => (string)
-                    $this->settings->get($this->settingsPrefix.'detailLevel' , 'line')
+                $this->settings->get($this->settingsPrefix.'neighborLines', 2),
+
+                // following lines are not necessary
+                // but notes for the future: these options
+                // must be that way and the opposite won't work because
+                // the way we're storing diffs. It has been summarized
+                // for less storage volume and different from the base dependency
+                // I did it this way because Flarum doesn't ignore them either.
+
+                // do not ignore case difference
+                'ignoreCase' => false,
+                // do not ignore whitespace difference
+                'ignoreWhitespace' => false,
             ]
         );
+
+        $renderer = new JsonRenderer();
 
         // check if this post has been edited before
         // and increase the revision number
@@ -102,7 +111,7 @@ class PostActions
             $revision,
             $post->id,
             $event->actor->id,
-            $diff
+            $renderer->render($differ)
         );
 
         $diff->created_at = Carbon::now();

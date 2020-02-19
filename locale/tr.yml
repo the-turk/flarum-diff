@@ -1,28 +1,33 @@
 the-turk-diff:
     forum:
-        oldVersion:             Eski
-        newVersion:             Yeni
-        differences:            Düzeltmeler
-        revisionInfo:           "{revisionCount} kere düzeltildi, yenisi en üstte"
-        emptyText:              Düzeltme Bulunamadı
+        differences:                Düzeltmeler
+        revisionInfo:               "{revisionCount} kere düzeltildi, yenisi en üstte|{revisionCount} kere düzeltildi, yenisi en üstte"
+        emptyText:                  Düzeltme Bulunamadı
+        confirmDelete:              Bu düzenleme içeriğini geçmişten silmek istediğinize emin misiniz?
+        deleteSuccessMessage:       Düzenleme içeriği, geçmişten silindi.
+        deleteErrorMessage:         Düzenleme içeriği silinemedi.
+        deletedText:                (silinmiş)
+        deletedTooltip:             "{username}, bu içeriği {ago} sildi"
     admin:
         settings:
-            title:              Diff Ayarları
-            displayMode:        Gösterim Modu (HTML)
-            customHTML:         Satır numarasız renkli özel görünüm
-            tabularHTML:        Satır numaralı renkli tablo görünümü
-            renderMode:         İşleme Modu
-            inline:             Aynı hizada
-            sideBySide:         Yan yana (HTML)
-            neighborLines:      Komşu Satırlar (HTML)
-            neighborLinesHelp:  Düzeltilen kısımlara komşu satırlardan kaçının gösterileceğini yazın.
-            onlyUnsigned:       Sadece <strong>işaretsiz tamsayılar</strong> geçerlidir!
-            detailLevel:        Detay Seviyesi
-            noneLevel:          Varsayılan
-            lineLevel:          Satır seviyesi
-            wordLevel:          Kelime seviyesi
-            charLevel:          Karakter seviyesi
-            separateBlock:      HTML işleyicilerinde uzak satırlardaki farklılıkları gösterirken birbirinden ayır
-            notice:             <strong>Detay Seviyesi</strong> & <strong>Komşu Satırlar</strong> ayarlarında yapılan değişiklikler, önceki düzenleme geçmişlerini etkilemez.
+            title:                  Diff Ayarları
+            displayMode:            Gösterim Modu (HTML)
+            customHTML:             Satır numarasız özel görünüm
+            tabularHTML:            Satır numaralı tablo görünümü
+            renderMode:             İşleme Modu
+            inline:                 Aynı hizada (HTML)
+            sideBySide:             Yan yana (HTML)
+            neighborLines:          Komşu Satırlar
+            neighborLinesHelp:      Düzeltilen kısımlara komşu satırlardan kaçının gösterileceğini yazın.
+            onlyUnsigned:           Sadece <strong>işaretsiz tamsayılar</strong> geçerlidir!
+            detailLevel:            Detay Seviyesi
+            noneLevel:              Varsayılan
+            lineLevel:              Satır seviyesi
+            wordLevel:              Kelime seviyesi
+            charLevel:              Karakter seviyesi
+            separateBlock:          HTML işleyicilerinde uzak satırlardaki farklılıkları gösterirken birbirinden ayır
+            notice:                 <strong>Komşu Satırlar</strong> ayarında yapılan değişiklikler, önceki düzenleme geçmişlerini etkilemez.
         permissions:
-            viewEditHistory:    Düzenleme geçmişini görüntüle
+            viewEditHistory:        Düzenleme geçmişini görüntüle
+            deleteEditHistory:      Başkalarının düzenleme geçmişlerini sil
+            selfDeleteEditHistory:  Kendi düzenleme geçmişini sil

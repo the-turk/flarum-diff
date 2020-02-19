@@ -18,15 +18,14 @@
 namespace TheTurk\Diff;
 
 use Flarum\Extend;
-use Flarum\Foundation\Application;
-use Flarum\Frontend\Assets;
 use Illuminate\Contracts\Events\Dispatcher;
-use Flarum\Frontend\Compiler\Source\SourceCollector;
-use TheTurk\Diff;
+use TheTurk\Diff\Api\Controllers;
+use TheTurk\Diff\Listeners;
 
 return [
     (new Extend\Routes('api'))
-        ->get('/diff/{id}', 'diff.index', Diff\Api\Controllers\ListDiffController::class),
+        ->get('/diff/{id}', 'diff.index', Controllers\ListDiffController::class)
+        ->delete('/diff/{id}', 'diff.delete', Controllers\DeleteDiffController::class),
     (new Extend\Frontend('admin'))
         ->css(__DIR__ . '/less/admin.less')
         ->js(__DIR__ . '/js/dist/admin.js'),
@@ -34,31 +33,8 @@ return [
         ->css(__DIR__ . '/less/forum.less')
         ->js(__DIR__.'/js/dist/forum.js'),
     (new Extend\Locales(__DIR__ . '/locale')),
-    function (Dispatcher $events) {
-        $events->subscribe(Diff\Listeners\PostActions::class);
-        $events->subscribe(Diff\Listeners\AddDiffRelationship::class);
-    },
-    // might change this on future releases
-    function (Application $app) {
-        $settings = $app['flarum.settings'];
-
-        $app->resolving('flarum.assets.forum', function (Assets $assets) use ($settings) {
-            $assets->css(function (SourceCollector $sources) use ($settings) {
-                $sources->addString(function () use ($settings) {
-                    $customHTML = $settings->get(
-                        'the-turk-diff.displayMode',
-                        'customHTML'
-                        ) === 'customHTML';
-
-                    $vars = [
-                        'diff-config-custom-html' => $customHTML ? 'true' : 'false',
-                    ];
-
-                    return array_reduce(array_keys($vars), function ($string, $name) use ($vars) {
-                        return $string."@$name: {$vars[$name]};";
-                    }, '');
-                });
-            });
-        });
+    static function (Dispatcher $events) {
+        $events->subscribe(Listeners\PostActions::class);
+        $events->subscribe(Listeners\AddDiffRelationship::class);
     }
 ];

@@ -14,4 +14,20 @@ app.initializers.add('the-turk-diff', app => {
             allowGuest: false
         });
     });
+
+    extend(PermissionGrid.prototype, 'moderateItems', items => {
+        items.add('deleteEditHistory', {
+            icon: 'fas fa-times',
+            label: app.translator.trans('the-turk-diff.admin.permissions.deleteEditHistory'),
+            permission: 'deleteEditHistory',
+            allowGuest: false
+        });
+
+        items.add('selfDeleteEditHistory', {
+            icon: 'fas fa-times',
+            label: app.translator.trans('the-turk-diff.admin.permissions.selfDeleteEditHistory'),
+            permission: 'selfDeleteEditHistory',
+            allowGuest: false
+        });
+    });
 });

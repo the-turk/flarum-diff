@@ -26,14 +26,23 @@ class DiffSerializer extends AbstractSerializer
         return [
             'revision'    => (int)$diff->revision,
             'createdAt'   => $this->formatDate($diff->created_at),
+            'deletedAt'   => $this->formatDate($diff->deleted_at),
         ];
     }
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\hasOne
-	 */
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\hasOne
+     */
     public function actor($diff)
-	{
-		return $this->hasOne($diff, BasicUserSerializer::class);
-	}
+    {
+        return $this->hasOne($diff, BasicUserSerializer::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\hasOne
+     */
+    public function deletedUser($diff)
+    {
+        return $this->hasOne($diff, BasicUserSerializer::class);
+    }
 }

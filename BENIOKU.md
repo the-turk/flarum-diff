@@ -6,15 +6,15 @@ Bu eklenti [Flarum](https://github.com/flarum) forumunuza "düzenleme geçmişi"
 
 Ekran görüntüleri:
 
-- [Mesaj Görünümü](https://i.ibb.co/3FNX48x/post-Stream-Item.png)
-- [Revizyon Listesi](https://i.ibb.co/hgBMpdy/Dropdown.png)
+- [Mesaj Görünümü](https://i.ibb.co/4m21pnM/post-Stream-Item.png)
+- [Revizyon Listesi](https://i.ibb.co/PTTcWCw/dropdown-List.png)
 - Aynı Hizada Gösterim Modu
-  - [Satır numarasız renkli özel görünüm](https://i.ibb.co/3vfbtYT/custom-Inline.png) (default)
-  - [Satır numaralı renkli tablo görünümü](https://i.ibb.co/qJVQBpm/tabular-Inline.png)
+  - [Satır numarasız özel görünüm](https://i.ibb.co/3RZWbsG/custom-Line-By-Line.png) (default)
+  - [Satır numaralı tablo görünümü](https://i.ibb.co/XtDT9Pp/tabular-Line-By-Line.png)
 - Yan Yana Gösterim Modu
-  - [Satır numarasız renkli özel görünüm](https://i.ibb.co/Hp0rDGW/thennnn.png)
-  - [Satır numaralı renkli tablo görünümü](https://i.ibb.co/d6WkMm3/tabular-Side-By-Side.png)
-- [Eklenti Ayarları](https://i.ibb.co/6JtMcfL/ext-Settings.png)
+  - [Satır numarasız özel görünüm](https://i.ibb.co/LP0x3vf/custom-Side-By-Side.png)
+  - [Satır numaralı tablo görünümü](https://i.ibb.co/d04NBS3/tabular-Side-By-Side.png)
+- [Eklenti Ayarları](https://i.ibb.co/YPBbhYT/extension-Settings.png)
 
 ## Özellikler
 
@@ -22,6 +22,7 @@ Ekran görüntüleri:
 - **satır** (varsayılan), **kelime** ve **karakter** seviyesindeki farklılıkları hesaplayabilir.
 - "Aynı hizada" ve "Yan yana" olmak üzere iki ayrı gösterim modu vardır.
 - Değişime uğrayan satırları, satır numaraları ile birlikte gösterebilirsiniz.
+- Düzenleme geçmişlerini silebilirsiniz.
 - `fof/nightmode` eklentisini destekler.
 
 ## Gereksinimler
@@ -48,7 +49,7 @@ php flarum cache:clear
 
 ## Kullanım
 
-Eklentiyi aktif edin, izinleri ayarlayın (varsayılan olarak sadece üyelere açıktır) ve görünümü istediğiniz şekilde özelleştirin.
+Eklentiyi aktif edin, izinleri ayarlayın ve görünümü istediğiniz şekilde özelleştirin.
 
 ## Bağlantılar
 

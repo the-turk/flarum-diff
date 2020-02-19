@@ -1,7 +1,21 @@
 // LESS variables for diff extension.
 
-// @diff-config-custom-html
-@diff-old-version-color:             #f8cbcb;
-@diff-new-version-color:             #cbf8cb;
-@diff-original-lines-border-color:   #f9c513;
-@diff-mixed-version-color:           lighten(mix(@diff-old-version-color, @diff-new-version-color), 2%);
+.define-colors(@config-dark-mode);
+.define-colors(false) {
+  @diff-old-version-del-color:          #ffb6ba;
+  @diff-new-version-ins-color:          #97f295;
+  @diff-old-version-bg-color:           #fee8e9;
+  @diff-new-version-bg-color:           #dfd;
+  @diff-change-version-del-color:       #FDF2D0;
+  @diff-change-version-ins-color:       #ded;
+  @diff-info-color:                     #f8fafd;
+}
+.define-colors(true) {
+  @diff-old-version-del-color:          #662222;
+  @diff-new-version-ins-color:          #225522;
+  @diff-old-version-bg-color:           #380000;
+  @diff-new-version-bg-color:           #002800;
+  @diff-change-version-del-color:       lighten(@diff-old-version-bg-color, 5%);
+  @diff-change-version-ins-color:       lighten(@diff-new-version-bg-color, 5%);
+  @diff-info-color:                     #1B1B1B;
+}

@@ -41,7 +41,7 @@
           text-overflow: ellipsis;
           .box-shadow(none);
           text-align: left;
-          font-size: 13px;
+          font-size: 12px;
           font-weight: normal;
           text-decoration: none;
         }
@@ -62,6 +62,18 @@
           > button {
             background: @control-bg;
           }
+        }
+
+        button > i.Button-caret {
+          margin-left: 0;
+          margin-right: 5px;
+        }
+
+        &.SubDiff button {
+          color: @muted-color;
+          cursor: inherit;
+          pointer-events: none;
+          white-space: normal;
         }
       }
     }
@@ -86,12 +98,6 @@
       .Avatar--size(24px);
       float: left;
       margin-right: 10px;
-    }
-
-    time {
-      font-size: 11px;
-      font-weight: bold;
-      text-transform: uppercase;
     }
   }
 }

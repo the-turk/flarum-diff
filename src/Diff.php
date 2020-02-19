@@ -12,6 +12,8 @@ use Flarum\User\User;
  * @property Post $post
  * @property int|null $actor_id
  * @property User|null $actor
+ * @property int|null $deleted_user_id
+ * @property User|null $deleted_user
  * @property \Carbon\Carbon $created_at
  */
 class Diff extends AbstractModel
@@ -26,14 +28,13 @@ class Diff extends AbstractModel
      *
      * @var array
      */
-    protected $dates = ['created_at'];
+    protected $dates = ['created_at', 'deleted_at'];
 
     /**
      * @param $revision
-	 	 * @param $postId
-	   * @param $actorId
-     * @param $diff
-     *
+     * @param $postId
+     * @param $actorId
+     * @param $diffs
      * @return static
      */
     public static function build($revision, $postId, $actorId, $diffs)
@@ -41,7 +42,7 @@ class Diff extends AbstractModel
         $diff = new static();
 
         $diff->revision = $revision;
-				$diff->post_id = $postId;
+        $diff->post_id = $postId;
         $diff->actor_id = $actorId;
         $diff->diff = $diffs;
 
@@ -54,5 +55,13 @@ class Diff extends AbstractModel
     public function actor()
     {
         return $this->belongsTo(User::class, 'actor_id')->withDefault();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function deletedUser()
+    {
+        return $this->belongsTo(User::class, 'deleted_user_id')->withDefault();
     }
 }

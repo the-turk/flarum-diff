@@ -20,7 +20,7 @@ class ListDiffController extends AbstractListController
     /**
      * {@inheritdoc}
      */
-    public $include = ['actor'];
+    public $include = ['actor', 'deletedUser'];
 
     /**
      * @var DiffRepository
@@ -49,9 +49,9 @@ class ListDiffController extends AbstractListController
         $include = $this->extractInclude($request);
 
         $diff = $this->diff->findWhere(
-                ['post_id' => $postId],
-                ['created_at' => 'DESC']
-            )
+            ['post_id' => $postId],
+            ['created_at' => 'DESC']
+        )
             ->load($include)
             ->all();
 

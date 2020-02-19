@@ -1,7 +1,8 @@
 <?php
 namespace TheTurk\Diff\Listeners;
 
-use Jfcherng\Diff\Factory\RendererFactory;
+use TheTurk\Diff\Renderer\Html\Inline as InlineRenderer;
+use TheTurk\Diff\Renderer\Html\SideBySide as SideBySideRenderer;
 use Flarum\Post\Post;
 use Flarum\Event\GetModelRelationship;
 use Flarum\Event\GetApiRelationship;
@@ -81,6 +82,7 @@ class AddDiffRelationship
 
     /**
      * @param Serializing $event
+     * @throws \Jfcherng\Diff\Exception\UnsupportedFunctionException
      */
     public function prepareApiAttributes(Serializing $event)
     {
@@ -90,82 +92,64 @@ class AddDiffRelationship
 
             $latestRevModel = Diff::where('post_id', $event->model->id)->latest()->first();
             $revision = ($latestRevModel ? $latestRevModel->revision : 0);
-            $event->attributes['revisionCount'] = (int)$revision;
+            $event->attributes['revisionCount'] = $revision;
         }
 
         if ($event->isSerializer(DiffSerializer::class)) {
+            $eventActor = $event->actor;
+            $isSelf = $eventActor->id === $event->model->actor->id;
+            $event->attributes['canDeleteEditHistory'] =
+                ($eventActor->can('deleteEditHistory')
+                    || ($isSelf && $eventActor->can('selfDeleteEditHistory')));
+
             $diffArray = json_decode($event->model->diff, true);
             if (!is_null($diffArray)) {
-                $renderer = RendererFactory::make(
-                    (string)$this->settings->get($this->settingsPrefix.'renderMode', 'Inline'),
-                    [
-                        'wrapperClasses' => ['TheTurkDiff', 'diff-wrapper'],
-                        'separateBlock' => (bool)$this->settings->get(
-                            'the-turk-diff.separateBlock',
-                            true
-                        ),
-                        'spacesToNbsp' => true,
-                        'lineNumbers' => $this->settings->get(
-                            'the-turk-diff.displayMode',
-                            'customHTML'
-                        ) === 'tabularHTML'
-                        // context option won't work for this renderer
-                        // since we already defined it in the JSON renderer
-                        // just before saving diff's to database
-                    ]
-                );
-                // this looks a bit dirty but can't see
-                // another reasonable way of doing this so...
-                $contentHtml = $renderer->renderArray($diffArray);
-                $contentHtml = $this->str_replace_first(
-                    ['Old', 'New', 'Differences'],
-                    [
-                        $this->translator->trans('the-turk-diff.forum.oldVersion'),
-                        $this->translator->trans('the-turk-diff.forum.newVersion'),
-                        $this->translator->trans('the-turk-diff.forum.differences')
-                    ],
-                    $contentHtml
-                );
+                $isTabular = $this->settings->get(
+                    'the-turk-diff.displayMode',
+                    'customHTML'
+                ) === 'tabularHTML';
 
-                $event->attributes['contentHtml'] = $contentHtml;
-                $event->attributes['largeModal'] = (bool)
-                    ($this->settings->get(
-                        $this->settingsPrefix.'displayMode', 'customHTML'
-                        ) === 'tabularHTML') &&
-                        ($this->settings->get(
-                            $this->settingsPrefix.'renderMode', 'Inline'
-                            ) === 'SideBySide');
-            }
-        }
-    }
+                $rendererChoice = (string)$this->settings->get($this->settingsPrefix.'renderMode', 'Inline');
+                $rendererOptions = [
+                    'separateBlock' => (bool)$this->settings->get(
+                        'the-turk-diff.separateBlock',
+                        true
+                    ),
+                    'lineNumbers' => $isTabular,
+                    'wrapperClasses' => $isTabular ? ['TabularDiff'] : ['CustomDiff']
+                    // context option won't work for this renderer
+                    // since we already defined it in the JSON renderer
+                    // just before saving diff's to database
+                ];
 
-    /**
-     * Function to localize table headings.
-     *
-     * @param array $search
-     * @param array $replace
-     * @param array $subject
-     * @return string
-     */
-    public function str_replace_first(
-        array $search,
-        array $replace,
-        string $subject
-    ) {
-        if (count($search) === count($replace)) {
-            foreach ($search as $k => $s) {
-                $pos = strpos($subject, $s);
-                if ($pos !== false && array_key_exists($k, $replace)) {
-                    $subject = substr_replace(
-                        $subject,
-                        $replace[$k],
-                        $pos,
-                        strlen($s)
-                    );
+                if ($rendererChoice === 'Inline') {
+                    $renderer = new InlineRenderer($rendererOptions);
+                } else {
+                    $renderer = new SideBySideRenderer($rendererOptions);
                 }
-            }
-        }
 
-        return $subject;
+                $renderer->setDetailLevel($this->settings->get(
+                    'the-turk-diff.detailLevel',
+                    'line'
+                ));
+
+                $renderer->setTranslationKeys([
+                    'differences' => $this->translator->trans('the-turk-diff.forum.differences'),
+                ]);
+
+                $contentHtml = $renderer->renderArray($diffArray);
+                $event->attributes['contentHtml'] = $contentHtml;
+            }
+
+            $event->attributes['largeModal'] =
+                ($this->settings->get(
+                    $this->settingsPrefix.'displayMode',
+                    'customHTML'
+                ) === 'tabularHTML') &&
+                ($this->settings->get(
+                    $this->settingsPrefix.'renderMode',
+                    'Inline'
+                ) === 'SideBySide');
+        }
     }
 }

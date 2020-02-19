@@ -1,6 +1,7 @@
 .DiffModal {
   .Modal-header {
     text-align: left;
+    background: @control-bg;
 
     time {
       font-size: 11px;
@@ -23,6 +24,26 @@
     }
   }
 
+  .Modal-body {
+    background: @body-bg;
+  }
+
+  .DiffModal-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: fade(@body-bg, 90%);
+    display: none;
+    border-radius: @border-radius @border-radius 0 0;
+    z-index: 999999;
+
+    &.active {
+      display: block;
+    }
+  }
+
   .Avatar {
     margin: -2px 5px -2px -6px;
     .Avatar--size(24px);
@@ -34,129 +55,298 @@
   }
 
   // diff display
-  .TheTurkDiff.diff-wrapper.diff {
-    background-color: @overlay-bg;
-    border-collapse: collapse;
-    border-spacing: 0;
-    color: darken(@control-color, 30%);
-    empty-cells: show;
-    width: 100%;
-    word-break: break-word;
+  .TheTurkDiff {
+    &.CustomDiff.diff-wrapper {
+      background-color: @overlay-bg;
+      border-collapse: collapse;
+      border-spacing: 0;
+      font-family: 'Menlo', 'Consolas', monospace;
+      font-size: 13px;
+      empty-cells: show;
+      width: 100%;
+      word-break: break-word;
 
-    & tbody {
-      & th {
-        background: lighten(@control-bg, 50%);
-        border-right: 1px solid darken(@body-bg, 2%);
-        text-align: right;
-        vertical-align: top;
-        width: 4em;
-
-        &.sign {
-          & when (@diff-config-custom-html = true) {
-            display: none;
-          }
-          background: @body-bg;
-          border-right: none;
-          padding-right: 0;
-          text-align: center;
-          width: 1em;
-
-          &.del {
-            background: @diff-old-version-color;
-          }
-
-          &.ins {
-            background: @diff-new-version-color;
-          }
-        }
+      & td {
+        background: darken(@control-bg, 5%);
+        padding: 10px;
       }
-    }
 
-    & thead {
-      & when (@diff-config-custom-html = true) {
-        display: none;
-      }
-    }
+      &.diff-html {
+        white-space: pre-wrap;
 
-    & thead th {
-      background: darken(@body-bg, 2%);
-      color: @muted-color;
-      padding: 5px;
-      text-align: left;
-    }
-
-    & td,
-    & th {
-      background: darken(@control-bg, 5%);
-      padding: 10px;
-
-      & a {
-        color: darken(@control-color, 30%);
-        cursor: inherit;
-        pointer-events: none;
-      }
-    }
-
-    &.diff-html {
-      white-space: pre-wrap;
-
-      & .change {
-        & .old {
-          & when (@diff-config-custom-html = true) {
-            border-left: 3px solid darken(@diff-old-version-color, 50%);
-          }
-          background: @diff-old-version-color;
-        }
-
-        & .new {
-          & when (@diff-config-custom-html = true) {
-            border-left: 3px solid darken(@diff-new-version-color, 50%);
-          }
-          background: @diff-new-version-color;
-        }
-
-        & .rep {
-          & when (@diff-config-custom-html = true) {
-            border-left: 3px solid darken(@diff-mixed-version-color, 50%);
-          }
-          background: @diff-mixed-version-color;
-        }
-
-        &.change-eq {
-          & .new,
+        & .change {
           & .old {
-            & when (@diff-config-custom-html = true) {
-              border-left: 3px solid @diff-original-lines-border-color;
+            border-left: 3px solid darken(@diff-old-version-bg-color, 50%);
+            background: @diff-old-version-bg-color;
+          }
+
+          & .new {
+            border-left: 3px solid darken(@diff-new-version-bg-color, 50%);
+            background: @diff-new-version-bg-color;
+          }
+
+          & .rep-del {
+            border-left: 3px solid darken(@diff-change-version-del-color, 50%);
+            background: @diff-change-version-del-color;
+          }
+
+          & .rep-ins {
+            border-left: 3px solid darken(@diff-change-version-ins-color, 50%);
+            background: @diff-change-version-ins-color;
+          }
+
+          &.change-eq {
+            & .new,
+            & .old {
+              border-left: 3px solid darken(@diff-info-color, 50%);
+              background: @body-bg;
+              color: @muted-color;
             }
-            background: @body-bg;
-            color: @muted-color;
+          }
+
+          ins {
+            display: inline-block;
+            margin-top: -1px;
+            text-decoration: none;
+            background-color: @diff-new-version-ins-color;
+            border-radius: 0.2em;
+            text-align: left;
+          }
+
+          del {
+            display: inline-block;
+            margin-top: -1px;
+            text-decoration: none;
+            background-color: @diff-old-version-del-color;
+            border-radius: 0.2em;
+          }
+        }
+      }
+    }
+
+    &.TabularDiff.diff-wrapper {
+      text-align: left;
+      border: 1px solid darken(@body-bg, 15%);
+      border-radius: @border-radius @border-radius 0 0;
+
+      & when (@config-dark-mode = true) {
+        border-color: @control-bg;
+      }
+
+      & .diff-header {
+        height: 35px;
+        padding: 5px 10px;
+        border-bottom: 1px solid darken(@body-bg, 10%);
+        background-color: darken(@body-bg, 2%);
+        border-radius: inherit;
+
+        & when (@config-dark-mode = true) {
+          border-color: @control-bg;
+          background-color: lighten(@body-bg, 2%);
+        }
+
+        > .diff-heading-wrapper {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-align: center;
+          -ms-flex-align: center;
+          align-items: center;
+          width: 100%;
+          font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 15px;
+
+          > .diff-heading-icon {
+            margin-right: 10px;
+          }
+
+          > .diff-heading-title {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow-x: hidden;
+          }
+        }
+      }
+
+      & .diff-block {
+        overflow-y: hidden;
+      }
+
+      & .diff-blocks {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      & .diff-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Menlo', 'Consolas', monospace;
+        font-size: 14px;
+
+        tbody {
+          background: @body-bg;
+        }
+
+        & .diff-code-line {
+          display: inline-block;
+          white-space: nowrap;
+          /* Compensate for the absolute positioning of the line numbers */
+          padding: 5px 8em;
+        }
+
+        & .diff-code-side-line {
+          display: inline-block;
+          white-space: nowrap;
+          /* Compensate for the absolute positioning of the line numbers */
+          padding: 5px 4.5em;
+        }
+
+        & .diff-code-line-prefix {
+          display: inline;
+          background: none;
+          padding: 0;
+          word-wrap: normal;
+          white-space: pre;
+        }
+
+        & .diff-code-line-ctn {
+          display: inline;
+          background: none;
+          padding: 0;
+          word-wrap: normal;
+          white-space: pre;
+          overflow-x: auto;
+
+          ins {
+            display: inline-block;
+            margin-top: -1px;
+            text-decoration: none;
+            background-color: @diff-new-version-ins-color;
+            border-radius: 0.2em;
+            text-align: left;
+          }
+
+          del {
+            display: inline-block;
+            margin-top: -1px;
+            text-decoration: none;
+            background-color: @diff-old-version-del-color;
+            border-radius: 0.2em;
           }
         }
 
-        & del,
-        & ins {
-          font-weight: bold;
-          text-decoration: none;
-        }
+        & .diff-code-linenumber {
+          box-sizing: border-box;
+          width: 7.5em;
+          /* Keep the numbers fixed on line contents scroll */
+          position: absolute;
+          display: inline-block;
+          background-color: @body-bg;
+          text-align: right;
+          border: solid darken(@body-bg, 7%);
+          border-width: 0 1px 0 0;
+          cursor: pointer;
+          padding: 5px 0;
 
-        & ins {
-          background: darken(@diff-new-version-color, 15%);
-        }
-
-        & del {
-          background: darken(@diff-old-version-color, 15%);
-        }
-
-        & .rep {
-          & ins {
-            background:  darken(@diff-new-version-color, 5%);
-          }
-
-          & del {
-            background:  darken(@diff-old-version-color, 5%);
-            text-decoration: line-through;
+          & when (@config-dark-mode = true) {
+            border-color: @control-bg;
           }
         }
+
+        & .diff-code-linenumber:after {
+          content: '\200b';
+        }
+
+        & .diff-code-side-linenumber {
+          /* Keep the numbers fixed on line contents scroll */
+          position: absolute;
+          display: inline-block;
+          box-sizing: border-box;
+          width: 4em;
+          background-color: @body-bg;
+          text-align: right;
+          border: solid darken(@body-bg, 7%);
+          border-width: 0 1px 0 1px;
+          cursor: pointer;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding: 5px 0.5em 5px 0.5em;
+
+          & when (@config-dark-mode = true) {
+            border-color: @control-bg;
+          }
+        }
+
+        & .diff-code-side-linenumber:after {
+          content: '\200b';
+        }
+
+        & .diff-code-linenumber,
+        & .diff-code-side-linenumber,
+        & .diff-code-line-prefix {
+          user-select: none;
+        }
+
+        & .diff-code-linenumber,
+        & .diff-code-side-linenumber {
+          direction: rtl;
+        }
+
+        & .line-num1 {
+          box-sizing: border-box;
+          float: left;
+          width: 3.5em;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding: 0 0.5em 0 0.5em;
+        }
+
+        & .line-num2 {
+          box-sizing: border-box;
+          float: right;
+          width: 3.5em;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding: 0 0.5em 0 0.5em;
+        }
+
+        /*
+       * Changes Highlight
+       */
+
+        & .diff-del {
+          background-color: @diff-old-version-bg-color;
+          border-color: darken(@diff-old-version-bg-color, 10%);
+
+          &.diff-change {
+            background-color: @diff-change-version-del-color;
+            border-color: darken(@diff-change-version-del-color, 10%);
+          }
+        }
+
+        & .diff-ins {
+          background-color: @diff-new-version-bg-color;
+          border-color: darken(@diff-new-version-bg-color, 10%);
+
+          &.diff-change {
+            background-color: @diff-change-version-ins-color;
+            border-color: darken(@diff-change-version-ins-color, 10%);
+          }
+        }
+
+        & .diff-info {
+          background-color: @diff-info-color;
+          border-color: darken(@diff-info-color, 10%);
+        }
+      }
+
+      & .diff-side-item {
+        display: inline-block;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        width: 50%;
+        margin-bottom: -4px;
       }
     }
   }
