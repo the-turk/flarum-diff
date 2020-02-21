@@ -18,12 +18,13 @@ export default class DiffModal extends Modal {
          * @type {Boolean}
          */
         this.loading = false;
+
+        this.attributes = this.props.item.data.attributes;
     }
 
     className()
     {
-        const type = this.props.item.data.attributes.largeModal ? 'large' : 'medium';
-        return 'DiffModal Modal--' + type;
+        return 'DiffModal';
     }
 
     title()
@@ -40,13 +41,23 @@ export default class DiffModal extends Modal {
         ];
     }
 
+    config(isInitialized) {
+        if (isInitialized) return;
+
+        if (app.forum.attribute('diffRenderer') === 'Inline') {
+            this.setModalContent('inline');
+        } else {
+            this.setModalContent('sideBySide');
+        }
+    }
+
     view()
     {
         return (
           <div className={'Modal modal-dialog ' + this.className()}>
             <div className="Modal-content">
                 <div className="Modal-close App-backControl">
-                  {(this.props.item.data.attributes.canDeleteEditHistory ?
+                  {(this.attributes.canDeleteEditHistory ?
                         Button.component({
                             icon: 'fas fa-trash-alt',
                             onclick: () => {
@@ -93,20 +104,29 @@ export default class DiffModal extends Modal {
 
     content()
     {
-        // do we need to worry about m.trust() function?
-        // well, Flarum itself doing the same way for rendering
-        // post items as seen on:
-        // https://github.com/flarum/core/blob/afe06ea750cfd81767461a3884a92a26f0b0ce37/js/src/forum/components/CommentPost.js#L52
-        // also, the diff library itself treat all inputs as plain text
-        // just before creating JSON data:
-        // https://github.com/jfcherng/php-diff/issues/9#issuecomment-526808774
-        // so no need to use additional Sanitizer lib for this operation.
-        return (
+        return [
+          app.forum.attribute('allowDiffSwitch') ?
+            <div className="controlsContainer">
+              {Button.component({
+                icon: 'fas fa-grip-lines',
+                onclick: () => {
+                  this.setModalContent('inline');
+                },
+                className: 'Button Button--icon Button--link inlineView'
+              })}
+              {Button.component({
+                icon: 'fas fa-columns',
+                onclick: () => {
+                  this.setModalContent('sideBySide');
+                },
+                className: 'Button Button--icon Button--link sideBySideView'
+              })}
+            </div> : '',
           <div className="Modal-body">
-            {m.trust(this.props.item.data.attributes.contentHtml)}
+            <div className="diffContainer"></div>
             {LoadingIndicator.component({className: 'DiffModal-loading' + (this.loading ? ' active' : '')})}
           </div>
-        );
+        ];
     }
 
     /**
@@ -135,6 +155,95 @@ export default class DiffModal extends Modal {
             $deleteButton.prop('disabled', true);
         } else if (state === 'enable') {
             $deleteButton.prop('disabled', false);
+        }
+    }
+
+    renderHtml(content)
+    {
+        // do we need to worry about m.trust() function?
+        // well, Flarum itself doing the same way for rendering
+        // post items as seen on:
+        // https://github.com/flarum/core/blob/afe06ea750cfd81767461a3884a92a26f0b0ce37/js/src/forum/components/CommentPost.js#L52
+        // also, the diff library itself treat all inputs as plain text
+        // just before creating JSON data:
+        // https://github.com/jfcherng/php-diff/issues/9#issuecomment-526808774
+        // so no need to use additional Sanitizer lib for this operation.
+
+        return m.trust(content);
+    }
+
+    setModalContent(content)
+    {
+        let htmlContent;
+        const $modalContent = this.$('.diffContainer');
+
+        if (content === 'sideBySide') {
+            htmlContent = this.renderHtml(this.attributes.sideBySideHtml);
+            $modalContent.html(htmlContent);
+            if(app.forum.attribute('enableDiffSyncScroll')) {
+              this.syncScroll();
+            }
+            this.changeModalSize('large');
+            this.$('.Button.sideBySideView').prop('disabled', true);
+            this.$('.Button.inlineView').prop('disabled', false);
+        } else if (content === 'inline') {
+            htmlContent = this.renderHtml(this.attributes.inlineHtml);
+            $modalContent.html(htmlContent);
+            this.changeModalSize();
+            this.$('.Button.sideBySideView').prop('disabled', false);
+            this.$('.Button.inlineView').prop('disabled', true);
+        }
+    }
+
+    changeModalSize(type = '')
+    {
+        const $modal = this.element;
+        const className = $modal.className;
+
+        if (type === 'large' && !className.includes('Modal--' + type))
+        {
+            $modal.className += ' Modal--large';
+        } else if (className.includes('Modal--large')) {
+            $modal.className = className.replace(' Modal--large', '');
+        }
+    }
+
+    /**
+     * Synchronize Scroll
+     * implemented from:
+     * https://stackoverflow.com/a/27007581
+     * Should be working with Zepto.js
+     */
+    syncScroll()
+    {
+        const $el1 = this.$('.diff-side-item.left-item');
+        const $el2 = this.$('.diff-side-item.right-item');
+
+        // Lets us know when a scroll is organic
+        // or forced from the synced element.
+        let forcedScroll = false;
+
+        // Catch our elements' scroll events and
+        // syncronize the related element.
+        $el1.scroll(function() { performScroll($el1, $el2); });
+        $el2.scroll(function() { performScroll($el2, $el1); });
+
+        // Perform the scroll of the synced element
+        // based on the scrolled element.
+        function performScroll($scrolled, $toScroll) {
+            if (forcedScroll) return (forcedScroll = false);
+            const percent = ($scrolled.scrollLeft() /
+              ($scrolled[0].scrollWidth - $scrolled[0].offsetWidth)) * 100;
+            setScrollTopFromPercent($toScroll, percent);
+        }
+
+        // Scroll to a position in the given
+        // element based on a percent.
+        function setScrollTopFromPercent($el, percent) {
+            const scrollTopPos = (percent / 100) *
+              ($el[0].scrollWidth - $el[0].offsetWidth);
+            forcedScroll = true;
+            $el.scrollLeft(scrollTopPos);
         }
     }
 }

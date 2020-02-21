@@ -27,6 +27,8 @@ the-turk-diff:
             charLevel:              Karakter seviyesi
             separateBlock:          HTML işleyicilerinde uzak satırlardaki farklılıkları gösterirken birbirinden ayır
             notice:                 <strong>Komşu Satırlar</strong> ayarında yapılan değişiklikler, önceki düzenleme geçmişlerini etkilemez.
+            enableSyncScroll:       Yan yana işleme modu için senkronize kaydırmayı etkinleştir.
+            allowSwitch:            Kullanıcıların işleme modları arasında geçiş yapmasına izin ver.
         permissions:
             viewEditHistory:        Düzenleme geçmişini görüntüle
             deleteEditHistory:      Başkalarının düzenleme geçmişlerini sil

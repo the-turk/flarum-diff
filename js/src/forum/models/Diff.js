@@ -7,7 +7,7 @@ export default class Diff extends mixin(Model, {
     deletedAt: Model.attribute('deletedAt', Model.transformDate),
     actor: Model.hasOne('actor'),
     deletedUser: Model.hasOne('deletedUser'),
-    contentHtml: Model.attribute('contentHtml'),
-    canDeleteEditHistory: Model.attribute('canDeleteEditHistory'),
-    largeModal: Model.attribute('largeModal')
+    inlineHtml: Model.attribute('inlineHtml'),
+    sideBySideHtml: Model.attribute('sideBySideHtml'),
+    canDeleteEditHistory: Model.attribute('canDeleteEditHistory')
 }) {}

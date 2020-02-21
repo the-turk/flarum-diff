@@ -290,7 +290,6 @@ function (_Dropdown) {
     _Dropdown.prototype.init.call(this);
 
     var post = this.props.post;
-    var largeModal = this.props.largeModal;
     this.list = new _DiffList__WEBPACK_IMPORTED_MODULE_2__["default"]({
       post: post
     });
@@ -582,11 +581,11 @@ function (_Modal) {
 
 
     this.loading = false;
+    this.attributes = this.props.item.data.attributes;
   };
 
   _proto.className = function className() {
-    var type = this.props.item.data.attributes.largeModal ? 'large' : 'medium';
-    return 'DiffModal Modal--' + type;
+    return 'DiffModal';
   };
 
   _proto.title = function title() {
@@ -599,6 +598,16 @@ function (_Modal) {
     })];
   };
 
+  _proto.config = function config(isInitialized) {
+    if (isInitialized) return;
+
+    if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('diffRenderer') === 'Inline') {
+      this.setModalContent('inline');
+    } else {
+      this.setModalContent('sideBySide');
+    }
+  };
+
   _proto.view = function view() {
     var _this = this;
 
@@ -608,7 +617,7 @@ function (_Modal) {
       className: "Modal-content"
     }, m("div", {
       className: "Modal-close App-backControl"
-    }, this.props.item.data.attributes.canDeleteEditHistory ? flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+    }, this.attributes.canDeleteEditHistory ? flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-trash-alt',
       onclick: function onclick() {
         if (confirm(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.confirmDelete'))) {
@@ -648,19 +657,29 @@ function (_Modal) {
   };
 
   _proto.content = function content() {
-    // do we need to worry about m.trust() function?
-    // well, Flarum itself doing the same way for rendering
-    // post items as seen on:
-    // https://github.com/flarum/core/blob/afe06ea750cfd81767461a3884a92a26f0b0ce37/js/src/forum/components/CommentPost.js#L52
-    // also, the diff library itself treat all inputs as plain text
-    // just before creating JSON data:
-    // https://github.com/jfcherng/php-diff/issues/9#issuecomment-526808774
-    // so no need to use additional Sanitizer lib for this operation.
-    return m("div", {
+    var _this2 = this;
+
+    return [flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('allowDiffSwitch') ? m("div", {
+      className: "controlsContainer"
+    }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      icon: 'fas fa-grip-lines',
+      onclick: function onclick() {
+        _this2.setModalContent('inline');
+      },
+      className: 'Button Button--icon Button--link inlineView'
+    }), flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      icon: 'fas fa-columns',
+      onclick: function onclick() {
+        _this2.setModalContent('sideBySide');
+      },
+      className: 'Button Button--icon Button--link sideBySideView'
+    })) : '', m("div", {
       className: "Modal-body"
-    }, m.trust(this.props.item.data.attributes.contentHtml), flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_8___default.a.component({
+    }, m("div", {
+      className: "diffContainer"
+    }), flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_8___default.a.component({
       className: 'DiffModal-loading' + (this.loading ? ' active' : '')
-    }));
+    }))];
   }
   /**
    * Show deletion alert of diff.
@@ -687,6 +706,95 @@ function (_Modal) {
       $deleteButton.prop('disabled', true);
     } else if (state === 'enable') {
       $deleteButton.prop('disabled', false);
+    }
+  };
+
+  _proto.renderHtml = function renderHtml(content) {
+    // do we need to worry about m.trust() function?
+    // well, Flarum itself doing the same way for rendering
+    // post items as seen on:
+    // https://github.com/flarum/core/blob/afe06ea750cfd81767461a3884a92a26f0b0ce37/js/src/forum/components/CommentPost.js#L52
+    // also, the diff library itself treat all inputs as plain text
+    // just before creating JSON data:
+    // https://github.com/jfcherng/php-diff/issues/9#issuecomment-526808774
+    // so no need to use additional Sanitizer lib for this operation.
+    return m.trust(content);
+  };
+
+  _proto.setModalContent = function setModalContent(content) {
+    var htmlContent;
+    var $modalContent = this.$('.diffContainer');
+
+    if (content === 'sideBySide') {
+      htmlContent = this.renderHtml(this.attributes.sideBySideHtml);
+      $modalContent.html(htmlContent);
+
+      if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('enableDiffSyncScroll')) {
+        this.syncScroll();
+      }
+
+      this.changeModalSize('large');
+      this.$('.Button.sideBySideView').prop('disabled', true);
+      this.$('.Button.inlineView').prop('disabled', false);
+    } else if (content === 'inline') {
+      htmlContent = this.renderHtml(this.attributes.inlineHtml);
+      $modalContent.html(htmlContent);
+      this.changeModalSize();
+      this.$('.Button.sideBySideView').prop('disabled', false);
+      this.$('.Button.inlineView').prop('disabled', true);
+    }
+  };
+
+  _proto.changeModalSize = function changeModalSize(type) {
+    if (type === void 0) {
+      type = '';
+    }
+
+    var $modal = this.element;
+    var className = $modal.className;
+
+    if (type === 'large' && !className.includes('Modal--' + type)) {
+      $modal.className += ' Modal--large';
+    } else if (className.includes('Modal--large')) {
+      $modal.className = className.replace(' Modal--large', '');
+    }
+  }
+  /**
+   * Synchronize Scroll
+   * implemented from:
+   * https://stackoverflow.com/a/27007581
+   * Should be working with Zepto.js
+   */
+  ;
+
+  _proto.syncScroll = function syncScroll() {
+    var $el1 = this.$('.diff-side-item.left-item');
+    var $el2 = this.$('.diff-side-item.right-item'); // Lets us know when a scroll is organic
+    // or forced from the synced element.
+
+    var forcedScroll = false; // Catch our elements' scroll events and
+    // syncronize the related element.
+
+    $el1.scroll(function () {
+      performScroll($el1, $el2);
+    });
+    $el2.scroll(function () {
+      performScroll($el2, $el1);
+    }); // Perform the scroll of the synced element
+    // based on the scrolled element.
+
+    function performScroll($scrolled, $toScroll) {
+      if (forcedScroll) return forcedScroll = false;
+      var percent = $scrolled.scrollLeft() / ($scrolled[0].scrollWidth - $scrolled[0].offsetWidth) * 100;
+      setScrollTopFromPercent($toScroll, percent);
+    } // Scroll to a position in the given
+    // element based on a percent.
+
+
+    function setScrollTopFromPercent($el, percent) {
+      var scrollTopPos = percent / 100 * ($el[0].scrollWidth - $el[0].offsetWidth);
+      forcedScroll = true;
+      $el.scrollLeft(scrollTopPos);
     }
   };
 
@@ -796,9 +904,9 @@ function (_mixin) {
   deletedAt: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('deletedAt', flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.transformDate),
   actor: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.hasOne('actor'),
   deletedUser: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.hasOne('deletedUser'),
-  contentHtml: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('contentHtml'),
-  canDeleteEditHistory: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('canDeleteEditHistory'),
-  largeModal: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('largeModal')
+  inlineHtml: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('inlineHtml'),
+  sideBySideHtml: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('sideBySideHtml'),
+  canDeleteEditHistory: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('canDeleteEditHistory')
 }));
 
 

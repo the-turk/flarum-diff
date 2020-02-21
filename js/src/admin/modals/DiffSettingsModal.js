@@ -13,11 +13,6 @@ export default class DiffSettingsModal extends SettingsModal {
         return app.translator.trans(localePrefix + 'title');
     }
 
-    className()
-    {
-        return 'Modal--medium';
-    }
-
     /**
      * Build modal form.
      *
@@ -58,6 +53,24 @@ export default class DiffSettingsModal extends SettingsModal {
                         this.setting(settingsPrefix + 'separateBlock')(value ? '1' : '0');
                     }
               }))
+          ]),
+          m('.Form-group', [
+            m('label', Switch.component({
+              state: this.setting(settingsPrefix + 'allowSwitch', '1')() === '1',
+              children: app.translator.trans(localePrefix + 'allowSwitch'),
+              onchange: value => {
+                this.setting(settingsPrefix + 'allowSwitch')(value ? '1' : '0');
+              }
+            }))
+          ]),
+          m('.Form-group', [
+            m('label', Switch.component({
+              state: this.setting(settingsPrefix + 'enableSyncScroll', '1')() === '1',
+              children: app.translator.trans(localePrefix + 'enableSyncScroll'),
+              onchange: value => {
+                this.setting(settingsPrefix + 'enableSyncScroll')(value ? '1' : '0');
+              }
+            }))
           ]),
           m('.Form-group', [
               m('label', app.translator.trans(localePrefix + 'detailLevel')),

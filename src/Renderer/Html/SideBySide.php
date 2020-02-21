@@ -149,10 +149,13 @@ final class SideBySide extends AbstractHtml
     protected function hunkWrapper(array $hunks): string
     {
         $html = '';
+        $i = 0;
 
         foreach ($hunks as $hunk) {
+            $side = ($i === 0 ? 'left' : 'right');
+
             $html .=
-                '<div class="diff-side-item">' .
+                '<div class="diff-side-item ' . $side . '-item">' .
                     '<div class="diff-code-wrapper">' .
                         '<table class="diff-table">' .
                             '<tbody>' .
@@ -161,6 +164,8 @@ final class SideBySide extends AbstractHtml
                         '</table>' .
                     '</div>' .
                 '</div>';
+
+            $i++;
         }
 
         return $html;

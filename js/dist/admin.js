@@ -211,10 +211,6 @@ function (_SettingsModal) {
 
   _proto.title = function title() {
     return flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'title');
-  };
-
-  _proto.className = function className() {
-    return 'Modal--medium';
   }
   /**
    * Build modal form.
@@ -245,6 +241,18 @@ function (_SettingsModal) {
       children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'separateBlock'),
       onchange: function onchange(value) {
         _this.setting(settingsPrefix + 'separateBlock')(value ? '1' : '0');
+      }
+    }))]), m('.Form-group', [m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
+      state: this.setting(settingsPrefix + 'allowSwitch', '1')() === '1',
+      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'allowSwitch'),
+      onchange: function onchange(value) {
+        _this.setting(settingsPrefix + 'allowSwitch')(value ? '1' : '0');
+      }
+    }))]), m('.Form-group', [m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
+      state: this.setting(settingsPrefix + 'enableSyncScroll', '1')() === '1',
+      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'enableSyncScroll'),
+      onchange: function onchange(value) {
+        _this.setting(settingsPrefix + 'enableSyncScroll')(value ? '1' : '0');
       }
     }))]), m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'detailLevel')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       options: {

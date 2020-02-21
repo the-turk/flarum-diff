@@ -13,6 +13,7 @@ use TheTurk\Diff\Diff;
 use Flarum\Api\Event\Serializing;
 use Flarum\Api\Serializer\BasicPostSerializer;
 use Flarum\Api\Serializer\PostSerializer;
+use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Settings\SettingsRepositoryInterface;
 
 class AddDiffRelationship
@@ -86,6 +87,22 @@ class AddDiffRelationship
      */
     public function prepareApiAttributes(Serializing $event)
     {
+        $rendererChoice = (string)$this->settings->get($this->settingsPrefix.'renderMode', 'Inline');
+        $allowSwitch = (bool)$this->settings->get(
+            'the-turk-diff.allowSwitch',
+            true
+        );
+
+        if ($event->isSerializer(ForumSerializer::class)) {
+            $event->attributes['diffRenderer'] = $rendererChoice;
+            $event->attributes['allowDiffSwitch'] = $allowSwitch;
+            $event->attributes['enableDiffSyncScroll'] = (bool)
+                $this->settings->get(
+                    'the-turk-diff.enableSyncScroll',
+                    true
+                );
+        }
+
         if ($event->isSerializer(PostSerializer::class)) {
             $event->attributes['canViewEditHistory'] = (bool)
                 $event->actor->can('viewEditHistory');
@@ -103,13 +120,17 @@ class AddDiffRelationship
                     || ($isSelf && $eventActor->can('selfDeleteEditHistory')));
 
             $diffArray = json_decode($event->model->diff, true);
+            $detailLevel = $this->settings->get(
+                'the-turk-diff.detailLevel',
+                'line'
+            );
+
             if (!is_null($diffArray)) {
                 $isTabular = $this->settings->get(
                     'the-turk-diff.displayMode',
                     'customHTML'
                 ) === 'tabularHTML';
 
-                $rendererChoice = (string)$this->settings->get($this->settingsPrefix.'renderMode', 'Inline');
                 $rendererOptions = [
                     'separateBlock' => (bool)$this->settings->get(
                         'the-turk-diff.separateBlock',
@@ -122,34 +143,28 @@ class AddDiffRelationship
                     // just before saving diff's to database
                 ];
 
-                if ($rendererChoice === 'Inline') {
-                    $renderer = new InlineRenderer($rendererOptions);
-                } else {
-                    $renderer = new SideBySideRenderer($rendererOptions);
+                if ($allowSwitch || $rendererChoice === 'Inline') {
+                    $inlineRenderer = new InlineRenderer($rendererOptions);
+                    $inlineRenderer->setDetailLevel($detailLevel);
+                    $inlineRenderer->setTranslationKeys([
+                        'differences' => $this->translator->trans('the-turk-diff.forum.differences'),
+                    ]);
+
+                    $inlineHtml = $inlineRenderer->renderArray($diffArray);
+                    $event->attributes['inlineHtml'] = $inlineHtml;
                 }
 
-                $renderer->setDetailLevel($this->settings->get(
-                    'the-turk-diff.detailLevel',
-                    'line'
-                ));
+                if ($allowSwitch || $rendererChoice === 'SideBySide') {
+                    $sideBySideRenderer = new SideBySideRenderer($rendererOptions);
+                    $sideBySideRenderer->setDetailLevel($detailLevel);
+                    $sideBySideRenderer->setTranslationKeys([
+                        'differences' => $this->translator->trans('the-turk-diff.forum.differences'),
+                    ]);
 
-                $renderer->setTranslationKeys([
-                    'differences' => $this->translator->trans('the-turk-diff.forum.differences'),
-                ]);
-
-                $contentHtml = $renderer->renderArray($diffArray);
-                $event->attributes['contentHtml'] = $contentHtml;
+                    $sideBySideHtml = $sideBySideRenderer->renderArray($diffArray);
+                    $event->attributes['sideBySideHtml'] = $sideBySideHtml;
+                }
             }
-
-            $event->attributes['largeModal'] =
-                ($this->settings->get(
-                    $this->settingsPrefix.'displayMode',
-                    'customHTML'
-                ) === 'tabularHTML') &&
-                ($this->settings->get(
-                    $this->settingsPrefix.'renderMode',
-                    'Inline'
-                ) === 'SideBySide');
         }
     }
 }

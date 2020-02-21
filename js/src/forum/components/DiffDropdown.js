@@ -18,7 +18,6 @@ export default class DiffDropdown extends Dropdown {
       {
           super.init();
           const post = this.props.post;
-          const largeModal = this.props.largeModal;
           this.list = new DiffList({post});
       }
 
