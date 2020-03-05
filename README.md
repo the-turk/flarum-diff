@@ -20,10 +20,11 @@ Here are the screenshots:
 
 - Based on [jfcherng/php-diff](https://github.com/jfcherng/php-diff) repository (this one is forked from [chrisboulton/php-diff](https://github.com/chrisboulton/php-diff) since it's no longer maintained).
 - Option for **line** (default), **word** and **char** level diffs.
-- Two render modes including "Inline", "Side By Side".
+- Three render modes including "Inline", "Side By Side" & "Combined".
 - Option for tabular view with line numbers.
-- Delete revisions.
-- Supports `fof/nightmode`.
+- Archive old revisions using cron jobs or manually.
+- Delete revisions or rollback to certain revision.
+- Supports `fof/nightmode`, `the-turk/flarum-quiet-edits`.
 
 Also, it won't load (and cache) anything until you click the "Edited" button so no need to worry about loading times.
 
@@ -53,11 +54,21 @@ php flarum cache:clear
 
 Enable the extension, set the permissions and customize the display mode if you wish.
 
+### Archive Old Revisions
+
+If **x ≥ A** (where the **x** is post's revision count), first **y=mx+b** revisions for the post can be stored as merged & compressed `BLOB` in a new table (which is called `post_edit_histories_archive`). Specify the **A**, **m** and **b** from the settings modal. Float values of **y** will be rounded to the next lowest integer value. It's recommended to archive old revisions if you want to save storage volume but _not recommended if you don't want to_.
+
+If you want to archive old revisions, please consider enabling _cron job option_ from the settings modal. I set a weekly cron job which is working on sundays at 02:00 AM (nothing special) using `diff:archive` command**. Otherwise, it'll try to find & archive old revisions for the post as soon as `Post\Revised` event fires or wait for your `php flarum diff:archive` command.
+
+> **: Here is the only Cron entry you need to add to your (Linux) server:
+> 
+> `* * * * * php /<path/to/flarum>/flarum schedule:run >> /dev/null 2>&1`
+> 
+> This Cron will call the Laravel command scheduler every minute. Then, Laravel evaluates your scheduled tasks and runs the tasks that are due.
+
 ## What's Next
 
 - `flarum/markdown`, `flarum/bbcode` and `flarum/mentions` support (it's so challanging with external libraries).
-
-- Rollback function? I don't know, it seems pretty useless to me since you can just copy and paste from your previous revisions. I might need to change the way of storing diffs into the database for this kind of functionality. Hit me with the suggestions on GitHub.
 
 ## Links
 
