@@ -1,3 +1,40 @@
+### 0.1.0-beta.7
+
+**You'll lose all of your previous diffs again.**
+
+- **Store** revisions as a whole instead of diffs-only.
+- **Add** archive old revisions option.
+  + I decided to use a linear equation **(y=mx+b)** where the **x** is post's revision count. If **x ≥ A**, first **y** revisions for the post can be stored as merged & compressed `BLOB` in a new table (which is called `post_edit_histories_archive`). Float values of **y** will be rounded to the next lowest integer value. Specify the **A**, **m** and **b** from the settings modal. It's recommended if you want to save storage volume but _not recommended if you don't want to_.
+- **Add** cron job option for checking old revisions. (Thus, `fof/console` is a dependency from now on)
+  + I set a weekly cron job which is working on sundays at 02:00 AM (nothing special) using `diff:archive` command**. If you want to archive old revisions, please consider enabling this option. Otherwise, it'll try to find & archive old revisions for the post as soon as `Post\Revised` event fires or wait for your `php flarum diff:archive` command.
+- **Add** store main post revisions-only option.
+- **Add** `the-turk/flarum-quiet-edits` support.
+  + Strongly recommended if you want to save even more storage volume.
+- **Add** lazy-loading to the revisions dropdown.
+- **Add** rollback feature.
+  + Users can rollback to certain revision if they have permission to delete revisions. There is a new event for developers called `PostWasRollbacked`
+- **Add** new renderer called **Combined**
+  + [Tabular view](https://i.ibb.co/df6JP6q/Combined-Tabular.png)
+  + [Custom view](https://i.ibb.co/FYhSjLj/Combined-Custom.png)
+- **Add** beta 12 compatibility.
+- **Fix** some PHP-related warnings.
+- **Fix** some CSS-related typos in renderers.
+- **Fix** black borders for the dark mode.
+- **Update** diff repository to 6.5.1
+
+There are new lines & few changes for translators.
+
+> **: Here is the only Cron entry you need to add to your (Linux) server:
+> 
+> `* * * * * php /<path/to/flarum>/flarum schedule:run >> /dev/null 2>&1`
+> 
+> This Cron will call the Laravel command scheduler every minute. Then, Laravel evaluates your scheduled tasks and runs the tasks that are due.
+
+### 0.1.0-beta.6
+
+- **Add** allow users to switch between renderers feature.
+- **Add** synchronised scrolling option for side by side renderer's tabular view mode.
+
 ### 0.1.0-beta.5
 
 **You'll lose all of your previous revisions.**

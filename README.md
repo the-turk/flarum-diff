@@ -9,11 +9,14 @@ Here are the screenshots:
 - [Post-Stream Item](https://i.ibb.co/4m21pnM/post-Stream-Item.png)
 - [Dropdown List](https://i.ibb.co/PTTcWCw/dropdown-List.png)
 - Line by Line Mode
-  - [Custom view without line numbers](https://i.ibb.co/3RZWbsG/custom-Line-By-Line.png) (default)
-  - [Tabular view with line numbers](https://i.ibb.co/XtDT9Pp/tabular-Line-By-Line.png)
+  - [Custom view](https://i.ibb.co/3RZWbsG/custom-Line-By-Line.png) (default)
+  - [Tabular view](https://i.ibb.co/XtDT9Pp/tabular-Line-By-Line.png)
 - Side by Side Mode
-  - [Custom view without line numbers](https://i.ibb.co/LP0x3vf/custom-Side-By-Side.png)
-  - [Tabular view with line numbers](https://i.ibb.co/d04NBS3/tabular-Side-By-Side.png)
+  - [Custom view](https://i.ibb.co/LP0x3vf/custom-Side-By-Side.png)
+  - [Tabular view](https://i.ibb.co/d04NBS3/tabular-Side-By-Side.png)
+- Combined Mode
+  - [Custom view](https://i.ibb.co/FYhSjLj/Combined-Custom.png)
+  - [Tabular view](https://i.ibb.co/df6JP6q/Combined-Tabular.png)
 - [Extension Settings](https://i.ibb.co/YPBbhYT/extension-Settings.png)
 
 ## Features
