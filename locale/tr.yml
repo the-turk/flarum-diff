@@ -12,6 +12,7 @@ the-turk-diff:
         deletedText:                (silinmiş)
         deletedTooltip:             "{username}, bu içeriği {ago} sildi"
         optionsButton:              Seçenekler
+        noDiff:                     Gösterilecek bir şey bulunamadı.
     admin:
         settings:
             title:                  Diff Ayarları

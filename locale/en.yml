@@ -13,6 +13,7 @@ the-turk-diff:
         deletedTooltip:             "{username} deleted this content {ago}"
         optionsButton:              Options
         rollbackButton:             Rollback to this revision
+        noDiff:                     There is nothing to show here.
     admin:
         settings:
             title:                  Diff Settings

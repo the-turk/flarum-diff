@@ -15,6 +15,7 @@ use TheTurk\Diff\Models\Diff;
 use TheTurk\Diff\Repositories\DiffArchiveRepository;
 use Flarum\Api\Event\Serializing;
 use Flarum\Api\Serializer\BasicPostSerializer;
+use Flarum\Extension\ExtensionManager;
 use Flarum\Api\Serializer\PostSerializer;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Settings\SettingsRepositoryInterface;
@@ -25,6 +26,11 @@ class AddDiffRelationship
      * @var SettingsRepositoryInterface
      */
     protected $settings;
+
+    /**
+     * @var ExtensionManager
+     */
+    private $extensions;
 
     /**
      * @var DiffArchiveRepository
@@ -43,15 +49,18 @@ class AddDiffRelationship
 
     /**
      * @param SettingsRepositoryInterface $settings
+     * @param ExtensionManager $extensions
      * @param Translator $translator
      * @param DiffArchiveRepository $diffArchive
      */
     public function __construct(
         SettingsRepositoryInterface $settings,
+        ExtensionManager $extensions,
         Translator $translator,
         DiffArchiveRepository $diffArchive
     ) {
         $this->settings = $settings;
+        $this->extensions = $extensions;
         $this->translator = $translator;
         $this->diffArchive = $diffArchive;
     }
@@ -171,16 +180,21 @@ class AddDiffRelationship
                     $newContent = Post::findOrFail($event->model->post_id)->content;
                 }
 
+                $ignoreCase = $ignoreWhiteSpace = false;
+
+                if($this->extensions->isEnabled('the-turk-quiet-edits')) {
+                    $ignoreCase = $this->settings->get('the-turk-quiet-edits.ignoreCase', true);
+                    $ignoreWhiteSpace = $this->settings->get('the-turk-quiet-edits.ignoreWhitespace', true);
+                }
+
                 $differ = new Differ(
                     explode("\n", $oldContent),
                     explode("\n", $newContent),
                     [
                         'context' => (int)
                             $this->settings->get($this->settingsPrefix.'neighborLines', 2),
-                        'ignoreCase' => (bool)
-                            $this->settings->get('the-turk-quiet-edits.ignoreCase', false),
-                        'ignoreWhitespace' => (bool)
-                            $this->settings->get('the-turk-quiet-edits.ignoreWhitespace', false),
+                        'ignoreCase' => $ignoreCase,
+                        'ignoreWhitespace' => $ignoreWhiteSpace,
                     ]
                 );
 
@@ -199,7 +213,8 @@ class AddDiffRelationship
                         true
                     ),
                     'lineNumbers' => $isTabular,
-                    'wrapperClasses' => $isTabular ? ['TabularDiff'] : ['CustomDiff']
+                    'wrapperClasses' => $isTabular ? ['TabularDiff'] : ['CustomDiff'],
+                    'resultForIdenticals' => $this->translator->trans('the-turk-diff.forum.noDiffs')
                 ];
 
                 if ($allowSwitch || $rendererChoice === 'Inline') {
