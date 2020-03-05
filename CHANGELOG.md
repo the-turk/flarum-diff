@@ -1,6 +1,6 @@
 ### 0.1.0-beta.7
 
-**You'll lose all of your previous diffs again.**
+**You'll lose all of your previous revisions again.**
 
 - **Store** revisions as a whole instead of diffs-only.
 - **Add** archive old revisions option.
