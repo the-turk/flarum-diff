@@ -15,8 +15,8 @@ Ekran görüntüleri:
   - [Özel görünüm](https://i.ibb.co/LP0x3vf/custom-Side-By-Side.png)
   - [Tablo görünümü](https://i.ibb.co/d04NBS3/tabular-Side-By-Side.png)
 - Kombine Gösterim Modu
-  - [Custom view](https://i.ibb.co/FYhSjLj/Combined-Custom.png)
-  - [Tabular view](https://i.ibb.co/df6JP6q/Combined-Tabular.png)
+  - [Özel görünüm](https://i.ibb.co/FYhSjLj/Combined-Custom.png)
+  - [Tablo görünümü](https://i.ibb.co/df6JP6q/Combined-Tabular.png)
 - [Eklenti Ayarları](https://i.ibb.co/YPBbhYT/extension-Settings.png)
 
 ## Özellikler
@@ -55,7 +55,7 @@ php flarum cache:clear
 
 Eklentiyi aktif edin, izinleri ayarlayın ve görünümü istediğiniz şekilde özelleştirin.
 
-### Eski Düzenlemeleri Arşivleyin
+### Eski Düzenlemeleri Arşivlemek
 
 **x** mesajın düzenlenme sayısı olmak üzere, **x ≥ A** koşulu sağlandığında mesaja ait ilk **y=mx+b** düzenlemeyi birleştirip sıkıştırarak yeni bir tabloda (`post_edit_histories_archive`) `BLOB` tipinde saklayabilirsiniz. **A**, **m** ve **b** değerlerini eklentinin ayarlarından belirleyin. Ondalık **y** değerleri en yakın alt tam sayıya yuvarlanacaktır. Depolama alanından tasarruf etmek istiyorsanız, eski düzenlemeleri arşivlemeniz önerilir ancak _depolama alanı sıkıntınız yoksa önerilmez_.
 
