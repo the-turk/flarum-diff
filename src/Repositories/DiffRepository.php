@@ -1,8 +1,9 @@
 <?php
-namespace TheTurk\Diff;
+namespace TheTurk\Diff\Repositories;
 
 use Carbon\Carbon;
 use Illuminate\Database\Query\Expression;
+use TheTurk\Diff\Models\Diff;
 
 class DiffRepository
 {
@@ -21,9 +22,11 @@ class DiffRepository
      *
      * @param array $where
      * @param array $sort
+     * @param int|null $limit
+     * @param int $offset
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function findWhere(array $where = [], $sort = [])
+    public function findWhere(array $where = [], $sort = [], $limit = null, $offset = 0)
     {
         $query = $this->query()->where($where);
 
@@ -31,6 +34,6 @@ class DiffRepository
             $query->orderBy($field, $order);
         }
 
-        return $query->get();
+        return $query->skip($offset)->take($limit)->get();
     }
 }

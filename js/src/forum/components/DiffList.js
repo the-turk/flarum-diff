@@ -17,6 +17,13 @@ export default class DiffList extends Component {
          */
         this.loading = false;
 
+        /**
+         * Whether or not there are more results that can be loaded.
+         *
+         * @type {Boolean}
+         */
+        this.moreResults = false;
+
         if (!app.cache.diffs) {
             /**
              * Initialize the cache.
@@ -96,6 +103,31 @@ export default class DiffList extends Component {
         );
     }
 
+    config(isInitialized, context)
+    {
+        if (isInitialized) return;
+
+        const $notifications = this.$('.DiffList-content');
+        const $scrollParent = $notifications.css('overflow') === 'auto' ? $notifications : $(window);
+
+        const scrollHandler = () => {
+            const scrollTop = $scrollParent.scrollTop();
+            const viewportHeight = $scrollParent.height();
+            const contentTop = $scrollParent === $notifications ? 0 : $notifications.offset().top;
+            const contentHeight = $notifications[0].scrollHeight;
+
+            if (this.moreResults && !this.loading && scrollTop + viewportHeight >= contentTop + contentHeight) {
+                this.loadMore();
+            }
+        };
+
+        $scrollParent.on('scroll', scrollHandler);
+
+        context.onunload = () => {
+            $scrollParent.off('scroll', scrollHandler);
+        };
+    }
+
     /**
      * Load diff results.
      *
@@ -110,13 +142,26 @@ export default class DiffList extends Component {
             return this.postRedrawer();
         }
 
+        this.loadMore();
+    }
+
+    /**
+     * Load the next page of diff results.
+     *
+     * @public
+     */
+    loadMore()
+    {
         this.loading = true;
         m.redraw(); // redraw for this view()
         this.postRedrawer();
 
         const postId = this.props.post.id();
+        const params = app.cache.diffs[postId]
+          ? {id: postId, page: {offset: app.cache.diffs[postId].length * 10}}
+          : {id: postId};
 
-        return app.store.find('diff', postId)
+        return app.store.find('diff', params)
           .then(this.parseResults.bind(this))
           .catch(() => {})
           .then(() => {
@@ -136,9 +181,9 @@ export default class DiffList extends Component {
     {
         app.cache.diffs[this.props.post.id()] = app.cache.diffs[this.props.post.id()] || [];
 
-        if (results.length) {
-            app.cache.diffs[this.props.post.id()].push(results);
-        }
+        if (results.length) app.cache.diffs[this.props.post.id()].push(results);
+
+        this.moreResults = !!results.payload.links.next;
 
         return results;
     }

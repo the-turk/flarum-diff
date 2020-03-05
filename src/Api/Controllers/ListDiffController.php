@@ -2,11 +2,12 @@
 namespace TheTurk\Diff\Api\Controllers;
 
 use TheTurk\Diff\Api\Serializers\DiffSerializer;
-use TheTurk\Diff\DiffRepository;
+use TheTurk\Diff\Repositories\DiffRepository;
 use Flarum\User\AssertPermissionTrait;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 use Flarum\Api\Controller\AbstractListController;
+use Flarum\Http\UrlGenerator;
 
 class ListDiffController extends AbstractListController
 {
@@ -20,7 +21,12 @@ class ListDiffController extends AbstractListController
     /**
      * {@inheritdoc}
      */
-    public $include = ['actor', 'deletedUser'];
+    public $include = ['actor', 'deletedUser', 'revertedUser'];
+
+    /**
+     * {@inheritdoc}
+     */
+    public $limit = 10;
 
     /**
      * @var DiffRepository
@@ -28,11 +34,18 @@ class ListDiffController extends AbstractListController
     protected $diff;
 
     /**
-     * @param DiffRepository $diff
+     * @var UrlGenerator
      */
-    public function __construct(DiffRepository $diff)
+    protected $url;
+
+    /**
+     * @param DiffRepository $diff
+     * @param UrlGenerator $url
+     */
+    public function __construct(DiffRepository $diff, UrlGenerator $url)
     {
         $this->diff = $diff;
+        $this->url = $url;
     }
 
     /**
@@ -46,14 +59,33 @@ class ListDiffController extends AbstractListController
 
         $postId = array_get($request->getQueryParams(), 'id');
 
+        $limit = $this->extractLimit($request);
+        $offset = $this->extractOffset($request);
         $include = $this->extractInclude($request);
 
         $diff = $this->diff->findWhere(
             ['post_id' => $postId],
-            ['created_at' => 'DESC']
+            ['revision' => 'DESC'],
+            $limit + 1,
+            $offset
         )
             ->load($include)
             ->all();
+
+        $areMoreResults = false;
+
+        if (count($diff) > $limit) {
+            array_pop($diff);
+            $areMoreResults = true;
+        }
+
+        $document->addPaginationLinks(
+            $this->url->to('api')->route('diff.index', ['id' => $postId]),
+            $request->getQueryParams(),
+            $offset,
+            $limit,
+            $areMoreResults ? null : 0
+        );
 
         return $diff;
     }

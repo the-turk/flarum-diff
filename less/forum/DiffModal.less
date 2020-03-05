@@ -1,4 +1,14 @@
 .DiffModal {
+  // fix for buttons
+  // on default Flarum theme
+  @media @phone {
+    & when (@config-colored-header = true) {
+      & button > span, button > i {
+        color: @text-color;
+      }
+    }
+  }
+
   .Modal-header {
     text-align: left;
     background: @control-bg;
@@ -26,6 +36,7 @@
 
   .controlsContainer {
     margin: 0 18px;
+    text-align: center;
   }
 
   .Modal-body {
@@ -80,29 +91,34 @@
 
         & .change {
           & .old {
-            border-left: 3px solid darken(@diff-old-version-bg-color, 50%);
+            border-left: 3px solid @diff-old-version-bg-color-border;
             background: @diff-old-version-bg-color;
           }
 
           & .new {
-            border-left: 3px solid darken(@diff-new-version-bg-color, 50%);
+            border-left: 3px solid @diff-new-version-bg-color-border;
             background: @diff-new-version-bg-color;
           }
 
+          & .rep {
+            border-left: 3px solid @diff-change-version-del-color-border;
+            background: @body-bg;
+          }
+
           & .rep-del {
-            border-left: 3px solid darken(@diff-change-version-del-color, 50%);
+            border-left: 3px solid @diff-change-version-del-color-border;
             background: @diff-change-version-del-color;
           }
 
           & .rep-ins {
-            border-left: 3px solid darken(@diff-change-version-ins-color, 50%);
+            border-left: 3px solid @diff-change-version-ins-color-border;
             background: @diff-change-version-ins-color;
           }
 
           &.change-eq {
             & .new,
             & .old {
-              border-left: 3px solid darken(@diff-info-color, 50%);
+              border-left: 3px solid @diff-info-color-border;
               background: @body-bg;
               color: @muted-color;
             }
@@ -351,6 +367,12 @@
         overflow-y: hidden;
         width: 50%;
         margin-bottom: -4px;
+      }
+
+      &.diff-combined {
+        & .diff-code-line {
+          padding-left: 5px;
+        }
       }
     }
   }

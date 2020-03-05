@@ -222,20 +222,38 @@ function (_SettingsModal) {
   _proto.form = function form() {
     var _this = this;
 
-    return [m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'renderMode')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+    return [m('div', {
+      className: 'diffSettingsFlex'
+    }, m('div', m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'renderMode')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       options: {
         Inline: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'inline'),
-        SideBySide: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'sideBySide')
+        SideBySide: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'sideBySide'),
+        Combined: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'combined')
       },
       onchange: this.setting(settingsPrefix + 'renderMode'),
       value: this.setting(settingsPrefix + 'renderMode')() || this.setting(settingsPrefix + 'renderMode')('Inline')
-    }))]), m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'displayMode')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+    }))])), m('div', m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'displayMode')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       options: {
         customHTML: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'customHTML'),
         tabularHTML: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'tabularHTML')
       },
       onchange: this.setting(settingsPrefix + 'displayMode'),
       value: this.setting(settingsPrefix + 'displayMode')() || this.setting(settingsPrefix + 'displayMode')('customHTML')
+    }))])), m('div', m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'detailLevel')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      options: {
+        none: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'noneLevel'),
+        line: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'lineLevel'),
+        word: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'wordLevel'),
+        "char": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'charLevel')
+      },
+      onchange: this.setting(settingsPrefix + 'detailLevel'),
+      value: this.setting(settingsPrefix + 'detailLevel')() || this.setting(settingsPrefix + 'detailLevel')('line')
+    }))]))), m('.Form-group', [m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
+      state: this.setting(settingsPrefix + 'mainPostOnly', '0')() === '1',
+      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'mainPostOnly'),
+      onchange: function onchange(value) {
+        _this.setting(settingsPrefix + 'mainPostOnly')(value ? '1' : '0');
+      }
     }))]), m('.Form-group', [m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
       state: this.setting(settingsPrefix + 'separateBlock', '1')() === '1',
       children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'separateBlock'),
@@ -254,27 +272,48 @@ function (_SettingsModal) {
       onchange: function onchange(value) {
         _this.setting(settingsPrefix + 'enableSyncScroll')(value ? '1' : '0');
       }
-    }))]), m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'detailLevel')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
-      options: {
-        none: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'noneLevel'),
-        line: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'lineLevel'),
-        word: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'wordLevel'),
-        "char": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'charLevel')
-      },
-      onchange: this.setting(settingsPrefix + 'detailLevel'),
-      value: this.setting(settingsPrefix + 'detailLevel')() || this.setting(settingsPrefix + 'detailLevel')('line')
     }))]), m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'neighborLines')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'neighborLinesHelp')), m('div', {
       className: 'helpText'
     }, m('i', {
       className: 'diffSettingsIcon fas fa-exclamation-circle'
     }), m('span', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'onlyUnsigned'))), m('input[type=text].FormControl', {
       bidi: this.setting(settingsPrefix + 'neighborLines', '2'),
-      placeholder: '2'
-    })]), m('.Form-group', [m('div', {
-      className: 'diffSettingsHelp helpText'
+      placeholder: '2',
+      style: 'width:25%'
+    })]), m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'dbOptimisation')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'archiveInfo')), m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
+      state: this.setting(settingsPrefix + 'archiveOlds', '0')() === '1',
+      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'archiveOlds'),
+      onchange: function onchange(value) {
+        _this.setting(settingsPrefix + 'archiveOlds')(value ? '1' : '0');
+      }
+    })), m('div', {
+      className: 'helpText'
+    }, m('span', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'archiveOldsInfo'))), m('div', {
+      className: 'helpText'
     }, m('i', {
       className: 'diffSettingsIcon fas fa-exclamation-circle'
-    }), m('span', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'notice')))])];
+    }), m('span', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'usePoint'))), m('div', {
+      className: 'diffSettingsFlex'
+    }, m('div', m('.Form-group', [m('label', m("strong", null, "A:")), m('div', m('input[type=text].FormControl', {
+      bidi: this.setting(settingsPrefix + 'archiveLimit', '15'),
+      placeholder: '15'
+    }))])), m('div', m('.Form-group', [m('label', m("strong", null, "m:")), m('div', m('input[type=text].FormControl', {
+      bidi: this.setting(settingsPrefix + 'archiveSlope', '0.4'),
+      placeholder: '0.4'
+    }))])), m('div', m('.Form-group', [m('label', m("strong", null, "b:")), m('div', m('input[type=text].FormControl', {
+      bidi: this.setting(settingsPrefix + 'archiveCoefficient', '0'),
+      placeholder: '0'
+    }))]))), m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
+      state: this.setting(settingsPrefix + 'useCrons', '0')() === '1',
+      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'useCrons'),
+      onchange: function onchange(value) {
+        _this.setting(settingsPrefix + 'useCrons')(value ? '1' : '0');
+      }
+    })), m('div', {
+      className: 'helpText'
+    }, m('i', {
+      className: 'diffSettingsIcon fas fa-exclamation-circle'
+    }), m('span', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'useCronsHelp')))])];
   };
 
   return DiffSettingsModal;

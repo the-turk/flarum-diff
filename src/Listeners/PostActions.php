@@ -1,46 +1,53 @@
 <?php
 namespace TheTurk\Diff\Listeners;
 
-use TheTurk\Diff\Diff;
-use TheTurk\Diff\Renderer\Html\Json as JsonRenderer;
-use Jfcherng\Diff\Differ;
+use TheTurk\Diff\Models\Diff;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Contracts\Events\Dispatcher;
 use Flarum\Post\Event\Saving as PostSaving;
 use Flarum\Post\Event\Revised as PostRevised;
-use Flarum\Post\PostRepository;
+use Flarum\Extension\ExtensionManager;
+use TheTurk\Diff\Jobs\ArchiveDiffs;
 use Carbon\Carbon;
+use Flarum\Post\Post;
+use Flarum\User\User;
 
 class PostActions
 {
-    /**
-     * @var PostRepository
-     */
-    protected $posts;
-
     /**
      * @var SettingsRepositoryInterface
      */
     protected $settings;
 
     /**
-     * @var string $settingsPrefix
+     * @var ExtensionManager
      */
-    public $settingsPrefix = 'the-turk-diff.';
+    private $extensions;
+
+    /**
+     * @var ArchiveDiffs
+     */
+    protected $job;
 
     /**
      * @var string $oldContent
      */
-    private $oldContent;
+    private $oldContent = '';
 
     /**
      * @param SettingsRepositoryInterface $settings
-     * @param PostRepository $posts
+     * @param ExtensionManager $extensions
+     * @param ArchiveDiffs $job
      */
-    public function __construct(SettingsRepositoryInterface $settings, PostRepository $posts)
+    public function __construct(
+      SettingsRepositoryInterface $settings,
+      ExtensionManager $extensions,
+      ArchiveDiffs $job
+    )
     {
         $this->settings = $settings;
-        $this->posts = $posts;
+        $this->extensions = $extensions;
+        $this->job = $job;
     }
 
     /**
@@ -51,7 +58,12 @@ class PostActions
     public function subscribe(Dispatcher $events)
     {
         $events->listen(PostSaving::class, [$this, 'whenSavingPost']);
-        $events->listen(PostRevised::class, [$this, 'whenRevisedPost']);
+        $events->listen(
+          ($this->extensions->isEnabled('the-turk-quiet-edits')
+          ? \TheTurk\QuietEdits\Events\PostWasRevisedLoudly::class
+          : PostRevised::class),
+          [$this, 'whenRevisedPost']
+        );
     }
 
     /**
@@ -63,58 +75,50 @@ class PostActions
     public function whenSavingPost(PostSaving $event)
     {
         $post = $event->post;
-
-        // if it exists it means that
-        // user is editing this post
-        if ($post->exists) {
-            $oldPost = $this->posts->findOrFail($post->id);
-            $this->oldContent = $oldPost->content;
-        }
+        if ($post->exists)
+          $this->oldContent = $post->getContentAttribute(
+            $post->getOriginal('content')
+          );
     }
 
-    public function whenRevisedPost(PostRevised $event)
+    public function whenRevisedPost($event)
     {
-        $post = $event->post;
-        $newContent = $post->content;
-
-        // find differences between
-        // old and new posts
-        $differ = new Differ(
-            explode("\n", $this->oldContent),
-            explode("\n", $newContent),
-            [
-                'context' => (int)
-                $this->settings->get($this->settingsPrefix.'neighborLines', 2),
-
-                // following lines are not necessary
-                // but notes for the future: these options
-                // must be that way and the opposite won't work because
-                // the way we're storing diffs. It has been summarized
-                // for less storage volume and different from the base dependency
-                // I did it this way because Flarum doesn't ignore them either.
-
-                // do not ignore case difference
-                'ignoreCase' => false,
-                // do not ignore whitespace difference
-                'ignoreWhitespace' => false,
-            ]
+        $mainPostOnly = (bool)$this->settings->get(
+            'the-turk-diff.mainPostOnly',
+            false
         );
 
-        $renderer = new JsonRenderer();
+        if ($mainPostOnly) {
+            if ($event->post->number != '1') return;
+        }
+
+        $archiveOlds = $this->settings->get(
+            'the-turk-diff.archiveOlds',
+            false
+        );
+
+        $useCrons = $this->settings->get(
+            'the-turk-diff.useCrons',
+            false
+        );
 
         // check if this post has been edited before
         // and increase the revision number
-        $latestRevModel = Diff::where('post_id', $post->id)->latest()->first();
-        $revision = ($latestRevModel ? $latestRevModel->revision + 1 : 1);
+        $latestRevModel = Diff::where('post_id', $event->post->id)->max('revision');
+        $revision = ($latestRevModel ? $latestRevModel + 1 : 1);
 
         $diff = Diff::build(
             $revision,
-            $post->id,
+            $event->post->id,
             $event->actor->id,
-            $renderer->render($differ)
+            $this->oldContent
         );
 
         $diff->created_at = Carbon::now();
         $diff->save();
+
+        if($archiveOlds && !$useCrons) {
+            $this->job->archiveForPost($event->post->id, $revision);
+        }
     }
 }

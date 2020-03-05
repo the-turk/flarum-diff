@@ -1,5 +1,5 @@
 <?php
-namespace TheTurk\Diff;
+namespace TheTurk\Diff\Models;
 
 use Flarum\Database\AbstractModel;
 use Flarum\User\User;
@@ -7,14 +7,19 @@ use Flarum\User\User;
 /**
  * @property int $id
  * @property int $revision
- * @property string $diff
+ * @property string $content
  * @property int $post_id
- * @property Post $post
+ * @property \Flarum\Post\Post $post
  * @property int|null $actor_id
  * @property User|null $actor
  * @property int|null $deleted_user_id
+ * @property int|null $reverted_user_id
  * @property User|null $deleted_user
+ * @property User|null $reverted_user
  * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $deleted_at
+ * @property \Carbon\Carbon $reverted_at
+ * @property bool $archived
  */
 class Diff extends AbstractModel
 {
@@ -34,17 +39,17 @@ class Diff extends AbstractModel
      * @param $revision
      * @param $postId
      * @param $actorId
-     * @param $diffs
+     * @param $content
      * @return static
      */
-    public static function build($revision, $postId, $actorId, $diffs)
+    public static function build($revision, $postId, $actorId, $content)
     {
         $diff = new static();
 
         $diff->revision = $revision;
         $diff->post_id = $postId;
         $diff->actor_id = $actorId;
-        $diff->diff = $diffs;
+        $diff->content = $content;
 
         return $diff;
     }
@@ -63,5 +68,13 @@ class Diff extends AbstractModel
     public function deletedUser()
     {
         return $this->belongsTo(User::class, 'deleted_user_id')->withDefault();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function revertedUser()
+    {
+        return $this->belongsTo(User::class, 'reverted_user_id')->withDefault();
     }
 }

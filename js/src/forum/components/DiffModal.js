@@ -6,6 +6,7 @@ import humanTime from 'flarum/helpers/humanTime';
 import avatar from 'flarum/helpers/avatar';
 import Alert from 'flarum/components/Alert';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
+import Dropdown from 'flarum/components/Dropdown';
 
 export default class DiffModal extends Modal {
     init()
@@ -57,12 +58,56 @@ export default class DiffModal extends Modal {
           <div className={'Modal modal-dialog ' + this.className()}>
             <div className="Modal-content">
                 <div className="Modal-close App-backControl">
-                  {(this.attributes.canDeleteEditHistory ?
-                        Button.component({
-                            icon: 'fas fa-trash-alt',
+                  {(this.props.item.canDeleteEditHistory() ?
+                    <Dropdown
+                        className="diffCotrollerDropdown"
+                        buttonClassName="Button Button--flat"
+                        menuClassName="Dropdown-menu--right"
+                        label={app.translator.trans('the-turk-diff.forum.optionsButton')}
+                        onshow={() => this.$('.controlsContainer').addClass('open')}
+                        onhide={() => this.$('.controlsContainer').removeClass('open')}>
+                        {(this.props.item.isRevertable() ?
+                              Button.component({
+                                  children: app.translator.trans('the-turk-diff.forum.rollbackButton'),
+                                  icon: 'fas fa-reply',
+                                  onclick: () => {
+                                      if (confirm(app.translator.trans('the-turk-diff.forum.confirmRollback'))) {
+                                          this.toggleDeleteAndRollbackButtons('disable');
+                                          this.loading = true;
+                                          m.redraw();
+
+                                          app.request({
+                                              url: `${app.forum.attribute('apiUrl')}/diff/${this.props.item.id()}`,
+                                              method: 'POST',
+                                              data: {
+                                                maxRevisionCount: this.props.post.revisionCount()
+                                              }
+                                          })
+                                              .then(() => {
+                                                  this.postRedrawer();
+                                                  app.modal.close();
+                                                  if (app.cache.diffs && app.cache.diffs[this.props.post.id()]) {
+                                                      delete app.cache.diffs[this.props.post.id()];
+                                                  }
+                                                  this.showAlert('success', 'rollback');
+                                              }).catch(() => {
+                                                  this.toggleDeleteAndRollbackButtons('enable');
+                                                  this.loading = false;
+                                                  m.redraw();
+                                                  this.postRedrawer();
+
+                                                  this.showAlert('error', 'rollback');
+                                              });
+                                      }
+                                  }
+                              }) : ''
+                        )}
+                        {Button.component({
+                            children: app.translator.trans('core.forum.post_controls.delete_button'),
+                            icon: 'far fa-trash-alt',
                             onclick: () => {
                                 if (confirm(app.translator.trans('the-turk-diff.forum.confirmDelete'))) {
-                                    this.toggleDeleteButton('disable');
+                                    this.toggleDeleteAndRollbackButtons('disable');
                                     this.loading = true;
                                     m.redraw();
 
@@ -71,20 +116,19 @@ export default class DiffModal extends Modal {
                                         if (app.cache.diffs && app.cache.diffs[this.props.post.id()]) {
                                             delete app.cache.diffs[this.props.post.id()];
                                         }
-                                        this.showDeletionAlert('success');
+                                        this.showAlert('success', 'delete');
                                     }).catch(() => {
-                                        this.toggleDeleteButton('enable');
+                                        this.toggleDeleteAndRollbackButtons('enable');
                                         this.loading = false;
                                         m.redraw();
 
-                                        this.showDeletionAlert('error');
+                                        this.showAlert('error', 'delete');
                                     });
                                 }
-                            },
-                            className: 'Button DeleteButton Button--icon Button--link'
-                        }) : ''
-                  )}
-
+                            }
+                        })}
+                    </Dropdown>
+                  : '' )}
                   {Button.component({
                         icon: 'fas fa-times',
                         onclick: this.hide.bind(this),
@@ -107,20 +151,32 @@ export default class DiffModal extends Modal {
         return [
           app.forum.attribute('allowDiffSwitch') ?
             <div className="controlsContainer">
-              {Button.component({
-                icon: 'fas fa-grip-lines',
-                onclick: () => {
-                  this.setModalContent('inline');
-                },
-                className: 'Button Button--icon Button--link inlineView'
-              })}
-              {Button.component({
-                icon: 'fas fa-columns',
-                onclick: () => {
-                  this.setModalContent('sideBySide');
-                },
-                className: 'Button Button--icon Button--link sideBySideView'
-              })}
+              <div className="diffSwitcher">
+                  {Button.component({
+                    icon: 'fas fa-grip-lines',
+                    onclick: () => {
+                      this.setModalContent('inline');
+                    },
+                    className: 'Button Button--icon Button--link inlineView'
+                  })}
+                  {Button.component({
+                    icon: 'fas fa-columns',
+                    onclick: () => {
+                      this.setModalContent('sideBySide');
+                    },
+                    className: 'Button Button--icon Button--link sideBySideView'
+                  })}
+                  {Button.component({
+                    icon: 'far fa-square',
+                    onclick: () => {
+                      this.setModalContent('combined');
+                    },
+                    className: 'Button Button--icon Button--link combinedView'
+                  })}
+              </div>
+              <div className="diffController">
+
+              </div>
             </div> : '',
           <div className="Modal-body">
             <div className="diffContainer"></div>
@@ -130,15 +186,14 @@ export default class DiffModal extends Modal {
     }
 
     /**
-     * Show deletion alert of diff.
-     *
      * @param {string} type
+     * @param {string} key
      */
-    showDeletionAlert(type)
+    showAlert(type, key)
     {
         const message = {
-            success: 'the-turk-diff.forum.deleteSuccessMessage',
-            error: 'the-turk-diff.forum.deleteErrorMessage',
+            success: 'the-turk-diff.forum.' + key + 'SuccessMessage',
+            error: 'the-turk-diff.forum.' + key + 'ErrorMessage',
         }[type];
 
         app.alerts.show(new Alert({
@@ -147,14 +202,17 @@ export default class DiffModal extends Modal {
         }));
     }
 
-    toggleDeleteButton(state)
+    toggleDeleteAndRollbackButtons(state)
     {
         const $deleteButton = this.$('.DeleteButton');
+        const $rollbackButton = this.$('.RollbackButton');
 
         if (state === 'disable') {
             $deleteButton.prop('disabled', true);
+            $rollbackButton.prop('disabled', true);
         } else if (state === 'enable') {
             $deleteButton.prop('disabled', false);
+            $rollbackButton.prop('disabled', false);
         }
     }
 
@@ -164,12 +222,23 @@ export default class DiffModal extends Modal {
         // well, Flarum itself doing the same way for rendering
         // post items as seen on:
         // https://github.com/flarum/core/blob/afe06ea750cfd81767461a3884a92a26f0b0ce37/js/src/forum/components/CommentPost.js#L52
-        // also, the diff library itself treat all inputs as plain text
-        // just before creating JSON data:
+        // also, the diff library itself treat all inputs as plain text:
         // https://github.com/jfcherng/php-diff/issues/9#issuecomment-526808774
         // so no need to use additional Sanitizer lib for this operation.
 
         return m.trust(content);
+    }
+
+    /**
+     * Redraw the post.
+     * Workaround for:
+     * https://discuss.flarum.org/d/22755-mithril-related-issues-on-poststream-items
+     */
+    postRedrawer()
+    {
+        return this.props.post.save({}).then(
+            () => m.redraw()
+        );
     }
 
     setModalContent(content)
@@ -186,12 +255,21 @@ export default class DiffModal extends Modal {
             this.changeModalSize('large');
             this.$('.Button.sideBySideView').prop('disabled', true);
             this.$('.Button.inlineView').prop('disabled', false);
+            this.$('.Button.combinedView').prop('disabled', false);
         } else if (content === 'inline') {
             htmlContent = this.renderHtml(this.attributes.inlineHtml);
             $modalContent.html(htmlContent);
             this.changeModalSize();
             this.$('.Button.sideBySideView').prop('disabled', false);
             this.$('.Button.inlineView').prop('disabled', true);
+            this.$('.Button.combinedView').prop('disabled', false);
+        } else if (content === 'combined') {
+            htmlContent = this.renderHtml(this.attributes.combinedHtml);
+            $modalContent.html(htmlContent);
+            this.changeModalSize();
+            this.$('.Button.sideBySideView').prop('disabled', false);
+            this.$('.Button.inlineView').prop('disabled', false);
+            this.$('.Button.combinedView').prop('disabled', true);
         }
     }
 

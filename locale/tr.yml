@@ -4,31 +4,43 @@ the-turk-diff:
         revisionInfo:               "{revisionCount} kere düzeltildi, yenisi en üstte|{revisionCount} kere düzeltildi, yenisi en üstte"
         emptyText:                  Düzeltme Bulunamadı
         confirmDelete:              Bu düzenleme içeriğini geçmişten silmek istediğinize emin misiniz?
+        confirmRollback:            Mesajınızı bu revizyonla değiştirmek istediğinize emin misiniz? Bu sürümden sonraki değişiklikler kalıcı olarak silinecektir.
         deleteSuccessMessage:       Düzenleme içeriği, geçmişten silindi.
         deleteErrorMessage:         Düzenleme içeriği silinemedi.
+        rollbackSuccessMessage:     Düzenlemeler geri alındı.
+        rollbackErrorMessage:       Düzenlemeler geri alınamadı.
         deletedText:                (silinmiş)
         deletedTooltip:             "{username}, bu içeriği {ago} sildi"
+        optionsButton:              Seçenekler
     admin:
         settings:
             title:                  Diff Ayarları
             displayMode:            Gösterim Modu (HTML)
-            customHTML:             Satır numarasız özel görünüm
-            tabularHTML:            Satır numaralı tablo görünümü
+            customHTML:             Özel görünüm
+            tabularHTML:            Tablo görünümü
             renderMode:             İşleme Modu
             inline:                 Aynı hizada (HTML)
             sideBySide:             Yan yana (HTML)
+            combined:               Kombine (HTML)
             neighborLines:          Komşu Satırlar
             neighborLinesHelp:      Düzeltilen kısımlara komşu satırlardan kaçının gösterileceğini yazın.
             onlyUnsigned:           Sadece <strong>işaretsiz tamsayılar</strong> geçerlidir!
+            usePoint:               Ondalık değerler için <strong>nokta</strong> kullanın.
             detailLevel:            Detay Seviyesi
             noneLevel:              Varsayılan
             lineLevel:              Satır seviyesi
             wordLevel:              Kelime seviyesi
             charLevel:              Karakter seviyesi
             separateBlock:          HTML işleyicilerinde uzak satırlardaki farklılıkları gösterirken birbirinden ayır
-            notice:                 <strong>Komşu Satırlar</strong> ayarında yapılan değişiklikler, önceki düzenleme geçmişlerini etkilemez.
             enableSyncScroll:       Yan yana işleme modu için senkronize kaydırmayı etkinleştir.
             allowSwitch:            Kullanıcıların işleme modları arasında geçiş yapmasına izin ver.
+            mainPostOnly:           Sadece ana mesajdaki düzenlemeleri kaydet
+            dbOptimisation:         Veritabanı Optimizasyonu
+            archiveOlds:            Eski düzenlemeleri arşivle
+            archiveOldsInfo:        Mesajın düzenlenme sayısı <strong>x</strong> olmak üzere <strong>x ≥ A</strong> koşulunu sağlayan mesajdaki ilk <strong>y=mx+b</strong> düzenleme, sıkıştırılmış olarak saklanır. Ondalık <strong>y</strong> en yakın alt tam sayıya yuvarlanır.
+            useCrons:               Arşivleme için zamanlanmış görevi kullan
+            useCronsHelp:           Görevin çalışabilmesi için sunucuya yeni bir zamanlayıcı eklemeniz gerekir. Bu görev her hafta Pazar günü saat 02:00'de çalışır. Zamanlanmış görev kullanmazsanız mesaja ait düzenlemeler her mesaj düzenlendiğinde taranır ve eski düzenlemeler arşivlenir.
+            archiveInfo:            Eski düzenlemeleri manuel olarak arşivlemek için her iki ayarı da kapatıp <code>php flarum diff:archive</code> komutunu kullanabilirsiniz.
         permissions:
             viewEditHistory:        Düzenleme geçmişini görüntüle
             deleteEditHistory:      Başkalarının düzenleme geçmişlerini sil

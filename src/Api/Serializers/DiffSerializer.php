@@ -3,7 +3,7 @@ namespace TheTurk\Diff\Api\Serializers;
 
 use Flarum\Api\Serializer\AbstractSerializer;
 use Flarum\Api\Serializer\BasicUserSerializer;
-use TheTurk\Diff\Diff;
+use TheTurk\Diff\Models\Diff;
 
 class DiffSerializer extends AbstractSerializer
 {
@@ -27,6 +27,8 @@ class DiffSerializer extends AbstractSerializer
             'revision'    => (int)$diff->revision,
             'createdAt'   => $this->formatDate($diff->created_at),
             'deletedAt'   => $this->formatDate($diff->deleted_at),
+            'revertedAt'  => $this->formatDate($diff->deleted_at),
+            'archived'    => (bool)$diff->archived
         ];
     }
 
@@ -42,6 +44,14 @@ class DiffSerializer extends AbstractSerializer
      * @return \Illuminate\Database\Eloquent\Relations\hasOne
      */
     public function deletedUser($diff)
+    {
+        return $this->hasOne($diff, BasicUserSerializer::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\hasOne
+     */
+    public function revertedUser($diff)
     {
         return $this->hasOne($diff, BasicUserSerializer::class);
     }

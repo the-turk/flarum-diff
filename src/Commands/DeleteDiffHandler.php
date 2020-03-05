@@ -3,19 +3,28 @@ namespace TheTurk\Diff\Commands;
 
 use Flarum\User\AssertPermissionTrait;
 use Flarum\User\Exception\PermissionDeniedException;
-use TheTurk\Diff\Diff;
-use Illuminate\Contracts\Events\Dispatcher;
-use Carbon\Carbon;
+use TheTurk\Diff\Models\Diff;
+use TheTurk\Diff\Jobs\DeleteDiff as DeleteDiffJob;
 
 class DeleteDiffHandler
 {
     use AssertPermissionTrait;
 
+    /**
+     * @var DeleteDiffJob
+     */
+    protected $job;
+
+    /**
+     * @param DeleteDiffJob $job
+     */
+    public function __construct(DeleteDiffJob $job)
+    {
+        $this->job = $job;
+    }
+
     public function handle(DeleteDiff $command)
     {
-        /**
-         * @var Diff
-         */
         $actor = $command->actor;
         $diff = Diff::findOrFail($command->diffId);
 
@@ -26,9 +35,6 @@ class DeleteDiffHandler
             throw new PermissionDeniedException();
         }
 
-        $diff->diff = null;
-        $diff->deleted_user_id = $actor->id;
-        $diff->deleted_at = Carbon::now();
-        $diff->save();
+        $this->job->delete($diff, $actor);
     }
 }

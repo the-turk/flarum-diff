@@ -375,6 +375,13 @@ function (_Component) {
      * @type {Boolean}
      */
     this.loading = false;
+    /**
+     * Whether or not there are more results that can be loaded.
+     *
+     * @type {Boolean}
+     */
+
+    this.moreResults = false;
 
     if (!flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs) {
       /**
@@ -439,6 +446,31 @@ function (_Component) {
     }) : pages.length ? '' : m("div", {
       className: "DiffList-empty"
     }, flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.emptyText')))));
+  };
+
+  _proto.config = function config(isInitialized, context) {
+    var _this2 = this;
+
+    if (isInitialized) return;
+    var $notifications = this.$('.DiffList-content');
+    var $scrollParent = $notifications.css('overflow') === 'auto' ? $notifications : $(window);
+
+    var scrollHandler = function scrollHandler() {
+      var scrollTop = $scrollParent.scrollTop();
+      var viewportHeight = $scrollParent.height();
+      var contentTop = $scrollParent === $notifications ? 0 : $notifications.offset().top;
+      var contentHeight = $notifications[0].scrollHeight;
+
+      if (_this2.moreResults && !_this2.loading && scrollTop + viewportHeight >= contentTop + contentHeight) {
+        _this2.loadMore();
+      }
+    };
+
+    $scrollParent.on('scroll', scrollHandler);
+
+    context.onunload = function () {
+      $scrollParent.off('scroll', scrollHandler);
+    };
   }
   /**
    * Load diff results.
@@ -448,8 +480,6 @@ function (_Component) {
   ;
 
   _proto.load = function load() {
-    var _this2 = this;
-
     if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()]) {
       m.redraw(); // also redraw the post because it sometimes
       // appears and sometimes doesn't after editing a post
@@ -457,16 +487,36 @@ function (_Component) {
       return this.postRedrawer();
     }
 
+    this.loadMore();
+  }
+  /**
+   * Load the next page of diff results.
+   *
+   * @public
+   */
+  ;
+
+  _proto.loadMore = function loadMore() {
+    var _this3 = this;
+
     this.loading = true;
     m.redraw(); // redraw for this view()
 
     this.postRedrawer();
     var postId = this.props.post.id();
-    return flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.store.find('diff', postId).then(this.parseResults.bind(this))["catch"](function () {}).then(function () {
-      _this2.loading = false;
+    var params = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[postId] ? {
+      id: postId,
+      page: {
+        offset: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[postId].length * 10
+      }
+    } : {
+      id: postId
+    };
+    return flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.store.find('diff', params).then(this.parseResults.bind(this))["catch"](function () {}).then(function () {
+      _this3.loading = false;
       m.redraw(); // redraw for this view()
 
-      _this2.postRedrawer();
+      _this3.postRedrawer();
     });
   }
   /**
@@ -479,11 +529,8 @@ function (_Component) {
 
   _proto.parseResults = function parseResults(results) {
     flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()] = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()] || [];
-
-    if (results.length) {
-      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()].push(results);
-    }
-
+    if (results.length) flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()].push(results);
+    this.moreResults = !!results.payload.links.next;
     return results;
   }
   /**
@@ -550,6 +597,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_components_Alert__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Alert__WEBPACK_IMPORTED_MODULE_7__);
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! flarum/components/LoadingIndicator */ "flarum/components/LoadingIndicator");
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! flarum/components/Dropdown */ "flarum/components/Dropdown");
+/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9__);
+
 
 
 
@@ -617,11 +667,60 @@ function (_Modal) {
       className: "Modal-content"
     }, m("div", {
       className: "Modal-close App-backControl"
-    }, this.attributes.canDeleteEditHistory ? flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
-      icon: 'fas fa-trash-alt',
+    }, this.props.item.canDeleteEditHistory() ? m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9___default.a, {
+      className: "diffCotrollerDropdown",
+      buttonClassName: "Button Button--flat",
+      menuClassName: "Dropdown-menu--right",
+      label: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.optionsButton'),
+      onshow: function onshow() {
+        return _this.$('.controlsContainer').addClass('open');
+      },
+      onhide: function onhide() {
+        return _this.$('.controlsContainer').removeClass('open');
+      }
+    }, this.props.item.isRevertable() ? flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.rollbackButton'),
+      icon: 'fas fa-reply',
+      onclick: function onclick() {
+        if (confirm(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.confirmRollback'))) {
+          _this.toggleDeleteAndRollbackButtons('disable');
+
+          _this.loading = true;
+          m.redraw();
+          flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.request({
+            url: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('apiUrl') + "/diff/" + _this.props.item.id(),
+            method: 'POST',
+            data: {
+              maxRevisionCount: _this.props.post.revisionCount()
+            }
+          }).then(function () {
+            _this.postRedrawer();
+
+            flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.modal.close();
+
+            if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs && flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.props.post.id()]) {
+              delete flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.props.post.id()];
+            }
+
+            _this.showAlert('success', 'rollback');
+          })["catch"](function () {
+            _this.toggleDeleteAndRollbackButtons('enable');
+
+            _this.loading = false;
+            m.redraw();
+
+            _this.postRedrawer();
+
+            _this.showAlert('error', 'rollback');
+          });
+        }
+      }
+    }) : '', flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.post_controls.delete_button'),
+      icon: 'far fa-trash-alt',
       onclick: function onclick() {
         if (confirm(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.confirmDelete'))) {
-          _this.toggleDeleteButton('disable');
+          _this.toggleDeleteAndRollbackButtons('disable');
 
           _this.loading = true;
           m.redraw();
@@ -633,19 +732,18 @@ function (_Modal) {
               delete flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.props.post.id()];
             }
 
-            _this.showDeletionAlert('success');
+            _this.showAlert('success', 'delete');
           })["catch"](function () {
-            _this.toggleDeleteButton('enable');
+            _this.toggleDeleteAndRollbackButtons('enable');
 
             _this.loading = false;
             m.redraw();
 
-            _this.showDeletionAlert('error');
+            _this.showAlert('error', 'delete');
           });
         }
-      },
-      className: 'Button DeleteButton Button--icon Button--link'
-    }) : '', flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      }
+    })) : '', flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-times',
       onclick: this.hide.bind(this),
       className: 'Button Button--icon Button--link'
@@ -661,6 +759,8 @@ function (_Modal) {
 
     return [flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('allowDiffSwitch') ? m("div", {
       className: "controlsContainer"
+    }, m("div", {
+      className: "diffSwitcher"
     }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-grip-lines',
       onclick: function onclick() {
@@ -673,6 +773,14 @@ function (_Modal) {
         _this2.setModalContent('sideBySide');
       },
       className: 'Button Button--icon Button--link sideBySideView'
+    }), flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      icon: 'far fa-square',
+      onclick: function onclick() {
+        _this2.setModalContent('combined');
+      },
+      className: 'Button Button--icon Button--link combinedView'
+    })), m("div", {
+      className: "diffController"
     })) : '', m("div", {
       className: "Modal-body"
     }, m("div", {
@@ -682,16 +790,15 @@ function (_Modal) {
     }))];
   }
   /**
-   * Show deletion alert of diff.
-   *
    * @param {string} type
+   * @param {string} key
    */
   ;
 
-  _proto.showDeletionAlert = function showDeletionAlert(type) {
+  _proto.showAlert = function showAlert(type, key) {
     var message = {
-      success: 'the-turk-diff.forum.deleteSuccessMessage',
-      error: 'the-turk-diff.forum.deleteErrorMessage'
+      success: 'the-turk-diff.forum.' + key + 'SuccessMessage',
+      error: 'the-turk-diff.forum.' + key + 'ErrorMessage'
     }[type];
     flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.alerts.show(new flarum_components_Alert__WEBPACK_IMPORTED_MODULE_7___default.a({
       type: type,
@@ -699,13 +806,16 @@ function (_Modal) {
     }));
   };
 
-  _proto.toggleDeleteButton = function toggleDeleteButton(state) {
+  _proto.toggleDeleteAndRollbackButtons = function toggleDeleteAndRollbackButtons(state) {
     var $deleteButton = this.$('.DeleteButton');
+    var $rollbackButton = this.$('.RollbackButton');
 
     if (state === 'disable') {
       $deleteButton.prop('disabled', true);
+      $rollbackButton.prop('disabled', true);
     } else if (state === 'enable') {
       $deleteButton.prop('disabled', false);
+      $rollbackButton.prop('disabled', false);
     }
   };
 
@@ -714,11 +824,22 @@ function (_Modal) {
     // well, Flarum itself doing the same way for rendering
     // post items as seen on:
     // https://github.com/flarum/core/blob/afe06ea750cfd81767461a3884a92a26f0b0ce37/js/src/forum/components/CommentPost.js#L52
-    // also, the diff library itself treat all inputs as plain text
-    // just before creating JSON data:
+    // also, the diff library itself treat all inputs as plain text:
     // https://github.com/jfcherng/php-diff/issues/9#issuecomment-526808774
     // so no need to use additional Sanitizer lib for this operation.
     return m.trust(content);
+  }
+  /**
+   * Redraw the post.
+   * Workaround for:
+   * https://discuss.flarum.org/d/22755-mithril-related-issues-on-poststream-items
+   */
+  ;
+
+  _proto.postRedrawer = function postRedrawer() {
+    return this.props.post.save({}).then(function () {
+      return m.redraw();
+    });
   };
 
   _proto.setModalContent = function setModalContent(content) {
@@ -736,12 +857,21 @@ function (_Modal) {
       this.changeModalSize('large');
       this.$('.Button.sideBySideView').prop('disabled', true);
       this.$('.Button.inlineView').prop('disabled', false);
+      this.$('.Button.combinedView').prop('disabled', false);
     } else if (content === 'inline') {
       htmlContent = this.renderHtml(this.attributes.inlineHtml);
       $modalContent.html(htmlContent);
       this.changeModalSize();
       this.$('.Button.sideBySideView').prop('disabled', false);
       this.$('.Button.inlineView').prop('disabled', true);
+      this.$('.Button.combinedView').prop('disabled', false);
+    } else if (content === 'combined') {
+      htmlContent = this.renderHtml(this.attributes.combinedHtml);
+      $modalContent.html(htmlContent);
+      this.changeModalSize();
+      this.$('.Button.sideBySideView').prop('disabled', false);
+      this.$('.Button.inlineView').prop('disabled', false);
+      this.$('.Button.combinedView').prop('disabled', true);
     }
   };
 
@@ -902,11 +1032,15 @@ function (_mixin) {
   revision: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('revision'),
   createdAt: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('createdAt', flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.transformDate),
   deletedAt: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('deletedAt', flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.transformDate),
+  revertedAt: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('revertedAt', flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.transformDate),
   actor: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.hasOne('actor'),
   deletedUser: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.hasOne('deletedUser'),
+  revertedUser: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.hasOne('revertedUser'),
   inlineHtml: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('inlineHtml'),
   sideBySideHtml: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('sideBySideHtml'),
-  canDeleteEditHistory: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('canDeleteEditHistory')
+  combinedHtml: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('combinedHtml'),
+  canDeleteEditHistory: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('canDeleteEditHistory'),
+  isRevertable: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('isRevertable')
 }));
 
 

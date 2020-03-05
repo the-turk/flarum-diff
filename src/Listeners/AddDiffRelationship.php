@@ -1,15 +1,18 @@
 <?php
 namespace TheTurk\Diff\Listeners;
 
-use TheTurk\Diff\Renderer\Html\Inline as InlineRenderer;
-use TheTurk\Diff\Renderer\Html\SideBySide as SideBySideRenderer;
+use TheTurk\Diff\Renderers\Html\Inline as InlineRenderer;
+use TheTurk\Diff\Renderers\Html\SideBySide as SideBySideRenderer;
+use TheTurk\Diff\Renderers\Html\Combined as CombinedRenderer;
 use Flarum\Post\Post;
+use Jfcherng\Diff\Differ;
 use Flarum\Event\GetModelRelationship;
 use Flarum\Event\GetApiRelationship;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Translation\Translator;
 use TheTurk\Diff\Api\Serializers\DiffSerializer;
-use TheTurk\Diff\Diff;
+use TheTurk\Diff\Models\Diff;
+use TheTurk\Diff\Repositories\DiffArchiveRepository;
 use Flarum\Api\Event\Serializing;
 use Flarum\Api\Serializer\BasicPostSerializer;
 use Flarum\Api\Serializer\PostSerializer;
@@ -24,6 +27,11 @@ class AddDiffRelationship
     protected $settings;
 
     /**
+     * @var DiffArchiveRepository
+     */
+    protected $diffArchive;
+
+    /**
      * @var string $settingsPrefix
      */
     public $settingsPrefix = 'the-turk-diff.';
@@ -36,13 +44,16 @@ class AddDiffRelationship
     /**
      * @param SettingsRepositoryInterface $settings
      * @param Translator $translator
+     * @param DiffArchiveRepository $diffArchive
      */
     public function __construct(
         SettingsRepositoryInterface $settings,
-        Translator $translator
+        Translator $translator,
+        DiffArchiveRepository $diffArchive
     ) {
         $this->settings = $settings;
         $this->translator = $translator;
+        $this->diffArchive = $diffArchive;
     }
 
     /**
@@ -89,7 +100,7 @@ class AddDiffRelationship
     {
         $rendererChoice = (string)$this->settings->get($this->settingsPrefix.'renderMode', 'Inline');
         $allowSwitch = (bool)$this->settings->get(
-            'the-turk-diff.allowSwitch',
+            $this->settingsPrefix.'allowSwitch',
             true
         );
 
@@ -98,7 +109,7 @@ class AddDiffRelationship
             $event->attributes['allowDiffSwitch'] = $allowSwitch;
             $event->attributes['enableDiffSyncScroll'] = (bool)
                 $this->settings->get(
-                    'the-turk-diff.enableSyncScroll',
+                    $this->settingsPrefix.'enableSyncScroll',
                     true
                 );
         }
@@ -107,62 +118,118 @@ class AddDiffRelationship
             $event->attributes['canViewEditHistory'] = (bool)
                 $event->actor->can('viewEditHistory');
 
-            $latestRevModel = Diff::where('post_id', $event->model->id)->latest()->first();
-            $revision = ($latestRevModel ? $latestRevModel->revision : 0);
-            $event->attributes['revisionCount'] = $revision;
+            $latestRevModel = Diff::where('post_id', $event->model->id)->max('revision');
+            $revisionCount = ($latestRevModel ? $latestRevModel : 0);
+            $event->attributes['revisionCount'] = $revisionCount;
         }
 
         if ($event->isSerializer(DiffSerializer::class)) {
-            $eventActor = $event->actor;
-            $isSelf = $eventActor->id === $event->model->actor->id;
-            $event->attributes['canDeleteEditHistory'] =
-                ($eventActor->can('deleteEditHistory')
-                    || ($isSelf && $eventActor->can('selfDeleteEditHistory')));
+            $event->attributes += [
+                'canDeleteEditHistory' => false,
+                'isRevertable' => false,
+                'inlineHtml' => null,
+                'sideBySideHtml' => null,
+                'combinedHtml' => null
+            ];
 
-            $diffArray = json_decode($event->model->diff, true);
-            $detailLevel = $this->settings->get(
-                'the-turk-diff.detailLevel',
-                'line'
-            );
+            if(null === $event->model->deleted_at) {
+                $oldContent = '';
+                $newContent = '';
 
-            if (!is_null($diffArray)) {
+                $eventActor = $event->actor;
+                $isSelf = $eventActor->id === $event->model->actor->id;
+                $event->attributes['canDeleteEditHistory'] =
+                    ($eventActor->can('deleteEditHistory')
+                        || ($isSelf && $eventActor->can('selfDeleteEditHistory')));
+
+                if ($event->model->archived) {
+                    $oldContent = $this->diffArchive->getArchivedContent(
+                        $event->model->post_id,
+                        $event->model->id
+                    );
+                } else {
+                    $oldContent = $event->model->content;
+                }
+
+                $nextDiff = Diff::where('revision', '>', $event->model->revision)
+                  ->where('post_id', $event->model->post_id)
+                  ->where('deleted_at', null)->first();
+
+                $isRevertable = null !== $nextDiff ? true : false;
+                $event->attributes['isRevertable'] = $isRevertable;
+
+                if ($isRevertable) {
+                    if ($nextDiff->archived) {
+                        $newContent = $this->diffArchive->getArchivedContent(
+                            $event->model->post_id,
+                            $nextDiff->id
+                        );
+                    } else {
+                      $newContent = $nextDiff->content;
+                    }
+                } else {
+                    $newContent = Post::findOrFail($event->model->post_id)->content;
+                }
+
+                $differ = new Differ(
+                    explode("\n", $oldContent),
+                    explode("\n", $newContent),
+                    [
+                        'context' => (int)
+                            $this->settings->get($this->settingsPrefix.'neighborLines', 2),
+                        'ignoreCase' => (bool)
+                            $this->settings->get('the-turk-quiet-edits.ignoreCase', false),
+                        'ignoreWhitespace' => (bool)
+                            $this->settings->get('the-turk-quiet-edits.ignoreWhitespace', false),
+                    ]
+                );
+
                 $isTabular = $this->settings->get(
-                    'the-turk-diff.displayMode',
+                    $this->settingsPrefix.'displayMode',
                     'customHTML'
                 ) === 'tabularHTML';
 
                 $rendererOptions = [
+                    'detailLevel' => $this->settings->get(
+                        $this->settingsPrefix.'detailLevel',
+                        'line'
+                    ),
                     'separateBlock' => (bool)$this->settings->get(
-                        'the-turk-diff.separateBlock',
+                        $this->settingsPrefix.'separateBlock',
                         true
                     ),
                     'lineNumbers' => $isTabular,
                     'wrapperClasses' => $isTabular ? ['TabularDiff'] : ['CustomDiff']
-                    // context option won't work for this renderer
-                    // since we already defined it in the JSON renderer
-                    // just before saving diff's to database
                 ];
 
                 if ($allowSwitch || $rendererChoice === 'Inline') {
                     $inlineRenderer = new InlineRenderer($rendererOptions);
-                    $inlineRenderer->setDetailLevel($detailLevel);
                     $inlineRenderer->setTranslationKeys([
                         'differences' => $this->translator->trans('the-turk-diff.forum.differences'),
                     ]);
 
-                    $inlineHtml = $inlineRenderer->renderArray($diffArray);
+                    $inlineHtml = $inlineRenderer->render($differ);
                     $event->attributes['inlineHtml'] = $inlineHtml;
                 }
 
                 if ($allowSwitch || $rendererChoice === 'SideBySide') {
                     $sideBySideRenderer = new SideBySideRenderer($rendererOptions);
-                    $sideBySideRenderer->setDetailLevel($detailLevel);
                     $sideBySideRenderer->setTranslationKeys([
                         'differences' => $this->translator->trans('the-turk-diff.forum.differences'),
                     ]);
 
-                    $sideBySideHtml = $sideBySideRenderer->renderArray($diffArray);
+                    $sideBySideHtml = $sideBySideRenderer->render($differ);
                     $event->attributes['sideBySideHtml'] = $sideBySideHtml;
+                }
+
+                if ($allowSwitch || $rendererChoice === 'Combined') {
+                    $combinedRenderer = new CombinedRenderer($rendererOptions);
+                    $combinedRenderer->setTranslationKeys([
+                        'differences' => $this->translator->trans('the-turk-diff.forum.differences'),
+                    ]);
+
+                    $combinedHtml = $combinedRenderer->render($differ);
+                    $event->attributes['combinedHtml'] = $combinedHtml;
                 }
             }
         }
