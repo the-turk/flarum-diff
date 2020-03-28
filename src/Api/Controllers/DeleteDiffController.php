@@ -41,4 +41,3 @@ class DeleteDiffController extends AbstractDeleteController
         );
     }
 }
-

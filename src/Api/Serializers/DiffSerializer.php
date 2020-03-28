@@ -24,11 +24,10 @@ class DiffSerializer extends AbstractSerializer
     protected function getDefaultAttributes($diff)
     {
         return [
-            'revision'    => (int)$diff->revision,
-            'createdAt'   => $this->formatDate($diff->created_at),
-            'deletedAt'   => $this->formatDate($diff->deleted_at),
-            'revertedAt'  => $this->formatDate($diff->deleted_at),
-            'archived'    => (bool)$diff->archived
+            'revision'      => (int)$diff->revision,
+            'createdAt'     => $this->formatDate($diff->created_at),
+            'deletedAt'     => $this->formatDate($diff->deleted_at),
+            'rollbackedAt'  => $this->formatDate($diff->rollbacked_at)
         ];
     }
 
@@ -51,7 +50,7 @@ class DiffSerializer extends AbstractSerializer
     /**
      * @return \Illuminate\Database\Eloquent\Relations\hasOne
      */
-    public function revertedUser($diff)
+    public function rollbackedUser($diff)
     {
         return $this->hasOne($diff, BasicUserSerializer::class);
     }

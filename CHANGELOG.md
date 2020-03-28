@@ -1,3 +1,40 @@
+### 1.0.0
+
+**You'll lose all of your previous revisions.** (Hopefully, for the last time.)
+
+- **Change** modal's layout.
+  + New layout may not work for some browsers. Click [here](https://caniuse.com/#feat=css-grid) to see supported ones (including IE10+).
+- **Change** rollback behaviour.
+  + Now they'll be treated as new edits and will not delete other revisions.
+- **Drop** tabular view because it wasn't fit well into community platforms.
+- **Drop** renderer selector from the extension's settings.
+- **Drop** `PostWasRollbacked` event because we're treating them as formal edits now.
+  + Now everyone can use any renderer they wish.
+- **Add** original post into revision list.
+- **Add** seperate permissions for rollbacking.
+- **Add** feature for keeping user's renderer preference.
+- **Add** some informations about comparisons to make things more clear.
+- **Add** informative tooltips to make things even more clear.
+- **Add** preview mode for all revisions.
+  + You need to update `s9e/text-formatter` to v2.3.7 for syntax highlighting in previews.
+  ```
+  composer update s9e/text-formatter:2.3.7
+  ```
+  + It worked well with Flarum's extensions so far but I expect some issues from 3rd parties. Report them and I'll see what I can do. Keep in mind that you always can disable text formatting from extension's settings modal if something breaks your Diff modal but it'll look like a mess for sure.
+- **Add** multiple archive rows feature.
+  + If you hit the `MEDIUMBLOB`'s limit for an archive, it'll automatically create a new archive row for the post and store new revisions there. I don't think you'll ever face with this situation but i did my best to solve this potential issue.
+- **Fix** `the-turk-diff.forum.noDiffs` translation key was missing.
+- **Fix** all renderer-related issues.
+- **Fix** wrong column types.
+- **Add** new columns and foreign keys.
+- **Make** Mobile & Dark Mode UI imporovements.
+- **Tidy** backend codes and add comments so everyone can understand what I am doing.
+- **Update** dependencies & README.md
+
+There are new lines & few changes for translators.
+
+**Note:** All versions of this extension conflicts with [dem13n/nickname-changer](https://discuss.flarum.org/d/21238-nickname-changer) package. Use [fof/username-request](https://discuss.flarum.org/d/20956-friendsofflarum-username-request) instead.
+
 ### 0.1.0-beta.7
 
 **You'll lose all of your previous revisions again.**
@@ -25,9 +62,9 @@
 There are new lines & few changes for translators.
 
 > **: Here is the only Cron entry you need to add to your (Linux) server:
-> 
+>
 > `* * * * * php /<path/to/flarum>/flarum schedule:run >> /dev/null 2>&1`
-> 
+>
 > This Cron will call the Laravel command scheduler every minute. Then, Laravel evaluates your scheduled tasks and runs the tasks that are due.
 
 ### 0.1.0-beta.6

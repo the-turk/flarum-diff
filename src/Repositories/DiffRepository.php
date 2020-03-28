@@ -18,7 +18,7 @@ class DiffRepository
     }
 
     /**
-     * Find diffs that match certain conditions.
+     * Find revisions that match certain conditions.
      *
      * @param array $where
      * @param array $sort

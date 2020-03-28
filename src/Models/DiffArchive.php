@@ -12,9 +12,4 @@ class DiffArchive extends AbstractModel
      * {@inheritdoc}
      */
     protected $table = 'post_edit_histories_archive';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected $fillable = ['post_id'];
 }

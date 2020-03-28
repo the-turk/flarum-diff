@@ -6,7 +6,15 @@ use TheTurk\Diff\Models\Diff;
 use Psr\Log\LoggerInterface;
 use TheTurk\Diff\Repositories\DiffArchiveRepository;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Carbon\Carbon;
 
+/**
+ * We're using a linear equation (y=mx+b) where the x is post's revision count.
+ * If x ≥ A, first y revisions for the post can be stored as merged & compressed
+ * `BLOB` in a new table (which is called `post_edit_histories_archive`).
+ * A, m and b values can be set from the settings modal.
+ * You can't archive last revision because it's the post itself.
+ */
 class ArchiveDiffs
 {
     /**
@@ -43,54 +51,60 @@ class ArchiveDiffs
         $this->log = $log;
         $this->diffArchive = $diffArchive;
 
-        $this->revLimit = $this->sanitizeFloat(
+        // this is the A value
+        $this->revLimit = self::sanitizeFloat(
             $settings->get('the-turk-diff.archiveLimit', 15)
         );
     }
 
     /**
+     * Archive specific post's revisions only.
+     *
      * @param int $postId
      * @param int $maxRevision
      */
     public function archiveForPost(int $postId, int $maxRevision)
     {
         if(!($maxRevision >= $this->revLimit)) return;
-
-        $slope = $this->sanitizeFloat(
+        // this is the m value
+        $slope = self::sanitizeFloat(
             $this->settings->get('the-turk-diff.archiveSlope', 0.4)
         );
-
-        $coefficient = $this->sanitizeFloat(
+        // this is the b value
+        $coefficient = self::sanitizeFloat(
             $this->settings->get('the-turk-diff.archiveCoefficient', 0)
         );
-
+        // y = mx + b
+        // float values of y will be rounded to the next lowest integer value.
         $linearEquation = (int)floor($slope * $maxRevision + $coefficient);
 
         if($linearEquation > 0) {
             try {
                 $diffsToBeArchived = Diff::where('revision', '<=', $linearEquation)
-                    ->where('archived', false)
-                    ->where('deleted_at', null)
+                    ->where('archive_id', null)
+                    ->whereNotNull('content')
                     ->where('post_id', $postId)
                     ->get();
 
                 if($diffsToBeArchived->count() > 0) {
-                    foreach($diffsToBeArchived as $diff) {
-                        $this->log->info(
-                            "[the-turk/flarum-diff] |> archiving revision #{$diff->id} from post #{$postId}"
-                        );
+                      // archive revisions one by one
+                      foreach($diffsToBeArchived as $diff) {
+                          $this->log->info(
+                              "[the-turk/flarum-diff] |> archiving revision #{$diff->id} from post #{$postId}"
+                          );
 
-                        $this->diffArchive->archiveContent(
-                            $diff->post_id,
-                            $diff->id,
-                            $diff->content
-                        );
+                          $archiveContent = $this->diffArchive->archiveContent(
+                              $diff->post_id,
+                              $diff->id,
+                              $diff->content
+                          );
 
-                        $updateDiff = Diff::findOrFail($diff->id);
-                        $updateDiff->archived = true;
-                        $updateDiff->content = null;
-                        $updateDiff->save();
-                    }
+                          // set archive id for revision
+                          $diff->archive_id = $archiveContent->id;
+                          // set revision content to null
+                          $diff->content = null;
+                          $diff->save();
+                      }
                 }
             } catch (\Exception $e) {
                 $this->log->error($e->getMessage());
@@ -98,33 +112,26 @@ class ArchiveDiffs
         }
     }
 
+    /**
+     * Archive all posts' revisions.
+     */
     public function archiveAll()
     {
-        /* ToDo: try to use below query next time.
-        SELECT `id`, `post_id`, `revision`, `content`, `deleted_at`, `archived`
-          FROM (
-            SELECT `id`, `post_id`, `revision`, `content`, `deleted_at`, `archived`,
-              @row_number := IF(@current_post = `post_id`, @row_number + 1, 1) AS `RowNumber`,
-              @current_post := `post_id` AS `CurrentPost`
-            FROM `post_edit_histories`,
-              (SELECT @current_post:=0, @row_number:=0) as t
-          ) ranked
-        WHERE `revision` >= $this->greaterOrEqual AND `RowNumber` <= $this->archiveFirst
-          AND `archived` = false AND `deleted_at` IS NULL AND `content` IS NOT NULL
-        ORDER BY `post_id`, `revision` ASC;
-        */
-
+        $time = Carbon::now();
+        $this->log->info(
+            "[the-turk/flarum-diff] |> archive post's revisions {$time}"
+        );
         $postsToBeArchived = Diff::select('post_id')
             ->selectRaw('MAX(revision) AS revision')
             ->where('revision', '>=', $this->revLimit)
-            ->where('archived', false)
-            ->where('deleted_at', null)
+            ->where('archive_id', null)
+            ->whereNotNull('content')
             ->groupBy('post_id')
             ->get();
 
         if($postsToBeArchived->count() > 0) {
             foreach($postsToBeArchived as $post) {
-                $this->archiveForPost($post->post_id, $post->revision, null);
+                $this->archiveForPost($post->post_id, $post->revision);
             }
         }
     }
@@ -133,7 +140,7 @@ class ArchiveDiffs
      * @param float $number
      * @return float
      */
-    public function sanitizeFloat(float $number) {
+    public static function sanitizeFloat(float $number) {
         return floatval(preg_replace('/[^-0-9\.]/', '', $number));
     }
 }

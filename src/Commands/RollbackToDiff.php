@@ -16,19 +16,12 @@ class RollbackToDiff
     public $diffId;
 
     /**
-     * @var int
-     */
-    public $maxRevisionCount;
-
-    /**
      * @param User $actor
      * @param int  $diffId
-     * @param int  $maxRevisionCount
      */
-    public function __construct(User $actor, int $diffId, int $maxRevisionCount)
+    public function __construct(User $actor, int $diffId)
     {
         $this->actor = $actor;
         $this->diffId = $diffId;
-        $this->maxRevisionCount = $maxRevisionCount;
     }
 }

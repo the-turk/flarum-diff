@@ -1,6 +1,6 @@
 {
   "name": "the-turk/flarum-diff",
-  "description": "View post edit histories in Flarum.",
+  "description": "View post edit histories.",
   "keywords": [
     "flarum",
     "edit",
@@ -23,7 +23,7 @@
   "require": {
     "flarum/core": ">=0.1.0-beta.10 <0.1.0-beta.13",
     "fof/console": "^0.5",
-    "jfcherng/php-diff": "^6.5.1",
+    "jfcherng/php-diff": "^6.6.1",
     "ext-json": "*"
   },
   "autoload": {

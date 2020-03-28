@@ -40,11 +40,10 @@ class PostActions
      * @param ArchiveDiffs $job
      */
     public function __construct(
-      SettingsRepositoryInterface $settings,
-      ExtensionManager $extensions,
-      ArchiveDiffs $job
-    )
-    {
+        SettingsRepositoryInterface $settings,
+        ExtensionManager $extensions,
+        ArchiveDiffs $job
+    ) {
         $this->settings = $settings;
         $this->extensions = $extensions;
         $this->job = $job;
@@ -59,10 +58,11 @@ class PostActions
     {
         $events->listen(PostSaving::class, [$this, 'whenSavingPost']);
         $events->listen(
-          ($this->extensions->isEnabled('the-turk-quiet-edits')
-          ? \TheTurk\QuietEdits\Events\PostWasRevisedLoudly::class
-          : PostRevised::class),
-          [$this, 'whenRevisedPost']
+            // support for my 'the-turk/flarum-quiet-edits' extension
+            ($this->extensions->isEnabled('the-turk-quiet-edits')
+            ? \TheTurk\QuietEdits\Events\PostWasRevisedLoudly::class
+            : PostRevised::class),
+              [$this, 'whenRevisedPost']
         );
     }
 
@@ -75,12 +75,19 @@ class PostActions
     public function whenSavingPost(PostSaving $event)
     {
         $post = $event->post;
-        if ($post->exists)
-          $this->oldContent = $post->getContentAttribute(
-            $post->getOriginal('content')
+        // if the post already exists,
+        // this means we're trying to edit.
+        if ($post->exists) {
+            $this->oldContent = $post->getContentAttribute(
+              $post->getOriginal('content')
           );
+        }
     }
 
+    /**
+     * We'll always store the old content as new revision
+     * because latest revision will always be the current post content.
+     */
     public function whenRevisedPost($event)
     {
         $mainPostOnly = (bool)$this->settings->get(
@@ -89,7 +96,10 @@ class PostActions
         );
 
         if ($mainPostOnly) {
-            if ($event->post->number != '1') return;
+            // skip if it's not first post
+            if ($event->post->number != '1') {
+                return;
+            }
         }
 
         $archiveOlds = $this->settings->get(
@@ -102,23 +112,49 @@ class PostActions
             false
         );
 
-        // check if this post has been edited before
-        // and increase the revision number
-        $latestRevModel = Diff::where('post_id', $event->post->id)->max('revision');
-        $revision = ($latestRevModel ? $latestRevModel + 1 : 1);
+        $diffSubject = Diff::where('post_id', $event->post->id);
+        $maxRevisionCount = $diffSubject->exists() ? $diffSubject->max('revision') : 0;
 
+        // if this is a first edit
+        if ($maxRevisionCount == 0) {
+            $diff = Diff::build(
+                0, // save original post as revision 0 before updating it
+                $event->post->id,
+                $event->actor->id,
+                $this->oldContent
+            );
+
+            $diff->created_at = $event->post->created_at;
+            $diff->save();
+        } else {
+            // update last revision's content
+            // because we set it to null before
+            // (we were getting its contents from posts table
+            // because latest revision is equal to latest post content)
+            $latestDiff = $diffSubject
+              ->where('revision', $maxRevisionCount)
+              ->firstOrFail();
+            $latestDiff->content = $this->oldContent;
+            $latestDiff->save();
+        }
+
+        // add new revision and set it content to null
+        // because latest revision is equal to latest post content
         $diff = Diff::build(
-            $revision,
+            $maxRevisionCount + 1,
             $event->post->id,
             $event->actor->id,
-            $this->oldContent
+            null
         );
 
         $diff->created_at = Carbon::now();
         $diff->save();
 
-        if($archiveOlds && !$useCrons) {
-            $this->job->archiveForPost($event->post->id, $revision);
+        // if they want to archive old revisions
+        // without using cron jobs or `diff:archive` command
+        // ...we're cool with it.
+        if ($archiveOlds && !$useCrons) {
+            $this->job->archiveForPost($event->post->id, $maxRevisionCount + 1);
         }
     }
 }

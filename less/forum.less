@@ -1,8 +1,34 @@
-@import './common/variables.less';
+@import "./common/variables.less";
+@import "./common/mixins.less";
+@import "./forum/DiffDropdown.less";
+@import "./forum/DiffList.less";
+@import "./forum/DiffModal.less";
 
-@import './forum/DiffDropdown.less';
-@import './forum/DiffList.less';
-@import './forum/DiffModal.less';
+// support for fof's night mode extension
+@import "./common/fofNightMode.less";
 
-// support for night mode extension by fof
-@import './common/fofNightMode.less';
+// all tooltips are docked to body
+// because of z-index problems in dropdow list
+// https://stackoverflow.com/a/15981951/12866913
+body > div.diffTooltip {
+  // wait, does internet explorer support css3 colors?
+  // I'm shocked!
+  // https://caniuse.com/#feat=css3-colors
+  &.deletedDiffTooltip {
+    &.tooltip.left .tooltip-inner {
+      background-color: indianred;
+    }
+
+    &.tooltip.left .tooltip-arrow {
+      border-left-color: indianred;
+    }
+  }
+
+  // tooltips for touch devices also skipped
+  // in DiffModal.js & DiffButton.js
+  // i'm not sure if i should implement it or not
+  // i'll se what i can do later
+  @media @phone {
+    display: none !important;
+  }
+}

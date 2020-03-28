@@ -10,16 +10,17 @@ use Flarum\User\User;
  * @property string $content
  * @property int $post_id
  * @property \Flarum\Post\Post $post
+ * @property int|null $rollbacked_to
  * @property int|null $actor_id
  * @property User|null $actor
  * @property int|null $deleted_user_id
- * @property int|null $reverted_user_id
+ * @property int|null $rollbacked_user_id
  * @property User|null $deleted_user
- * @property User|null $reverted_user
+ * @property User|null $rollbacked_user
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $deleted_at
- * @property \Carbon\Carbon $reverted_at
- * @property bool $archived
+ * @property \Carbon\Carbon $rollbacked_at
+ * @property int $archive_id
  */
 class Diff extends AbstractModel
 {
@@ -33,7 +34,7 @@ class Diff extends AbstractModel
      *
      * @var array
      */
-    protected $dates = ['created_at', 'deleted_at'];
+    protected $dates = ['created_at', 'deleted_at', 'rollbacked_at'];
 
     /**
      * @param $revision
@@ -73,8 +74,8 @@ class Diff extends AbstractModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function revertedUser()
+    public function rollbackedUser()
     {
-        return $this->belongsTo(User::class, 'reverted_user_id')->withDefault();
+        return $this->belongsTo(User::class, 'rollbacked_user_id')->withDefault();
     }
 }

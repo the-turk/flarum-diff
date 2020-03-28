@@ -3,26 +3,31 @@ namespace TheTurk\Diff\Commands;
 
 use Flarum\User\AssertPermissionTrait;
 use Flarum\User\Exception\PermissionDeniedException;
+use TheTurk\Diff\Repositories\DiffArchiveRepository;
 use TheTurk\Diff\Models\Diff;
-use TheTurk\Diff\Jobs\DeleteDiff as DeleteDiffJob;
+use Carbon\Carbon;
 
 class DeleteDiffHandler
 {
     use AssertPermissionTrait;
 
     /**
-     * @var DeleteDiffJob
+     * @var DiffArchiveRepository
      */
-    protected $job;
+    protected $diffArchive;
 
     /**
-     * @param DeleteDiffJob $job
+     * @param DiffArchiveRepository $diffArchive
      */
-    public function __construct(DeleteDiffJob $job)
+    public function __construct(DiffArchiveRepository $diffArchive)
     {
-        $this->job = $job;
+        $this->diffArchive = $diffArchive;
     }
 
+    /*
+     * Deleting revision will keep their rows.
+     * Only the revision contents will be removed for good.
+     */
     public function handle(DeleteDiff $command)
     {
         $actor = $command->actor;
@@ -35,6 +40,19 @@ class DeleteDiffHandler
             throw new PermissionDeniedException();
         }
 
-        $this->job->delete($diff, $actor);
+        // if this is an archived revision
+        if($diff->archive_id !== null) {
+            $this->diffArchive->deleteArchivedContent(
+                $diff->archive_id,
+                $diff->id
+            );
+            // it's not archived anymore
+            $diff->archive_id = null;
+        }
+
+        if($diff->archive_id === null) $diff->content = null;
+        $diff->deleted_user_id = $actor->id;
+        $diff->deleted_at = Carbon::now();
+        $diff->save();
     }
 }

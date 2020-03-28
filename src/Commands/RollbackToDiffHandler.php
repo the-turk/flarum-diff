@@ -6,20 +6,24 @@ use Flarum\User\Exception\PermissionDeniedException;
 use TheTurk\Diff\Models\Diff;
 use TheTurk\Diff\Events\PostWasRollbacked;
 use TheTurk\Diff\Repositories\DiffArchiveRepository;
-use TheTurk\Diff\Jobs\DeleteDiff;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Flarum\Post\Command\EditPost;
 use Carbon\Carbon;
-use Flarum\Post\Post;
-use InvalidArgumentException;
+use Flarum\Post\PostRepository;
 
 class RollbackToDiffHandler
 {
     use AssertPermissionTrait;
 
     /**
+     * @var \Flarum\Post\PostRepository
+     */
+    protected $posts;
+
+    /**
      * @var Dispatcher
      */
-    protected $events;
+    protected $bus;
 
     /**
      * @var DiffArchiveRepository
@@ -27,77 +31,82 @@ class RollbackToDiffHandler
     protected $diffArchive;
 
     /**
-     * @var DeleteDiff
-     */
-    protected $job;
-
-    /**
-     * @param Dispatcher $events
+     * @param PostRepository $posts
+     * @param Dispatcher $bus
      * @param DiffArchiveRepository $diffArchive
-     * @param DeleteDiff $job
      */
     public function __construct(
-      Dispatcher $events,
-      DiffArchiveRepository $diffArchive,
-      DeleteDiff $job
+      PostRepository $posts,
+      Dispatcher $bus,
+      DiffArchiveRepository $diffArchive
     )
     {
-        $this->events = $events;
+        $this->posts = $posts;
+        $this->bus = $bus;
         $this->diffArchive = $diffArchive;
-        $this->job = $job;
     }
 
+    /*
+     * Rollbacking to a revision will be considered as formal edit.
+     * Thus, new edit will be performed for post using revision's content
+     * that we want to rollback to.
+     */
     public function handle(RollbackToDiff $command)
     {
         $actor = $command->actor;
         $diff = Diff::findOrFail($command->diffId);
         $isSelf = $actor->id === $diff->actor->id;
 
-        if (!$actor->can('deleteEditHistory')
-            && !($isSelf && $actor->can('selfDeleteEditHistory'))) {
+        if (!$actor->can('rollbackEditHistory')
+            && !($isSelf && $actor->can('selfRollbackEditHistory'))) {
             throw new PermissionDeniedException();
         }
 
-        $rollbackTo = Diff::where('revision', '>', $diff->revision)
-                      ->where('post_id', $diff->post_id)
-                      ->where('deleted_at', null)
-                      ->firstOrFail();
+        $maxRevisionCount = Diff::where('post_id', $diff->post_id)->max('revision');
 
-        if ($rollbackTo->archived) {
+        $post = $this->posts->findOrFail($diff->post_id, $actor);
+
+        // if we want to rollback to archived revision
+        if ($diff->archive_id !== null) {
             $postContent = $this->diffArchive->getArchivedContent(
-                $diff->post_id,
-                $rollbackTo->id
+                $diff->archive_id,
+                $diff->id
             );
         } else {
-            $postContent = $rollbackTo->content;
+            $postContent = $diff->content;
+
+            // if this is the last revision then its contents
+            // gotta be null, because we were retraining its contents
+            // from the post subject. We'll add a new revision after
+            // this rollback operation so we need to convert this
+            // null value into current content first. Revision after
+            // rollbacking will be null again because it's the post itself.
+            if($diff->revision == $maxRevisionCount
+                  && null === $diff->content) {
+                    $diff->content = $post->content;
+            }
         }
 
-        if(null === $postContent) {
-            throw new InvalidArgumentException(
-                'Post\'s content can\'t be null.'
+        $postData = [
+            'attributes' => [
+                'content' => $postContent
+            ]
+        ];
+
+        if($post->content !== $postContent) {
+            // dispatching events occuring when post edited
+            // this will also validate our new post
+            $this->bus->dispatch(
+                new EditPost($diff->post_id, $actor, $postData)
             );
+
+            $diff->rollbacked_user_id = $actor->id;
+            $diff->rollbacked_at = Carbon::now();
+            // this is to track what's been rollbacked to what
+            $diff->rollbacked_to = Diff::where('post_id', $diff->post_id)
+                ->where('revision', $maxRevisionCount + 1)
+                ->firstOrFail()->id;
+            $diff->save();
         }
-
-        for ($i = $command->maxRevisionCount; $i > $diff->revision; $i--) {
-            $diffToDelete = Diff::where('revision', $i)
-                            ->where('post_id', $diff->post_id)
-                            ->firstOrFail();
-
-            $this->job->delete($diffToDelete, $actor);
-        }
-
-        $post = Post::findOrFail($diff->post_id);
-        $post->content = $postContent;
-        $post->edited_at = Carbon::now();
-        $post->edited_user_id = $actor->id;
-        $post->save();
-
-        $diff->reverted_user_id = $actor->id;
-        $diff->reverted_at = Carbon::now();
-        $diff->save();
-
-        $this->events->dispatch(
-            new PostWasRollbacked($post, $actor)
-        );
     }
 }

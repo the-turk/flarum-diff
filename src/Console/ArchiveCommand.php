@@ -18,9 +18,9 @@ class ArchiveCommand extends Command
      * @var string
      */
     protected $description =
-        'If a post\'s revision count is greater (or equal) than X,
-        first Y can be stored as merged & compressed using this command.
-        Specify X and Y from the settings modal.';
+        'If a post\'s revision count [x] is greater (or equal) than [A],
+        first [y] can be stored as merged & compressed using this command.
+        Specify related values from the settings modal.';
 
     public function handle()
     {

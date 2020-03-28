@@ -181,6 +181,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * The `DiffButton` component composes a button
+ * for all revisions created in DiffList.
+ */
 
 var DiffButton =
 /*#__PURE__*/
@@ -193,48 +197,60 @@ function (_Button) {
 
   var _proto = DiffButton.prototype;
 
+  // see the following link to find out why i'm overriding this at all
+  // https://discuss.flarum.org/d/22728-passing-an-object-to-a-custom-button-component
   _proto.view = function view() {
     var attrs = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, this.props);
 
     delete attrs.item;
     delete attrs.subButton;
+    delete attrs.postDate;
     attrs.type = 'button';
     return m("button", attrs, this.getButtonContent());
-  }
-  /**
-   * Get the template for the button's content.
-   *
-   * @return {*}
-   * @protected
-   */
-  ;
+  };
 
   _proto.getButtonContent = function getButtonContent() {
-    var diff = this.props.item;
-    var actor = diff.actor();
-    var editedInfo = flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('core.forum.post.edited_tooltip', {
-      username: flarum_helpers_username__WEBPACK_IMPORTED_MODULE_5___default()(diff.actor()),
-      ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(diff.createdAt())
+    var revision = this.props.item;
+    var actor = revision.actor();
+    var buttonText = revision.revision() == 0 ?
+    /* {username} created {ago} */
+    flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('the-turk-diff.forum.createdTooltip', {
+      username: flarum_helpers_username__WEBPACK_IMPORTED_MODULE_5___default()(revision.actor()),
+      ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(this.props.postDate)
+    })) :
+    /* {username} edited {ago} */
+    flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('core.forum.post.edited_tooltip', {
+      username: flarum_helpers_username__WEBPACK_IMPORTED_MODULE_5___default()(revision.actor()),
+      ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(revision.createdAt())
     }));
 
-    if (diff.deletedAt()) {
+    if (revision.deletedAt()) {
       if (this.props.subButton === false) {
-        editedInfo = editedInfo + ' ' + app.translator.trans('the-turk-diff.forum.deletedText');
+        /* {username} did something {ago} (deleted) */
+        buttonText = buttonText + ' ' + app.translator.trans('the-turk-diff.forum.deletedText');
       } else {
-        actor = diff.deletedUser();
-        editedInfo = flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('the-turk-diff.forum.deletedTooltip', {
-          username: flarum_helpers_username__WEBPACK_IMPORTED_MODULE_5___default()(diff.deletedUser()),
-          ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(diff.deletedAt())
+        /* sub button text that appears when you click on caret icon */
+        actor = revision.deletedUser();
+        /* {actor} deleted this content {ago} */
+
+        buttonText = flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('the-turk-diff.forum.deletedTooltip', {
+          username: flarum_helpers_username__WEBPACK_IMPORTED_MODULE_5___default()(revision.deletedUser()),
+          ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(revision.deletedAt())
         }));
       }
     }
 
-    return [actor.username() ? flarum_helpers_avatar__WEBPACK_IMPORTED_MODULE_3___default()(actor) : '', diff.deletedAt() && this.props.subButton === false ? flarum_helpers_icon__WEBPACK_IMPORTED_MODULE_4___default()('fas fa-caret-down', {
+    return [// we also should consider deleted users here
+    actor.username() ? flarum_helpers_avatar__WEBPACK_IMPORTED_MODULE_3___default()(actor) : '', // does this button have an icon?
+    revision.deletedAt() && this.props.subButton === false ? flarum_helpers_icon__WEBPACK_IMPORTED_MODULE_4___default()('fas fa-caret-down', {
       className: 'Button-caret'
-    }) : '', m("span", {
+    }) : '', // button label
+    m("span", {
       className: "Button-label",
-      title: editedInfo
-    }, diff.deletedAt() && this.props.subButton === true ? m("em", null, editedInfo) : editedInfo)];
+      title: buttonText
+    }, revision.deletedAt() && this.props.subButton === true ?
+    /* emphasize deleted revision's information */
+    m("em", null, buttonText) : buttonText)];
   };
 
   return DiffButton;
@@ -264,6 +280,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * The `DiffDropdown` component is the entrance point for this extension.
+ * It's the component that you see when you click on "Edited" button.
+ * It also contains DiffList components.
+ */
 
 var DiffDropdown =
 /*#__PURE__*/
@@ -288,10 +309,26 @@ function (_Dropdown) {
 
   _proto.init = function init() {
     _Dropdown.prototype.init.call(this);
+    /**
+     * The post that we're working with.
+     *
+     * @type {Post[]}
+     */
 
-    var post = this.props.post;
+
+    this.post = this.props.post;
+    /**
+     * Create a new revision list.
+     * This approach may not work with newer Mithril versions.
+     *
+     * @type {DiffList}
+     */
+
     this.list = new _DiffList__WEBPACK_IMPORTED_MODULE_2__["default"]({
-      post: post
+      post: this.post,
+      forModal: false,
+      selectedItem: null,
+      moreResults: null
     });
   };
 
@@ -314,8 +351,16 @@ function (_Dropdown) {
   _proto.getMenu = function getMenu() {
     return m("div", {
       className: 'Dropdown-menu ' + this.props.menuClassName
-    }, this.showing ? this.list.render() : '');
-  };
+    }, m("div", {
+      className: "DiffList-header"
+    }, m("h4", null, app.translator.transChoice('the-turk-diff.forum.revisionInfo', this.props.post.revisionCount(), {
+      revisionCount: this.props.post.revisionCount()
+    }))), this.showing ? this.list.render() : '');
+  }
+  /**
+   * Load revision list.
+   */
+  ;
 
   _proto.onclick = function onclick() {
     this.list.load();
@@ -347,6 +392,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _DiffModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./DiffModal */ "./src/forum/components/DiffModal.js");
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! flarum/components/LoadingIndicator */ "flarum/components/LoadingIndicator");
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! flarum/utils/extractText */ "flarum/utils/extractText");
+/* harmony import */ var flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _utils_touchDevice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../utils/touchDevice */ "./src/forum/utils/touchDevice.js");
+/* harmony import */ var _utils_redrawPost__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../utils/redrawPost */ "./src/forum/utils/redrawPost.js");
+
+
+
 
 
 
@@ -354,7 +406,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /**
- * The `DiffList` component displays a list of the post's diffs.
+ * The `DiffList` component displays a list of the post's revisions.
+ * It's been using on both DiffDropdown & DiffModal components.
+ * It also contains DiffButton components.
  */
 
 var DiffList =
@@ -370,22 +424,62 @@ function (_Component) {
 
   _proto.init = function init() {
     /**
-     * Whether or not the diffs are loading.
+     * Whether or not the revisions are loading.
      *
      * @type {Boolean}
      */
     this.loading = false;
     /**
+     * The post that we're working with.
+     *
+     * @type {Post[]}
+     */
+
+    this.post = this.props.post;
+    /**
      * Whether or not there are more results that can be loaded.
+     *
+     * @type {Boolean|Null}
+     */
+
+    if (null !== this.props.moreResults) {
+      this.moreResults = this.props.moreResults;
+    } else {
+      this.moreResults = false;
+    }
+    /**
+     * Whether if this list for the DiffModal Component or not.
+     * Because the DiffList also can be used for DiffDropdown.
      *
      * @type {Boolean}
      */
 
-    this.moreResults = false;
+
+    this.forModal = this.props.forModal;
+    /**
+     * Whether there is a pre-selected revision or not.
+     * If user clicks a revision in this list while DiffModal open,
+     * we'll use this value to active & disable selected revision's
+     * DiffButton component.
+     *
+     * @type {Number|Null}
+     */
+
+    this.selectedItem = this.props.selectedItem;
+    /**
+     * Whether there is a pre-selected revision or not.
+     * If user clicks a revision in this list while DiffModal open,
+     * we'll use this value to active & disable selected revision's
+     * DiffButton component.
+     *
+     * @type {Number|Null}
+     */
+
+    this.selectedItem = this.props.selectedItem;
 
     if (!flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs) {
       /**
-       * Initialize the cache.
+       * Initialize the cache if it isn't already initialized.
        *
        * @type {Array}
        */
@@ -396,70 +490,107 @@ function (_Component) {
   _proto.view = function view() {
     var _this = this;
 
-    var post = this.props.post;
-    var pages = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[post.id()] || [];
-    var postRevisionCount = post.revisionCount();
+    var pages = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.post.id()] || [];
     return m("div", {
-      className: "DiffList"
+      className: "DiffList-container"
     }, m("div", {
-      className: "DiffList-header"
-    }, m("h4", null, flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.transChoice('the-turk-diff.forum.revisionInfo', postRevisionCount, {
-      revisionCount: postRevisionCount
-    }))), m("div", {
       className: "DiffList-content"
     }, m("ul", null, pages.length ? pages.map(function (diffs) {
-      var items = [];
+      var items = []; // This allows us to use .map function
+
       diffs.forEach(function (diff) {
         items.push(diff);
       });
       return items.map(function (item) {
+        // we can use this class to customize all tooltips
+        // provided by this extension
+        var tooltipClass = 'diffTooltip';
         var diffButton = _DiffButton__WEBPACK_IMPORTED_MODULE_3__["default"].component({
+          postDate: _this.post.createdAt(),
           subButton: false,
           item: item,
           onclick: function onclick() {
             if (!item.deletedAt()) {
               flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.modal.show(new _DiffModal__WEBPACK_IMPORTED_MODULE_4__["default"]({
                 item: item,
-                post: post
+                post: _this.post,
+                moreResults: _this.moreResults
               }));
+
+              if (_this.forModal) {
+                // .DiffList-content container of clicked revision
+                var $listContainer = _this.$('li#parentDiff' + item.id()); // disable clicked revision, enable others
+
+
+                $listContainer.find('button').prop('disabled', true);
+                $listContainer.siblings().find('button').prop('disabled', false); // add 'active' class to clicked revision, remove it from others
+
+                $listContainer.siblings().removeClass('active');
+                $listContainer.addClass('active');
+              }
             } else {
+              // if revision is deleted, we'll toggle the info
+              // like GitHub does.
               _this.toggleSubDiff(item.id());
             }
+          },
+          config: function config(elm) {
+            return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_7__["default"])() === false ? $(elm).tooltip({
+              trigger: 'hover',
+              placement: 'left',
+              container: 'body'
+            }).attr('data-original-title', flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_6___default()(item.revision() == _this.post.revisionCount() ? // we're hovering on latest revision's button
+            flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.mostRecent') : item.revision() == 0 ? // we're hovering on zeroth revision's button
+            flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.originalContent') : // we're hovering on other revision's button
+            flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.revisionWithNumber', {
+              number: item.revision()
+            }))) // this is a workaround for adding custom
+            // classes into bootstrap tooltips
+            // https://stackoverflow.com/a/29879041/12866913
+            .data('bs.tooltip').tip().addClass(item.deletedAt() ? tooltipClass + 'deletedDiffTooltip' : tooltipClass) : '';
           }
-        });
-        return m("div", {
-          className: "DiffList-holder"
-        }, m("li", {
+        }); // returns the template for revision list items
+
+        return [m("li", {
           className: 'Diff ParentDiff' + (item.deletedAt() ? ' has-sub' : ''),
           id: 'parentDiff' + item.id()
         }, diffButton), item.deletedAt() ? m("li", {
           className: "Diff SubDiff",
-          id: 'subDiff' + item.id(),
-          style: "display:none;"
+          id: 'subDiff' + item.id()
         }, _DiffButton__WEBPACK_IMPORTED_MODULE_3__["default"].component({
-          item: item,
-          subButton: true
-        })) : '');
+          postDate: _this.post.createdAt(),
+          subButton: true,
+          item: item
+        })) : ''];
       });
     }) : '', this.loading ? flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_5___default.a.component({
       className: 'LoadingIndicator--block'
-    }) : pages.length ? '' : m("div", {
+    }) : !pages.length ? m("div", {
       className: "DiffList-empty"
-    }, flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.emptyText')))));
+    }, flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.emptyText')) : '')));
   };
 
   _proto.config = function config(isInitialized, context) {
     var _this2 = this;
 
     if (isInitialized) return;
-    var $notifications = this.$('.DiffList-content');
-    var $scrollParent = $notifications.css('overflow') === 'auto' ? $notifications : $(window);
+
+    if (this.forModal && this.selectedItem) {
+      var $selectedItem = this.$('li#parentDiff' + this.selectedItem);
+      $selectedItem.find('button').prop('disabled', true);
+      $selectedItem.addClass('active');
+    }
+
+    var $revisions = this.$('.DiffList-content');
+    var $scrollParent = $revisions.css('overflow') === 'auto' ? $revisions : $(window); // Lazy-loading implementation for the revision list
+    // simply checks if we're bottom of the list
+    // and if there are more results to show
 
     var scrollHandler = function scrollHandler() {
       var scrollTop = $scrollParent.scrollTop();
       var viewportHeight = $scrollParent.height();
-      var contentTop = $scrollParent === $notifications ? 0 : $notifications.offset().top;
-      var contentHeight = $notifications[0].scrollHeight;
+      var contentTop = $scrollParent === $revisions ? 0 : $revisions.offset().top;
+      var contentHeight = $revisions[0].scrollHeight;
 
       if (_this2.moreResults && !_this2.loading && scrollTop + viewportHeight >= contentTop + contentHeight) {
         _this2.loadMore();
@@ -473,24 +604,20 @@ function (_Component) {
     };
   }
   /**
-   * Load diff results.
+   * Load revisions.
    *
    * @public
    */
   ;
 
   _proto.load = function load() {
-    if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()]) {
-      m.redraw(); // also redraw the post because it sometimes
-      // appears and sometimes doesn't after editing a post
-
-      return this.postRedrawer();
-    }
-
+    // don't do anthing if we already cached revisions for the post.
+    // lazy-loading will perform loadMore() if there are moreResults
+    if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.post.id()]) return this.redrawList();
     this.loadMore();
   }
   /**
-   * Load the next page of diff results.
+   * Load the next page of revision results.
    *
    * @public
    */
@@ -500,27 +627,29 @@ function (_Component) {
     var _this3 = this;
 
     this.loading = true;
-    m.redraw(); // redraw for this view()
+    this.redrawList(); // don't do anthing if we already cached ALL revisions for the post.
 
-    this.postRedrawer();
-    var postId = this.props.post.id();
-    var params = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[postId] ? {
-      id: postId,
+    if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.post.id()] && flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.post.id()].length == this.post.revisionCount()) {
+      return;
+    } // set URL parameters
+
+
+    var params = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.post.id()] ? {
+      id: this.post.id(),
       page: {
-        offset: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[postId].length * 10
+        offset: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.post.id()].length * 10
       }
     } : {
-      id: postId
+      id: this.post.id()
     };
     return flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.store.find('diff', params).then(this.parseResults.bind(this))["catch"](function () {}).then(function () {
       _this3.loading = false;
-      m.redraw(); // redraw for this view()
 
-      _this3.postRedrawer();
+      _this3.redrawList();
     });
   }
   /**
-   * Parse results and append them to the diff list.
+   * Parse results and append them to the revision list.
    *
    * @param {Diff[]} results
    * @return {Diff[]}
@@ -528,39 +657,42 @@ function (_Component) {
   ;
 
   _proto.parseResults = function parseResults(results) {
-    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()] = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()] || [];
-    if (results.length) flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.props.post.id()].push(results);
+    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.post.id()] = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.post.id()] || [];
+    if (results.length) flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[this.post.id()].push(results);
     this.moreResults = !!results.payload.links.next;
     return results;
   }
   /**
-   * Redraw the post.
-   * Workaround for:
-   * https://discuss.flarum.org/d/22755-mithril-related-issues-on-poststream-items
-   */
-  ;
-
-  _proto.postRedrawer = function postRedrawer() {
-    return this.props.post.save({}).then(function () {
-      return m.redraw();
-    });
-  }
-  /**
-   * @param id
+   * Toggle the deleted revision's information (sub-button).
+   *
+   * @param {Number} id
    */
   ;
 
   _proto.toggleSubDiff = function toggleSubDiff(id) {
-    var $subDiff = this.$('.DiffList-holder #subDiff' + id);
-    var $parentDiff = this.$('.DiffList-holder #parentDiff' + id);
+    var $subDiff = this.$('li.Diff#subDiff' + id);
+    var $parentDiff = this.$('li.Diff#parentDiff' + id);
     var $icon = $parentDiff.find('.icon');
-    $subDiff.toggle();
+    $subDiff.toggle(); // switch caret icon onClick
 
     if ($icon.hasClass('fa-caret-down')) {
       $icon.removeClass('fa-caret-down').addClass('fa-caret-up');
     } else {
       $icon.removeClass('fa-caret-up').addClass('fa-caret-down');
     }
+  }
+  /**
+   * Redraw the list based on parent component.
+   */
+  ;
+
+  _proto.redrawList = function redrawList() {
+    m.redraw(); // because we don't need to redraw the post
+    // to update DiffList in DiffModal.
+    // We just need it for updating DiffDropdown.
+
+    if (this.forModal) return;
+    return Object(_utils_redrawPost__WEBPACK_IMPORTED_MODULE_8__["default"])(this.post);
   };
 
   return DiffList;
@@ -593,12 +725,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var flarum_helpers_avatar__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! flarum/helpers/avatar */ "flarum/helpers/avatar");
 /* harmony import */ var flarum_helpers_avatar__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(flarum_helpers_avatar__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var flarum_components_Alert__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! flarum/components/Alert */ "flarum/components/Alert");
-/* harmony import */ var flarum_components_Alert__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Alert__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! flarum/components/LoadingIndicator */ "flarum/components/LoadingIndicator");
-/* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! flarum/components/Dropdown */ "flarum/components/Dropdown");
-/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! flarum/utils/extractText */ "flarum/utils/extractText");
+/* harmony import */ var flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../utils/touchDevice */ "./src/forum/utils/touchDevice.js");
+/* harmony import */ var _utils_redrawPost__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../utils/redrawPost */ "./src/forum/utils/redrawPost.js");
+/* harmony import */ var flarum_components_Alert__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! flarum/components/Alert */ "flarum/components/Alert");
+/* harmony import */ var flarum_components_Alert__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Alert__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! flarum/components/LoadingIndicator */ "flarum/components/LoadingIndicator");
+/* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! flarum/components/Dropdown */ "flarum/components/Dropdown");
+/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_12__);
+/* harmony import */ var _DiffList__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./DiffList */ "./src/forum/components/DiffList.js");
 
 
 
@@ -609,6 +746,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+
+
+/**
+ * The `DiffModal` component is the main component of this extension.
+ * It also contains DiffList components.
+ */
 
 var DiffModal =
 /*#__PURE__*/
@@ -624,14 +769,62 @@ function (_Modal) {
   _proto.init = function init() {
     _Modal.prototype.init.call(this);
     /**
-     * Whether or not the component is loading.
+     * Whether or not the modal is loading.
      *
      * @type {Boolean}
      */
 
 
     this.loading = false;
-    this.attributes = this.props.item.data.attributes;
+    /**
+     * Whether the modal is showing or not.
+     *
+     * @type {Boolean}
+     */
+
+    this.showing = false;
+    /**
+     * We will use this to change modal's content when
+     * user clicks on a revision on the list.
+     *
+     * @type {Number|Null}
+     */
+
+    this.diffId = null;
+    /**
+     * The post that we're working with.
+     *
+     * @type {Post[]}
+     */
+
+    this.post = this.props.post;
+    /**
+     * This is the current revision object.
+     *
+     * @type {Diff[]}
+     */
+
+    this.revision = this.props.item;
+    /**
+     * Create a new revision list.
+     * This approach may not work with newer Mithril versions.
+     *
+     * @type {DiffList}
+     */
+
+    this.list = new _DiffList__WEBPACK_IMPORTED_MODULE_13__["default"]({
+      post: this.post,
+      forModal: true,
+      selectedItem: this.revision.id(),
+      moreResults: this.props.moreResults
+    });
+    /**
+     * This holds information about which revisions are subjects for comparison.
+     *
+     * @type {Object}
+     */
+
+    this.comparisonBetween = JSON.parse(this.revision.comparisonBetween());
   };
 
   _proto.className = function className() {
@@ -639,22 +832,42 @@ function (_Modal) {
   };
 
   _proto.title = function title() {
-    return [this.props.item.actor().username() ? flarum_helpers_avatar__WEBPACK_IMPORTED_MODULE_6___default()(this.props.item.actor()) : '', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.post.edited_tooltip', {
+    return [// we also should consider deleted users here
+    this.revision.actor().username() ? flarum_helpers_avatar__WEBPACK_IMPORTED_MODULE_6___default()(this.revision.actor()) : '', this.revision.revision() != 0 ? // x edited y ago
+    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.post.edited_tooltip', {
       username: m("a", {
-        href: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.route.user(this.props.item.actor()),
+        href: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.route.user(this.revision.actor()),
         config: m.route
-      }, flarum_helpers_username__WEBPACK_IMPORTED_MODULE_4___default()(this.props.item.actor())),
-      ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_5___default()(this.props.item.createdAt())
+      }, flarum_helpers_username__WEBPACK_IMPORTED_MODULE_4___default()(this.revision.actor())),
+      ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_5___default()(this.revision.createdAt())
+    }) : // x created y ago
+    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.createdTooltip', {
+      username: m("a", {
+        href: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.route.user(this.revision.actor()),
+        config: m.route
+      }, flarum_helpers_username__WEBPACK_IMPORTED_MODULE_4___default()(this.revision.actor())),
+      ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_5___default()(this.post.createdAt())
     })];
   };
 
   _proto.config = function config(isInitialized) {
-    if (isInitialized) return;
+    // workaround for missing 'in' class on .ModalManager
+    // after redrawing the DiffList component.
+    // because i'm done with this shit.
+    // https://github.com/flarum/core/pull/2080
+    if (this.showing && !$('.ModalManager').hasClass('in')) $('.ModalManager').addClass('in'); // we should re-Initialize this component after user
+    // clicks a different revision while modal is open
 
-    if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('diffRenderer') === 'Inline') {
-      this.setModalContent('inline');
+    if (isInitialized && this.diffId == this.revision.id()) return;
+    this.showing = true;
+    this.diffId = this.revision.id();
+
+    if (this.revision.revision() != 0 && this.comparisonBetween["new"].revision != this.comparisonBetween.old.revision) {
+      // we'll use Side By Side renderer as a fallback
+      // if there is no renderer choice
+      return this.setDiffContent(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.session.user.preferences().diffRenderer ? flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.session.user.preferences().diffRenderer : 'sideBySide');
     } else {
-      this.setModalContent('sideBySide');
+      return this.setDiffContent('preview');
     }
   };
 
@@ -667,75 +880,74 @@ function (_Modal) {
       className: "Modal-content"
     }, m("div", {
       className: "Modal-close App-backControl"
-    }, this.props.item.canDeleteEditHistory() ? m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9___default.a, {
-      className: "diffCotrollerDropdown",
-      buttonClassName: "Button Button--flat",
+    }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      icon: 'fas fa-times',
+      onclick: this.hide.bind(this),
+      className: 'Button Button--icon Button--link'
+    })), this.post.canDeleteEditHistory() && this.revision.revision() != this.post.revisionCount() || this.post.canRollbackEditHistory() ? m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_12___default.a, {
+      className: "diffCotrollerDropdown App-primaryControl",
+      icon: "fas fa-ellipsis-v",
+      buttonClassName: "Button",
       menuClassName: "Dropdown-menu--right",
-      label: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.optionsButton'),
-      onshow: function onshow() {
-        return _this.$('.controlsContainer').addClass('open');
-      },
-      onhide: function onhide() {
-        return _this.$('.controlsContainer').removeClass('open');
-      }
-    }, this.props.item.isRevertable() ? flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
-      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.rollbackButton'),
+      label: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.optionsButton')
+    }, this.post.canRollbackEditHistory() && this.comparisonBetween.old.diffId ? flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      children: this.revision.revision() == 0 ?
+      /* we're viewing the original content */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.rollbackToOriginalButton') : this.revision.revision() == this.post.revisionCount() ? this.comparisonBetween.old.revision != 0 ?
+      /* we're comparing this revision with current content. */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.revertChangesButton') :
+      /* we're comparing this revision with original content */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.rollbackToOriginalButton') :
+      /* we're comparing this revision with another revision */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.rollbackButton', {
+        number: this.revision.revision()
+      }),
       icon: 'fas fa-reply',
       onclick: function onclick() {
-        if (confirm(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.confirmRollback'))) {
-          _this.toggleDeleteAndRollbackButtons('disable');
-
+        if (confirm(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.confirmRollback', {
+          number: _this.revision.revision()
+        }))) {
           _this.loading = true;
           m.redraw();
+          var rollbackTo = _this.revision.revision() == _this.post.revisionCount() ? _this.comparisonBetween.old.diffId : _this.revision.id();
           flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.request({
-            url: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('apiUrl') + "/diff/" + _this.props.item.id(),
-            method: 'POST',
-            data: {
-              maxRevisionCount: _this.props.post.revisionCount()
-            }
+            url: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('apiUrl') + "/diff/" + rollbackTo,
+            method: 'POST'
           }).then(function () {
-            _this.postRedrawer();
-
+            Object(_utils_redrawPost__WEBPACK_IMPORTED_MODULE_9__["default"])(_this.post);
             flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.modal.close();
 
-            if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs && flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.props.post.id()]) {
-              delete flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.props.post.id()];
+            if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs && flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.post.id()]) {
+              delete flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.post.id()];
             }
 
             _this.showAlert('success', 'rollback');
           })["catch"](function () {
-            _this.toggleDeleteAndRollbackButtons('enable');
-
             _this.loading = false;
             m.redraw();
-
-            _this.postRedrawer();
+            Object(_utils_redrawPost__WEBPACK_IMPORTED_MODULE_9__["default"])(_this.post);
 
             _this.showAlert('error', 'rollback');
           });
         }
       }
-    }) : '', flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+    }) : '', this.post.canDeleteEditHistory() && this.revision.revision() != this.post.revisionCount() ? flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.post_controls.delete_button'),
       icon: 'far fa-trash-alt',
       onclick: function onclick() {
         if (confirm(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.confirmDelete'))) {
-          _this.toggleDeleteAndRollbackButtons('disable');
-
           _this.loading = true;
           m.redraw();
 
-          _this.props.item["delete"]().then(function () {
+          _this.revision["delete"]().then(function () {
             flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.modal.close();
 
-            if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs && flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.props.post.id()]) {
-              delete flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.props.post.id()];
+            if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs && flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.post.id()]) {
+              delete flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs[_this.post.id()];
             }
 
             _this.showAlert('success', 'delete');
           })["catch"](function () {
-            _this.toggleDeleteAndRollbackButtons('enable');
-
             _this.loading = false;
             m.redraw();
 
@@ -743,11 +955,7 @@ function (_Modal) {
           });
         }
       }
-    })) : '', flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
-      icon: 'fas fa-times',
-      onclick: this.hide.bind(this),
-      className: 'Button Button--icon Button--link'
-    })), m("div", {
+    }) : '') : '', m("div", {
       className: "Modal-header"
     }, m("h3", {
       className: "App-titleControl App-titleControl--text"
@@ -757,39 +965,95 @@ function (_Modal) {
   _proto.content = function content() {
     var _this2 = this;
 
-    return [flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('allowDiffSwitch') ? m("div", {
-      className: "controlsContainer"
+    return [m("div", {
+      className: "diff-grid"
+    }, m("div", {
+      className: "diff-grid-item diff-grid-controls"
     }, m("div", {
       className: "diffSwitcher"
-    }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+    }, this.revision.revision() != 0 && this.comparisonBetween["new"].revision != this.comparisonBetween.old.revision ? [flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-grip-lines',
       onclick: function onclick() {
-        _this2.setModalContent('inline');
+        _this2.setDiffContent('inline');
       },
-      className: 'Button Button--icon Button--link inlineView'
+      className: 'Button Button--icon Button--link inlineView',
+      config: function config(elm) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+          trigger: 'hover'
+        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.inline')) : '';
+      }
     }), flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-columns',
       onclick: function onclick() {
-        _this2.setModalContent('sideBySide');
+        _this2.setDiffContent('sideBySide');
       },
-      className: 'Button Button--icon Button--link sideBySideView'
+      className: 'Button Button--icon Button--link sideBySideView',
+      config: function config(elm) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+          trigger: 'hover'
+        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.sideBySide')) : '';
+      }
     }), flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'far fa-square',
       onclick: function onclick() {
-        _this2.setModalContent('combined');
+        _this2.setDiffContent('combined');
+
+        m.redraw();
       },
-      className: 'Button Button--icon Button--link combinedView'
-    })), m("div", {
-      className: "diffController"
-    })) : '', m("div", {
-      className: "Modal-body"
+      className: 'Button Button--icon Button--link combinedView',
+      config: function config(elm) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+          trigger: 'hover'
+        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.combined')) : '';
+      }
+    })] : '', flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      icon: 'far fa-eye',
+      onclick: function onclick() {
+        _this2.setDiffContent('preview');
+      },
+      className: 'Button Button--icon Button--link diffPreview',
+      config: function config(elm) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+          trigger: 'hover'
+        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.composer.preview_tooltip')) : '';
+      }
+    }))), m("div", {
+      className: "diff-grid-item diff-grid-info"
     }, m("div", {
+      className: "revisionInfo"
+    }, m("h4", null, flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.transChoice('the-turk-diff.forum.revisions', this.post.revisionCount(), {
+      revisionCount: this.post.revisionCount()
+    })), m("p", {
+      "class": "diffInfoContainer"
+    }))), m("div", {
+      className: "diff-grid-item diff-grid-revisions"
+    }, this.list.render()), m("div", {
+      className: "diff-grid-item diff-grid-diff"
+    }, m("div", {
+      className: "diffContents"
+    }, m("div", {
+      className: "previewContainer Post-body"
+    }, this.renderHtml(this.revision.data.attributes.previewHtml)), m("div", {
       className: "diffContainer"
-    }), flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_8___default.a.component({
+    }))), flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_11___default.a.component({
       className: 'DiffModal-loading' + (this.loading ? ' active' : '')
     }))];
   }
   /**
+   * Slowly scroll to selected revision.
+   */
+  ;
+
+  _proto.onready = function onready() {
+    var $revisions = this.$('.DiffList-content');
+    var $selectedItem = this.$('li#parentDiff' + this.revision.id());
+    $revisions.animate({
+      scrollTop: $selectedItem.offset().top - $revisions.offset().top + $revisions.scrollTop()
+    });
+  }
+  /**
+   * Show success and error messages for rollback and delete operations.
+   *
    * @param {string} type
    * @param {string} key
    */
@@ -800,132 +1064,131 @@ function (_Modal) {
       success: 'the-turk-diff.forum.' + key + 'SuccessMessage',
       error: 'the-turk-diff.forum.' + key + 'ErrorMessage'
     }[type];
-    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.alerts.show(new flarum_components_Alert__WEBPACK_IMPORTED_MODULE_7___default.a({
+    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.alerts.show(new flarum_components_Alert__WEBPACK_IMPORTED_MODULE_10___default.a({
       type: type,
       children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(message)
     }));
-  };
-
-  _proto.toggleDeleteAndRollbackButtons = function toggleDeleteAndRollbackButtons(state) {
-    var $deleteButton = this.$('.DeleteButton');
-    var $rollbackButton = this.$('.RollbackButton');
-
-    if (state === 'disable') {
-      $deleteButton.prop('disabled', true);
-      $rollbackButton.prop('disabled', true);
-    } else if (state === 'enable') {
-      $deleteButton.prop('disabled', false);
-      $rollbackButton.prop('disabled', false);
-    }
-  };
+  }
+  /**
+   * Render the diff views provided by external lib.
+   *
+   * do we need to worry about m.trust() function?
+   * well, Flarum itself doing the same way for rendering
+   * post items as seen on CommentPost.js#L52
+   * also, the diff library itself treat all inputs as plain text:
+   * https://github.com/jfcherng/php-diff/issues/9#issuecomment-526808774
+   * so no need to use additional Sanitizer lib for this operation.
+   *
+   * @param {string} content
+   */
+  ;
 
   _proto.renderHtml = function renderHtml(content) {
-    // do we need to worry about m.trust() function?
-    // well, Flarum itself doing the same way for rendering
-    // post items as seen on:
-    // https://github.com/flarum/core/blob/afe06ea750cfd81767461a3884a92a26f0b0ce37/js/src/forum/components/CommentPost.js#L52
-    // also, the diff library itself treat all inputs as plain text:
-    // https://github.com/jfcherng/php-diff/issues/9#issuecomment-526808774
-    // so no need to use additional Sanitizer lib for this operation.
     return m.trust(content);
   }
   /**
-   * Redraw the post.
-   * Workaround for:
-   * https://discuss.flarum.org/d/22755-mithril-related-issues-on-poststream-items
+   * Insert rendered diff views into their container
+   * and disable active views' buttons.
+   * Disabling buttons is just for indicating
+   * so frontend looks good but the backend sucks.
+   *
+   * @param {string} contentType
    */
   ;
 
-  _proto.postRedrawer = function postRedrawer() {
-    return this.props.post.save({}).then(function () {
-      return m.redraw();
-    });
-  };
+  _proto.setDiffContent = function setDiffContent(contentType) {
+    var diffContentHtml;
+    var $diffContainer = this.$('.diffContainer');
+    var $previewContainer = this.$('.previewContainer'); // buttons
 
-  _proto.setModalContent = function setModalContent(content) {
-    var htmlContent;
-    var $modalContent = this.$('.diffContainer');
+    var $sideBySideButton = this.$('.Button.sideBySideView');
+    var $inlineButton = this.$('.Button.inlineView');
+    var $combinedButton = this.$('.Button.combinedView');
+    var $previewButton = this.$('.Button.diffPreview');
 
-    if (content === 'sideBySide') {
-      htmlContent = this.renderHtml(this.attributes.sideBySideHtml);
-      $modalContent.html(htmlContent);
-
-      if (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('enableDiffSyncScroll')) {
-        this.syncScroll();
+    if (contentType !== 'preview') {
+      if (contentType === 'sideBySide') {
+        diffContentHtml = this.renderHtml(this.revision.data.attributes.sideBySideHtml);
+        $sideBySideButton.prop('disabled', true);
+        $sideBySideButton.siblings().prop('disabled', false);
+      } else if (contentType === 'inline') {
+        diffContentHtml = this.renderHtml(this.revision.data.attributes.inlineHtml);
+        $inlineButton.prop('disabled', true);
+        $inlineButton.siblings().prop('disabled', false);
+      } else if (contentType === 'combined') {
+        diffContentHtml = this.renderHtml(this.revision.data.attributes.combinedHtml);
+        $combinedButton.prop('disabled', true);
+        $combinedButton.siblings().prop('disabled', false);
       }
-
-      this.changeModalSize('large');
-      this.$('.Button.sideBySideView').prop('disabled', true);
-      this.$('.Button.inlineView').prop('disabled', false);
-      this.$('.Button.combinedView').prop('disabled', false);
-    } else if (content === 'inline') {
-      htmlContent = this.renderHtml(this.attributes.inlineHtml);
-      $modalContent.html(htmlContent);
-      this.changeModalSize();
-      this.$('.Button.sideBySideView').prop('disabled', false);
-      this.$('.Button.inlineView').prop('disabled', true);
-      this.$('.Button.combinedView').prop('disabled', false);
-    } else if (content === 'combined') {
-      htmlContent = this.renderHtml(this.attributes.combinedHtml);
-      $modalContent.html(htmlContent);
-      this.changeModalSize();
-      this.$('.Button.sideBySideView').prop('disabled', false);
-      this.$('.Button.inlineView').prop('disabled', false);
-      this.$('.Button.combinedView').prop('disabled', true);
-    }
-  };
-
-  _proto.changeModalSize = function changeModalSize(type) {
-    if (type === void 0) {
-      type = '';
+    } else {
+      $diffContainer.hide();
+      this.$('.previewContainer').show();
+      $previewButton.prop('disabled', true);
+      $previewButton.siblings().prop('disabled', false);
+      return this.setInfoContent(true);
     }
 
-    var $modal = this.element;
-    var className = $modal.className;
+    if (diffContentHtml) {
+      $diffContainer.html(diffContentHtml);
 
-    if (type === 'large' && !className.includes('Modal--' + type)) {
-      $modal.className += ' Modal--large';
-    } else if (className.includes('Modal--large')) {
-      $modal.className = className.replace(' Modal--large', '');
+      if ($previewContainer.is(':visible')) {
+        $diffContainer.show();
+        $previewContainer.hide();
+      } // let's remember their renderer choice
+
+
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.session.user.savePreferences({
+        'diffRenderer': contentType
+      });
+      return this.setInfoContent();
     }
+
+    return;
   }
   /**
-   * Synchronize Scroll
-   * implemented from:
-   * https://stackoverflow.com/a/27007581
-   * Should be working with Zepto.js
+   * Set informations about comparisons.
+   *
+   * @param {Boolean} preview
    */
   ;
 
-  _proto.syncScroll = function syncScroll() {
-    var $el1 = this.$('.diff-side-item.left-item');
-    var $el2 = this.$('.diff-side-item.right-item'); // Lets us know when a scroll is organic
-    // or forced from the synced element.
-
-    var forcedScroll = false; // Catch our elements' scroll events and
-    // syncronize the related element.
-
-    $el1.scroll(function () {
-      performScroll($el1, $el2);
-    });
-    $el2.scroll(function () {
-      performScroll($el2, $el1);
-    }); // Perform the scroll of the synced element
-    // based on the scrolled element.
-
-    function performScroll($scrolled, $toScroll) {
-      if (forcedScroll) return forcedScroll = false;
-      var percent = $scrolled.scrollLeft() / ($scrolled[0].scrollWidth - $scrolled[0].offsetWidth) * 100;
-      setScrollTopFromPercent($toScroll, percent);
-    } // Scroll to a position in the given
-    // element based on a percent.
-
-
-    function setScrollTopFromPercent($el, percent) {
-      var scrollTopPos = percent / 100 * ($el[0].scrollWidth - $el[0].offsetWidth);
-      forcedScroll = true;
-      $el.scrollLeft(scrollTopPos);
+  _proto.setInfoContent = function setInfoContent(preview) {
+    if (preview === void 0) {
+      preview = false;
     }
+
+    var $infoContainer = this.$('.diffInfoContainer');
+    var infoContentHtml = !preview && this.revision.revision() != 0 && this.comparisonBetween["new"].revision != this.comparisonBetween.old.revision ? flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.differences', {
+      old: this.comparisonBetween.old.revision == -1 ?
+      /* we're viewing differences between current content and {new} */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.currentContent') : this.comparisonBetween.old.revision == 0 ?
+      /* we're viewing differences between original content and {new} */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.originalContent') :
+      /* we're viewing differences between revision X and {new} */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.revisionWithNumber', {
+        number: this.comparisonBetween.old.revision
+      }),
+      "new": this.comparisonBetween["new"].revision == 0 ?
+      /* we're viewing differences between {old} and original content */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.originalContent') : this.comparisonBetween["new"].revision == this.post.revisionCount() ?
+      /* we're viewing differences between {old} and current content */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.currentContent') :
+      /* we're viewing differences between {old} and revision X */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.revisionWithNumber', {
+        number: this.comparisonBetween["new"].revision
+      })
+    })) : flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.previewMode', {
+      content: this.comparisonBetween["new"].revision == 0 ?
+      /* we're previewing original content */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.originalContent') : this.comparisonBetween["new"].revision == this.post.revisionCount() ?
+      /* we're previewing current content */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.currentContent') :
+      /* we're previewing revision X */
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.revisionWithNumber', {
+        number: this.comparisonBetween["new"].revision
+      })
+    }));
+    return $infoContainer.html(infoContentHtml);
   };
 
   return DiffModal;
@@ -970,6 +1233,8 @@ flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.initializers.add('the-turk/dif
   flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.store.models.diff = _models_Diff__WEBPACK_IMPORTED_MODULE_3__["default"];
   flarum_models_Post__WEBPACK_IMPORTED_MODULE_4___default.a.prototype.revisionCount = flarum_Model__WEBPACK_IMPORTED_MODULE_5___default.a.attribute('revisionCount');
   flarum_models_Post__WEBPACK_IMPORTED_MODULE_4___default.a.prototype.canViewEditHistory = flarum_Model__WEBPACK_IMPORTED_MODULE_5___default.a.attribute('canViewEditHistory');
+  flarum_models_Post__WEBPACK_IMPORTED_MODULE_4___default.a.prototype.canRollbackEditHistory = flarum_Model__WEBPACK_IMPORTED_MODULE_5___default.a.attribute('canRollbackEditHistory');
+  flarum_models_Post__WEBPACK_IMPORTED_MODULE_4___default.a.prototype.canDeleteEditHistory = flarum_Model__WEBPACK_IMPORTED_MODULE_5___default.a.attribute('canDeleteEditHistory');
   Object(flarum_extend__WEBPACK_IMPORTED_MODULE_1__["extend"])(flarum_components_CommentPost__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'headerItems', function (items) {
     var post = this.props.post; // replace "edited" text to "edited" button
 
@@ -983,15 +1248,15 @@ flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.initializers.add('the-turk/dif
     if (this.isEditing() && flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.cache.diffs && flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.cache.diffs[this.props.post.id()]) {
       delete flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.cache.diffs[this.props.post.id()];
     }
-  });
+  }); // prevent dropdown from closing when user
+  // clicks on deleted diff
+
   Object(flarum_extend__WEBPACK_IMPORTED_MODULE_1__["extend"])(flarum_components_DiscussionPage__WEBPACK_IMPORTED_MODULE_7___default.a.prototype, 'init', function () {
-    // prevent dropdown from closing when user
-    // clicks on deleted diff
-    var $exists = $('body');
-    $exists.on('click', 'li.ParentDiff.has-sub', function (e) {
+    var $body = $('body');
+    $body.on('click', 'li.ParentDiff.has-sub', function (e) {
       e.stopPropagation();
     });
-    $exists.on('click', 'li.SubDiff', function (e) {
+    $body.on('click', 'li.SubDiff', function (e) {
       e.stopPropagation();
     });
   });
@@ -1032,18 +1297,65 @@ function (_mixin) {
   revision: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('revision'),
   createdAt: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('createdAt', flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.transformDate),
   deletedAt: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('deletedAt', flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.transformDate),
-  revertedAt: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('revertedAt', flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.transformDate),
+  rollbackedAt: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('rollbackedAt', flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.transformDate),
   actor: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.hasOne('actor'),
   deletedUser: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.hasOne('deletedUser'),
-  revertedUser: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.hasOne('revertedUser'),
+  rollbackedUser: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.hasOne('rollbackedUser'),
   inlineHtml: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('inlineHtml'),
   sideBySideHtml: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('sideBySideHtml'),
   combinedHtml: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('combinedHtml'),
-  canDeleteEditHistory: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('canDeleteEditHistory'),
-  isRevertable: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('isRevertable')
+  previewHtml: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('previewHtml'),
+  comparisonBetween: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('comparisonBetween')
 }));
 
 
+
+/***/ }),
+
+/***/ "./src/forum/utils/redrawPost.js":
+/*!***************************************!*\
+  !*** ./src/forum/utils/redrawPost.js ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return redrawPost; });
+/**
+ * Redraw the post.
+ * Workaround for - SubtreeRetainer doesn't allow redrawing post
+ * https://discuss.flarum.org/d/22755-mithril-related-issues-on-poststream-items
+ *
+ * @param {Object} post
+ */
+function redrawPost(post) {
+  return post.save({}).then(function () {
+    return m.redraw();
+  });
+}
+
+/***/ }),
+
+/***/ "./src/forum/utils/touchDevice.js":
+/*!****************************************!*\
+  !*** ./src/forum/utils/touchDevice.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return touchDevice; });
+/**
+ * Tooltips will be skipped for touch devices. Because they're forcing users
+ * to double click the buttons. They also working unstable and won't fit to
+ * screen sometimes. I'm planning to deal with them later on next versions.
+ * https://stackoverflow.com/a/24647710/12866913
+ */
+function touchDevice() {
+  return true == ('ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch);
+}
 
 /***/ }),
 

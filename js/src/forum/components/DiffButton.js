@@ -5,57 +5,80 @@ import username from 'flarum/helpers/username';
 import humanTime from 'flarum/helpers/humanTime';
 import extractText from 'flarum/utils/extractText';
 
+/**
+ * The `DiffButton` component composes a button
+ * for all revisions created in DiffList.
+ */
 export default class DiffButton extends Button {
-    view()
-    {
-        const attrs = Object.assign({}, this.props);
+  // see the following link to find out why i'm overriding this at all
+  // https://discuss.flarum.org/d/22728-passing-an-object-to-a-custom-button-component
+  view() {
+    const attrs = Object.assign({}, this.props);
 
-        delete attrs.item;
-        delete attrs.subButton;
+    delete attrs.item;
+    delete attrs.subButton;
+    delete attrs.postDate;
 
-        attrs.type = 'button';
+    attrs.type = 'button';
 
-        return <button {...attrs}>{this.getButtonContent()}</button>;
-    }
+    return <button {...attrs}>{this.getButtonContent()}</button>;
+  }
 
-  /**
-   * Get the template for the button's content.
-   *
-   * @return {*}
-   * @protected
-   */
-    getButtonContent()
-    {
-        const diff = this.props.item;
+  getButtonContent() {
+    const revision = this.props.item;
+    let actor = revision.actor();
 
-        let actor = diff.actor();
-        let editedInfo = extractText(app.translator.trans(
-            'core.forum.post.edited_tooltip',
-            {username: username(diff.actor()), ago: humanTime(diff.createdAt())}
-        ));
-
-        if (diff.deletedAt()) {
-            if (this.props.subButton === false) {
-                editedInfo = editedInfo + ' ' + app.translator.trans('the-turk-diff.forum.deletedText');
-            } else {
-                actor = diff.deletedUser();
-                editedInfo = extractText(app.translator.trans(
-                    'the-turk-diff.forum.deletedTooltip',
-                    {username: username(diff.deletedUser()), ago: humanTime(diff.deletedAt())}
-                ));
-            }
+    let buttonText = revision.revision() == 0 ?
+      /* {username} created {ago} */
+      extractText(app.translator.trans(
+        'the-turk-diff.forum.createdTooltip', {
+          username: username(revision.actor()),
+          ago: humanTime(this.props.postDate)
         }
+      )) :
+      /* {username} edited {ago} */
+      extractText(app.translator.trans(
+        'core.forum.post.edited_tooltip', {
+          username: username(revision.actor()),
+          ago: humanTime(revision.createdAt())
+        }
+      ));
 
-        return [
-            actor.username() ? avatar(actor) : '',
-            diff.deletedAt() && this.props.subButton === false ?
-              icon('fas fa-caret-down', {className: 'Button-caret'}) : '',
-            <span className="Button-label" title={editedInfo}>
-              {diff.deletedAt() && this.props.subButton === true ?
-                    <em>
-                    {editedInfo}
-                    </em> : editedInfo}
-            </span>
-        ];
+
+    if (revision.deletedAt()) {
+      if (this.props.subButton === false) {
+        /* {username} did something {ago} (deleted) */
+        buttonText = buttonText + ' ' + app.translator.trans('the-turk-diff.forum.deletedText');
+      } else {
+        /* sub button text that appears when you click on caret icon */
+        actor = revision.deletedUser();
+        /* {actor} deleted this content {ago} */
+        buttonText = extractText(app.translator.trans(
+          'the-turk-diff.forum.deletedTooltip', {
+            username: username(revision.deletedUser()),
+            ago: humanTime(revision.deletedAt())
+          }
+        ));
+      }
     }
-}
+
+    return [
+      // we also should consider deleted users here
+      actor.username() ? avatar(actor) : '',
+      // does this button have an icon?
+      revision.deletedAt() && this.props.subButton === false ?
+      icon('fas fa-caret-down', {
+        className: 'Button-caret'
+      }) : '',
+      // button label
+      <span className="Button-label" title={buttonText}>
+        {
+          revision.deletedAt() && this.props.subButton === true ?
+            /* emphasize deleted revision's information */
+            <em>{buttonText}</em> :
+            buttonText
+        }
+      </span>
+      ];
+    }
+  }

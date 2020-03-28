@@ -1,49 +1,141 @@
-.DiffModal {
-  // fix for buttons
-  // on default Flarum theme
-  @media @phone {
-    & when (@config-colored-header = true) {
-      & button > span, button > i {
-        color: @text-color;
-      }
-    }
-  }
+// ------------------------------------
+// DiffModal
 
-  .Modal-header {
+.DiffModal {
+  max-width: 960px;
+
+  & .Modal-header {
     text-align: left;
     background: @control-bg;
 
-    time {
+    & .Avatar {
+      margin: -2px 5px -2px -6px;
+      .Avatar--size(24px);
+    }
+
+    & > time {
       font-size: 11px;
       font-weight: bold;
       text-transform: uppercase;
     }
 
-    h3 {
+    & > h3 {
       font-size: 14px;
     }
+  }
 
-    // fix for username links
-    // on default Flarum theme
-    @media @phone {
-      & when (@config-colored-header = true) {
-        & a {
-          color: @text-color;
+  & .Modal-body {
+    background: @body-bg;
+  }
+
+  // the "Options" button
+  & .diffCotrollerDropdown {
+    & .Button {
+      padding-left: 20px;
+      padding-right: 20px;
+
+      & .Button-icon {
+        display: none;
+      }
+    }
+  }
+
+  // Modal Content's Layout
+  // grids are partially supported and
+  // grid-areas are not supported by Internet Explorer
+  // https://caniuse.com/#feat=css-grid
+  & .diff-grid {
+    display: -ms-grid;
+    display: grid;
+
+    & > .diff-grid-item {
+
+      // info about on-screen contents
+      &.diff-grid-info .revisionInfo {
+        padding: 10px 16px;
+        color: @control-color;
+
+        // x Revisions
+        & > h4 {
+          margin: 0;
+        }
+      }
+
+      &.diff-grid-controls .diffSwitcher {
+        text-align: center;
+        margin: 15px 0;
+      }
+
+      // revision list
+      &.diff-grid-revisions {
+        border-top: 1px solid @control-bg;
+        position: relative;
+
+        & .DiffList-container {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+        }
+
+        & .DiffList-content {
+          max-height: 100%;
+          overflow: auto;
+        }
+      }
+
+      // diff container
+      &.diff-grid-diff {
+        border-right: 1px solid @control-bg;
+        position: relative;
+
+        & .diffContents {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+
+          & .diffContainer {
+            max-height: 100%;
+            overflow: auto;
+            width: 100%;
+            height: 100%;
+
+            & > div.noDiff {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+              height: 100%;
+
+              & > p {
+                padding: 20px;
+                text-align: center;
+                font-size: 15px;
+                color: @control-color;
+              }
+            }
+          }
+
+          & .previewContainer {
+            max-height: 100%;
+            overflow: auto;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            // i'll switch this later
+            // when user click on the preview button
+            // or for the original content
+            display: none;
+          }
         }
       }
     }
   }
 
-  .controlsContainer {
-    margin: 0 18px;
-    text-align: center;
-  }
-
-  .Modal-body {
-    background: @body-bg;
-  }
-
-  .DiffModal-loading {
+  & .DiffModal-loading {
     position: absolute;
     top: 0;
     left: 0;
@@ -52,327 +144,209 @@
     background: fade(@body-bg, 90%);
     display: none;
     border-radius: @border-radius @border-radius 0 0;
-    z-index: 999999;
+    z-index: 1010;
 
     &.active {
       display: block;
     }
   }
 
-  .Avatar {
-    margin: -2px 5px -2px -6px;
-    .Avatar--size(24px);
-    @media @phone {
-      margin-top: 10px;
-      // fix for long usernames
-      margin-left: 6px;
-    }
-  }
-
   // diff display
-  .TheTurkDiff {
-    &.CustomDiff.diff-wrapper {
-      background-color: @overlay-bg;
-      border-collapse: collapse;
-      border-spacing: 0;
-      font-family: 'Menlo', 'Consolas', monospace;
-      font-size: 13px;
-      empty-cells: show;
-      width: 100%;
-      word-break: break-word;
+  & .TheTurkDiff.CustomDiff.diff-wrapper {
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-family: 'Menlo', 'Consolas', monospace;
+    font-size: 13px;
+    empty-cells: show;
+    width: 100%;
+    word-break: break-word;
+    table-layout: fixed;
 
-      & td {
-        background: darken(@control-bg, 5%);
-        padding: 10px;
-      }
+    // this is a workaround for stripes on blank lines
+    // https://stackoverflow.com/a/25689081/12866913
+    .diff-stripes(lighten(@control-bg, 4%), darken(@control-bg, 3%));
 
-      &.diff-html {
-        white-space: pre-wrap;
+    & th.sign,
+    & thead {
+      display: none;
+    }
 
-        & .change {
-          & .old {
-            border-left: 3px solid @diff-old-version-bg-color-border;
+    & td {
+      padding: 10px;
+    }
+
+    &.diff-html {
+      white-space: pre-wrap;
+
+      & .change {
+        & .old {
+          border-left: 3px solid @diff-old-version-bg-color-border;
+          // blank changes will be striped in SideBySide view
+          &:not(.none) {
             background: @diff-old-version-bg-color;
           }
+        }
 
-          & .new {
-            border-left: 3px solid @diff-new-version-bg-color-border;
+        & .new {
+          border-left: 3px solid @diff-new-version-bg-color-border;
+          // blank changes will be striped in SideBySide view
+          &:not(.none) {
             background: @diff-new-version-bg-color;
           }
-
-          & .rep {
-            border-left: 3px solid @diff-change-version-del-color-border;
-            background: @body-bg;
-          }
-
-          & .rep-del {
-            border-left: 3px solid @diff-change-version-del-color-border;
-            background: @diff-change-version-del-color;
-          }
-
-          & .rep-ins {
-            border-left: 3px solid @diff-change-version-ins-color-border;
-            background: @diff-change-version-ins-color;
-          }
-
-          &.change-eq {
-            & .new,
-            & .old {
-              border-left: 3px solid @diff-info-color-border;
-              background: @body-bg;
-              color: @muted-color;
-            }
-          }
-
-          ins {
-            display: inline-block;
-            margin-top: -1px;
-            text-decoration: none;
-            background-color: @diff-new-version-ins-color;
-            border-radius: 0.2em;
-            text-align: left;
-          }
-
-          del {
-            display: inline-block;
-            margin-top: -1px;
-            text-decoration: none;
-            background-color: @diff-old-version-del-color;
-            border-radius: 0.2em;
-          }
-        }
-      }
-    }
-
-    &.TabularDiff.diff-wrapper {
-      text-align: left;
-      border: 1px solid darken(@body-bg, 15%);
-      border-radius: @border-radius @border-radius 0 0;
-
-      & when (@config-dark-mode = true) {
-        border-color: @control-bg;
-      }
-
-      & .diff-header {
-        height: 35px;
-        padding: 5px 10px;
-        border-bottom: 1px solid darken(@body-bg, 10%);
-        background-color: darken(@body-bg, 2%);
-        border-radius: inherit;
-
-        & when (@config-dark-mode = true) {
-          border-color: @control-bg;
-          background-color: lighten(@body-bg, 2%);
         }
 
-        > .diff-heading-wrapper {
-          display: -webkit-box;
-          display: -ms-flexbox;
-          display: flex;
-          -webkit-box-align: center;
-          -ms-flex-align: center;
-          align-items: center;
-          width: 100%;
-          font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-          font-size: 15px;
-
-          > .diff-heading-icon {
-            margin-right: 10px;
-          }
-
-          > .diff-heading-title {
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow-x: hidden;
-          }
-        }
-      }
-
-      & .diff-block {
-        overflow-y: hidden;
-      }
-
-      & .diff-blocks {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-
-      & .diff-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: 'Menlo', 'Consolas', monospace;
-        font-size: 14px;
-
-        tbody {
+        & .rep {
+          border-left: 3px solid @diff-change-version-del-color-border;
           background: @body-bg;
         }
 
-        & .diff-code-line {
+        & .rep-del {
+          border-left: 3px solid @diff-change-version-del-color-border;
+          background: @diff-change-version-del-color;
+        }
+
+        & .rep-ins {
+          border-left: 3px solid @diff-change-version-ins-color-border;
+          background: @diff-change-version-ins-color;
+        }
+
+        &.change-eq {
+          & .new,
+          & .old {
+            border-left: 3px solid @diff-info-color-border;
+            background: @body-bg;
+            color: @muted-color;
+          }
+        }
+
+        & ins {
           display: inline-block;
-          white-space: nowrap;
-          /* Compensate for the absolute positioning of the line numbers */
-          padding: 5px 8em;
+          margin-top: -1px;
+          text-decoration: none;
+          background-color: @diff-new-version-ins-color;
+          border-radius: 0.2em;
         }
 
-        & .diff-code-side-line {
+        & del {
           display: inline-block;
-          white-space: nowrap;
-          /* Compensate for the absolute positioning of the line numbers */
-          padding: 5px 4.5em;
+          margin-top: -1px;
+          text-decoration: none;
+          background-color: @diff-old-version-del-color;
+          border-radius: 0.2em;
         }
 
-        & .diff-code-line-prefix {
-          display: inline;
-          background: none;
-          padding: 0;
-          word-wrap: normal;
-          white-space: pre;
+        & .new.none,
+        & .old.none,
+        & .rep.none {
+          border-left: 3px solid @diff-info-color-border;
         }
+      }
+    }
+  }
 
-        & .diff-code-line-ctn {
-          display: inline;
-          background: none;
-          padding: 0;
-          word-wrap: normal;
-          white-space: pre;
-          overflow-x: auto;
+  @media @tablet-up {
+    & .diffCotrollerDropdown {
+      position: absolute;
+      top: 10px;
+      right: 50px;
+    }
 
-          ins {
-            display: inline-block;
-            margin-top: -1px;
-            text-decoration: none;
-            background-color: @diff-new-version-ins-color;
-            border-radius: 0.2em;
-            text-align: left;
-          }
+    & .diff-grid {
+      max-height: 465px;
+      min-height: 115px;
+      -ms-grid-rows: 0.2fr auto 0.5fr;
+      grid-template-rows: 0.2fr auto 0.5fr;
+      -ms-grid-columns: 8fr 2.8fr;
+      grid-template-columns: 8fr 2.8fr;
 
-          del {
-            display: inline-block;
-            margin-top: -1px;
-            text-decoration: none;
-            background-color: @diff-old-version-del-color;
-            border-radius: 0.2em;
-          }
-        }
+      & > .diff-grid-item {
+        &.diff-grid-info {
+          -ms-grid-column: 2;
+          -ms-grid-row: 3;
+          grid-column: 2;
+          grid-row: 3;
 
-        & .diff-code-linenumber {
-          box-sizing: border-box;
-          width: 7.5em;
-          /* Keep the numbers fixed on line contents scroll */
-          position: absolute;
-          display: inline-block;
-          background-color: @body-bg;
-          text-align: right;
-          border: solid darken(@body-bg, 7%);
-          border-width: 0 1px 0 0;
-          cursor: pointer;
-          padding: 5px 0;
-
-          & when (@config-dark-mode = true) {
-            border-color: @control-bg;
+          & .revisionInfo {
+            border-top: 1px solid @control-bg;
           }
         }
 
-        & .diff-code-linenumber:after {
-          content: '\200b';
+        &.diff-grid-revisions {
+          -ms-grid-column: 2;
+          -ms-grid-row: 2;
+          grid-column: 2;
+          grid-row: 2;
+          min-height: 230px;
         }
 
-        & .diff-code-side-linenumber {
-          /* Keep the numbers fixed on line contents scroll */
-          position: absolute;
-          display: inline-block;
-          box-sizing: border-box;
-          width: 4em;
-          background-color: @body-bg;
-          text-align: right;
-          border: solid darken(@body-bg, 7%);
-          border-width: 0 1px 0 1px;
-          cursor: pointer;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          padding: 5px 0.5em 5px 0.5em;
-
-          & when (@config-dark-mode = true) {
-            border-color: @control-bg;
-          }
+        &.diff-grid-diff {
+          -ms-grid-column: 1;
+          -ms-grid-row: 1;
+          -ms-grid-row-span: 3;
+          grid-column: 1;
+          grid-row-start: 1;
+          grid-row-end: 4;
         }
 
-        & .diff-code-side-linenumber:after {
-          content: '\200b';
+        &.diff-grid-controls {
+          -ms-grid-column: 2;
+          -ms-grid-row: 1;
+          grid-column: 2;
+          grid-row: 1;
+        }
+      }
+    }
+  }
+
+  @media @phone {
+    // this will be positioned relatively to .Modal-content
+    // to fill the full height on narrow views
+    & .diff-grid {
+      -ms-grid-rows: 0.5fr 1.3fr 0.2fr 3fr;
+      grid-template-rows: 0.5fr 1.3fr 0.2fr 3fr;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: @header-height-phone;
+
+      & > .diff-grid-item {
+        &.diff-grid-info {
+          -ms-grid-row: 1;
+          grid-row: 1;
         }
 
-        & .diff-code-linenumber,
-        & .diff-code-side-linenumber,
-        & .diff-code-line-prefix {
-          user-select: none;
+        &.diff-grid-revisions {
+          -ms-grid-row: 2;
+          grid-row: 2;
         }
 
-        & .diff-code-linenumber,
-        & .diff-code-side-linenumber {
-          direction: rtl;
+        &.diff-grid-diff {
+          -ms-grid-row: 4;
+          grid-row: 4;
         }
 
-        & .line-num1 {
-          box-sizing: border-box;
-          float: left;
-          width: 3.5em;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          padding: 0 0.5em 0 0.5em;
+        &.diff-grid-controls {
+          -ms-grid-row: 3;
+          grid-row: 3;
+          border-top: 1px solid @control-bg;
         }
+      }
+    }
 
-        & .line-num2 {
-          box-sizing: border-box;
-          float: right;
-          width: 3.5em;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          padding: 0 0.5em 0 0.5em;
-        }
-
-        /*
-       * Changes Highlight
-       */
-
-        & .diff-del {
-          background-color: @diff-old-version-bg-color;
-          border-color: darken(@diff-old-version-bg-color, 10%);
-
-          &.diff-change {
-            background-color: @diff-change-version-del-color;
-            border-color: darken(@diff-change-version-del-color, 10%);
-          }
-        }
-
-        & .diff-ins {
-          background-color: @diff-new-version-bg-color;
-          border-color: darken(@diff-new-version-bg-color, 10%);
-
-          &.diff-change {
-            background-color: @diff-change-version-ins-color;
-            border-color: darken(@diff-change-version-ins-color, 10%);
-          }
-        }
-
-        & .diff-info {
-          background-color: @diff-info-color;
-          border-color: darken(@diff-info-color, 10%);
+    & .Modal-header {
+      // fix for username links
+      // on default Flarum theme
+      & when (@config-colored-header = true) {
+        & a {
+          color: @header-control-color;
         }
       }
 
-      & .diff-side-item {
-        display: inline-block;
-        overflow-x: scroll;
-        overflow-y: hidden;
-        width: 50%;
-        margin-bottom: -4px;
-      }
-
-      &.diff-combined {
-        & .diff-code-line {
-          padding-left: 5px;
-        }
+      & .Avatar {
+        margin-top: 10px;
+        // fix for long usernames
+        margin-left: 6px;
       }
     }
   }

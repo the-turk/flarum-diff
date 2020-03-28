@@ -14,9 +14,11 @@ class ConsoleProvider extends AbstractServiceProvider
             define('ARTISAN_BINARY', 'flarum');
         }
 
-        // Force registering the Schedule as singleton.
+        // force registering the Schedule as singleton
         $this->app->register(Console::class);
 
+        // set a weekly cron job which is working on sundays at 02:00 AM
+        // (nothing special)
         $this->app->resolving(Schedule::class, function (Schedule $schedule) {
             $schedule->command('diff:archive')
                 ->weeklyOn(2, '2:00')

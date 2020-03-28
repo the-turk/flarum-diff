@@ -34,8 +34,9 @@ class RollbackToDiffController extends AbstractShowController
         return $this->bus->dispatch(
             new RollbackToDiff(
                 $request->getAttribute('actor'),
-                Arr::get($request->getQueryParams(), 'id'),
-                Arr::get($request->getParsedBody(), 'maxRevisionCount')
+                Arr::get($request->getQueryParams(), 'id')
+                // I could do that but can't rely on this value
+                // Arr::get($request->getParsedBody(), 'maxRevisionCount')
             )
         );
     }

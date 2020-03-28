@@ -1,103 +1,94 @@
-.DiffList {
-  .DiffList-header {
-    padding: 12px 15px;
-    border-bottom: 1px solid @control-bg;
+// ------------------------------------
+// DiffList
 
-    h4 {
-      font-size: 12px;
-      font-weight: bold;
-      margin: 0;
+// These are common list styles
+// for both modal & dropdown
+.DiffList-container .DiffList-content {
+  max-height: 150px;
+  overflow: auto;
+
+  & > ul {
+    margin: 7px 0;
+    padding: 8px 0;
+
+    // container for singular revision items
+    & > li.Diff {
+      display: block;
+      padding: 8px 15px;
       color: @muted-color;
-    }
-  }
+      overflow: hidden;
+      text-decoration: none;
 
-  .DiffList-empty {
-    color: @muted-color;
-    text-align: center;
-    padding: 35px 0;
-    font-size: 16px;
-  }
+      &:hover {
+        background: lighten(@control-bg, 5%);
+      }
 
-  .DiffList-content {
-    max-height: 150px;
-    overflow: auto;
+      &.active {
+        background: @control-bg;
+      }
 
-    > ul {
-      margin: 7px 0;
-      padding: 8px 0;
+      & > a,
+      & > button,
+      & > span {
+        display: block;
+        width: 100%;
+        color: @text-color;
+        border-radius: 0;
+        border: 0;
+        background: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        .box-shadow(none);
+        text-align: left;
+        font-size: 12px;
+        font-weight: normal;
+        text-decoration: none;
+      }
 
-      li {
-        > a,
-         > span,
-        > button {
-          display: block;
-          width: 100%;
-          color: @text-color;
-          border-radius: 0;
-          border: 0;
-          background: none;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          .box-shadow(none);
-          text-align: left;
-          font-size: 12px;
-          font-weight: normal;
-          text-decoration: none;
+      & > a,
+      & > button {
+        &:focus {
+          outline: none;
         }
+      }
 
-        > a,
-        > button {
-          &:hover {
-            background: @control-bg;
-          }
+      // icon for deleted revisions
+      & > button > i.Button-caret {
+        margin-left: 0;
+        margin-right: 5px;
+      }
 
-          &:focus {
-            outline: none;
-          }
-        }
+      // info for deleted revisions
+      // pops when you click on a deleted revision
+      // (x deleted y ago)
+      &.SubDiff {
+        display:none;
 
-        &.active {
-          > a,
-          > button {
-            background: @control-bg;
-          }
-        }
-
-        button > i.Button-caret {
-          margin-left: 0;
-          margin-right: 5px;
-        }
-
-        &.SubDiff button {
+        & > button {
           color: @muted-color;
           cursor: inherit;
           pointer-events: none;
           white-space: normal;
         }
       }
+
+      & .Avatar {
+        .Avatar--size(24px);
+        float: left;
+        margin-right: 10px;
+      }
     }
+  }
+
+  & .DiffList-empty {
+    color: @muted-color;
+    text-align: center;
+    padding: 35px 0;
+    font-size: 16px;
   }
 
   & .loading-indicator {
     height: 70px;
-  }
-  // singular diff items
-  .Diff {
-    display: block;
-    padding: 8px 15px;
-    color: @muted-color;
-    overflow: hidden;
-
-    &:hover {
-      text-decoration: none;
-      background: @control-bg;
-    }
-
-    .Avatar {
-      .Avatar--size(24px);
-      float: left;
-      margin-right: 10px;
-    }
   }
 }

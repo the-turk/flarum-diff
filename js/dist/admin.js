@@ -140,11 +140,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.initializers.add('the-turk-diff', function (app) {
+  // show extension's settings modal
   app.extensionSettings['the-turk-diff'] = function () {
     return app.modal.show(new _modals_DiffSettingsModal__WEBPACK_IMPORTED_MODULE_3__["default"]());
   };
 
   Object(flarum_extend__WEBPACK_IMPORTED_MODULE_1__["extend"])(flarum_components_PermissionGrid__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'viewItems', function (items) {
+    // who can view edit history?
     items.add('viewEditHistory', {
       icon: 'fas fa-history',
       label: app.translator.trans('the-turk-diff.admin.permissions.viewEditHistory'),
@@ -153,16 +155,32 @@ flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.initializers.add('the-turk-dif
     });
   });
   Object(flarum_extend__WEBPACK_IMPORTED_MODULE_1__["extend"])(flarum_components_PermissionGrid__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'moderateItems', function (items) {
+    // who can delete others edit history?
     items.add('deleteEditHistory', {
       icon: 'fas fa-times',
       label: app.translator.trans('the-turk-diff.admin.permissions.deleteEditHistory'),
       permission: 'deleteEditHistory',
       allowGuest: false
-    });
+    }); // who can delete their own edit history?
+
     items.add('selfDeleteEditHistory', {
       icon: 'fas fa-times',
       label: app.translator.trans('the-turk-diff.admin.permissions.selfDeleteEditHistory'),
       permission: 'selfDeleteEditHistory',
+      allowGuest: false
+    }); // who can rollback others edit history?
+
+    items.add('rollbackEditHistory', {
+      icon: 'fas fa-history',
+      label: app.translator.trans('the-turk-diff.admin.permissions.rollbackEditHistory'),
+      permission: 'rollbackEditHistory',
+      allowGuest: false
+    }); // who can rollback their own edit history?
+
+    items.add('selfRollbackEditHistory', {
+      icon: 'fas fa-history',
+      label: app.translator.trans('the-turk-diff.admin.permissions.selfRollbackEditHistory'),
+      permission: 'selfRollbackEditHistory',
       allowGuest: false
     });
   });
@@ -214,41 +232,13 @@ function (_SettingsModal) {
   }
   /**
    * Build modal form.
-   *
-   * @returns {*}
    */
   ;
 
   _proto.form = function form() {
     var _this = this;
 
-    return [m('div', {
-      className: 'diffSettingsFlex'
-    }, m('div', m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'renderMode')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
-      options: {
-        Inline: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'inline'),
-        SideBySide: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'sideBySide'),
-        Combined: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'combined')
-      },
-      onchange: this.setting(settingsPrefix + 'renderMode'),
-      value: this.setting(settingsPrefix + 'renderMode')() || this.setting(settingsPrefix + 'renderMode')('Inline')
-    }))])), m('div', m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'displayMode')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
-      options: {
-        customHTML: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'customHTML'),
-        tabularHTML: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'tabularHTML')
-      },
-      onchange: this.setting(settingsPrefix + 'displayMode'),
-      value: this.setting(settingsPrefix + 'displayMode')() || this.setting(settingsPrefix + 'displayMode')('customHTML')
-    }))])), m('div', m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'detailLevel')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
-      options: {
-        none: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'noneLevel'),
-        line: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'lineLevel'),
-        word: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'wordLevel'),
-        "char": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'charLevel')
-      },
-      onchange: this.setting(settingsPrefix + 'detailLevel'),
-      value: this.setting(settingsPrefix + 'detailLevel')() || this.setting(settingsPrefix + 'detailLevel')('line')
-    }))]))), m('.Form-group', [m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
+    return [m('.Form-group', [m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
       state: this.setting(settingsPrefix + 'mainPostOnly', '0')() === '1',
       children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'mainPostOnly'),
       onchange: function onchange(value) {
@@ -261,17 +251,20 @@ function (_SettingsModal) {
         _this.setting(settingsPrefix + 'separateBlock')(value ? '1' : '0');
       }
     }))]), m('.Form-group', [m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
-      state: this.setting(settingsPrefix + 'allowSwitch', '1')() === '1',
-      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'allowSwitch'),
+      state: this.setting(settingsPrefix + 'textFormatting', '1')() === '1',
+      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'textFormatting'),
       onchange: function onchange(value) {
-        _this.setting(settingsPrefix + 'allowSwitch')(value ? '1' : '0');
+        _this.setting(settingsPrefix + 'textFormatting')(value ? '1' : '0');
       }
-    }))]), m('.Form-group', [m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
-      state: this.setting(settingsPrefix + 'enableSyncScroll', '1')() === '1',
-      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'enableSyncScroll'),
-      onchange: function onchange(value) {
-        _this.setting(settingsPrefix + 'enableSyncScroll')(value ? '1' : '0');
-      }
+    }))]), m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'detailLevel')), m('div', flarum_components_Select__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+      options: {
+        none: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'noneLevel'),
+        line: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'lineLevel'),
+        word: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'wordLevel'),
+        "char": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'charLevel')
+      },
+      onchange: this.setting(settingsPrefix + 'detailLevel'),
+      value: this.setting(settingsPrefix + 'detailLevel')() || this.setting(settingsPrefix + 'detailLevel')('line')
     }))]), m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'neighborLines')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'neighborLinesHelp')), m('div', {
       className: 'helpText'
     }, m('i', {
@@ -279,6 +272,14 @@ function (_SettingsModal) {
     }), m('span', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'onlyUnsigned'))), m('input[type=text].FormControl', {
       bidi: this.setting(settingsPrefix + 'neighborLines', '2'),
       placeholder: '2',
+      style: 'width:25%'
+    })]), m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'mergeThreshold')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'mergeThresholdHelp')), m('div', {
+      className: 'helpText'
+    }, m('i', {
+      className: 'diffSettingsIcon fas fa-exclamation-circle'
+    }), m('span', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'usePoint'))), m('input[type=text].FormControl', {
+      bidi: this.setting(settingsPrefix + 'mergeThreshold', '0.8'),
+      placeholder: '0.8',
       style: 'width:25%'
     })]), m('.Form-group', [m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'dbOptimisation')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans(localePrefix + 'archiveInfo')), m('label', flarum_components_Switch__WEBPACK_IMPORTED_MODULE_4___default.a.component({
       state: this.setting(settingsPrefix + 'archiveOlds', '0')() === '1',

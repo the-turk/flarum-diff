@@ -11,7 +11,7 @@
  * @author     Hasan Özbey <hasanoozbey@gmail.com>
  * @copyright  2020
  * @license    The MIT License
- * @version    Release: 0.1.0-beta.7
+ * @version    Release: 1.0.0
  * @link       https://github.com/the-turk/flarum-diff
  */
 
@@ -34,8 +34,9 @@ return [
         ->js(__DIR__ . '/js/dist/admin.js'),
     (new Extend\Frontend('forum'))
         ->css(__DIR__ . '/less/forum.less')
-        ->js(__DIR__.'/js/dist/forum.js'),
+        ->js(__DIR__ . '/js/dist/forum.js'),
     (new Extend\Locales(__DIR__ . '/locale')),
+    
     static function (Application $app) {
         /** @var Dispatcher $events */
         $events = $app['events'];
@@ -43,6 +44,7 @@ return [
         $events->subscribe(Listeners\PostActions::class);
         $events->subscribe(Listeners\AddDiffRelationship::class);
         $events->subscribe(Listeners\RegisterConsoleCommand::class);
+        $events->subscribe(Listeners\UserPreferences::class);
 
         $app->register(Providers\ConsoleProvider::class);
     }

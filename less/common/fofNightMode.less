@@ -1,5 +1,7 @@
-// nightmode for Diff extension
-// we need to redefine almost all of the colors, such a shame...
+// fof/night-mode support for the Diff extension
+// i think we need to redefine almost all of the colors
+// to make this support happen, such a shame...
+
 body.dark {
   @secondary-color: @config-secondary-color;
   @secondary-hue: hue(@secondary-color);
@@ -8,181 +10,148 @@ body.dark {
   @muted-color: hsl(@secondary-hue, min(15%, @secondary-sat), 50%);
   @body-bg: hsl(@secondary-hue, min(20%, @secondary-sat), 10%);
   @overlay-bg: fade(darken(@body-bg, 5%), 90%);
+  @control-color: @muted-color;
+  @header-control-color: @control-color;
   @text-color: #ddd;
 
-  // variables for dark mode
-  @diff-old-version-del-color:           #662222;
-  @diff-new-version-ins-color:           #225522;
-  @diff-old-version-bg-color:            #380000;
-  @diff-new-version-bg-color:            #002800;
-  @diff-change-version-del-color:        lighten(@diff-old-version-bg-color, 5%);
-  @diff-change-version-ins-color:        lighten(@diff-new-version-bg-color, 5%);
-  @diff-info-color:                      #1B1B1B;
-  @diff-old-version-bg-color-border:     lighten(@diff-old-version-bg-color, 5%);
-  @diff-new-version-bg-color-border:     lighten(@diff-new-version-bg-color, 5%);
-  @diff-change-version-del-color-border: lighten(@diff-change-version-del-color, 5%);
-  @diff-change-version-ins-color-border: lighten(@diff-change-version-ins-color, 5%);
-  @diff-info-color-border:               lighten(@diff-info-color, 6%);
+  // variables for the diff's dark mode
+  @import "variables/dark-mode.less";
 
-  .DiffList {
-    .DiffList-header {
-      border-bottom-color: @control-bg;
-    }
-
-    .DiffList-empty {
-      color: @muted-color;
-    }
-
-    .DiffList-content > ul li {
-      > a,
-      > span,
-      > button {
-        color: @text-color;
-      }
-      > a,
-      > button {
-        &:hover {
-          background: @control-bg;
-        }
-      }
-      &.active {
-        > a,
-        > button {
-          background: @control-bg;
-        }
-      }
-    }
-
-    .Diff {
-      color: @muted-color;
-      &:hover {
-        background: @control-bg;
-      }
-    }
-  }
-  .DiffModal {
-    .Modal-body {
+  & .DiffModal {
+    & .Modal-body {
       background: @body-bg;
     }
 
-    .TheTurkDiff {
-      &.CustomDiff.diff-wrapper {
-        background-color: @overlay-bg;
-
-        & td {
-          background: darken(@control-bg, 5%);
+    & .diff-grid {
+      & > .diff-grid-item {
+        &.diff-grid-info .revisionInfo {
+          color: @control-color;
         }
 
-        &.diff-html {
-          & .change {
-            & .old {
-              border-color: @diff-old-version-bg-color-border;
-              background: @diff-old-version-bg-color;
-            }
-
-            & .new {
-              border-color: @diff-new-version-bg-color-border;
-              background: @diff-new-version-bg-color;
-            }
-
-            & .rep {
-              border-color: @diff-change-version-del-color-border;
-              background: @body-bg;
-            }
-
-            & .rep-del {
-              border-color: @diff-change-version-del-color-border;
-              background: @diff-change-version-del-color;
-            }
-
-            & .rep-ins {
-              border-color: @diff-change-version-ins-color-border;
-              background: @diff-change-version-ins-color;
-            }
-
-            &.change-eq {
-              & .new,
-              & .old {
-                border-color: @diff-info-color-border;
-                background: @body-bg;
-                color: @muted-color;
-              }
-            }
-
-            ins {
-              background-color: @diff-new-version-ins-color;
-            }
-
-            del {
-              background-color: @diff-old-version-del-color;
-            }
-          }
-        }
-      }
-
-      &.TabularDiff.diff-wrapper {
-        border-color: @control-bg;
-
-        & .diff-header {
+        &.diff-grid-revisions {
           border-color: @control-bg;
-          background-color: lighten(@body-bg, 2%);
         }
 
-        & .diff-table {
-          tbody {
-            background: @body-bg;
-          }
+        &.diff-grid-diff {
+          border-color: @control-bg;
 
-          & .diff-code-line-ctn {
-            ins {
-              background-color: @diff-new-version-ins-color;
-            }
-
-            del {
-              background-color: @diff-old-version-del-color;
-            }
-          }
-
-          & .diff-code-linenumber {
-            background-color: @body-bg;
-            border-color: @control-bg;
-          }
-
-          & .diff-code-side-linenumber {
-            background-color: @body-bg;
-            border-color: @control-bg;
-          }
-
-          /*
-         * Changes Highlight
-         */
-
-          & .diff-del {
-            background-color: @diff-old-version-bg-color;
-            border-color: darken(@diff-old-version-bg-color, 10%);
-
-            &.diff-change {
-              background-color: @diff-change-version-del-color;
-              border-color: darken(@diff-change-version-del-color, 10%);
-            }
-          }
-
-          & .diff-ins {
-            background-color: @diff-new-version-bg-color;
-            border-color: darken(@diff-new-version-bg-color, 10%);
-
-            &.diff-change {
-              background-color: @diff-change-version-ins-color;
-              border-color: darken(@diff-change-version-ins-color, 10%);
-            }
-          }
-
-          & .diff-info {
-            background-color: @diff-info-color;
-            border-color: darken(@diff-info-color, 10%);
+          & .diffContents .diffContainer > div.noDiff > p {
+            color: @control-color;
           }
         }
       }
+    }
+
+    & .DiffModal-loading {
+      background: fade(@body-bg, 90%);
+    }
+
+    & .TheTurkDiff.CustomDiff.diff-wrapper {
+      .diff-stripes(lighten(@control-bg, 4%), darken(@control-bg, 3%));
+
+      &.diff-html .change {
+        & .old {
+          border-color: @diff-old-version-bg-color-border;
+
+          &:not(.none) {
+            background: @diff-old-version-bg-color;
+          }
+        }
+
+        & .new {
+          border-color: @diff-new-version-bg-color-border;
+
+          &:not(.none) {
+            background: @diff-new-version-bg-color;
+          }
+        }
+
+        & .rep {
+          border-color: @diff-change-version-del-color-border;
+          background: @body-bg;
+        }
+
+        & .rep-del {
+          border-color: @diff-change-version-del-color-border;
+          background: @diff-change-version-del-color;
+        }
+
+        & .rep-ins {
+          border-color: @diff-change-version-ins-color-border;
+          background: @diff-change-version-ins-color;
+        }
+
+        &.change-eq {
+          & .new,
+          & .old {
+            border-color: @diff-info-color-border;
+            background: @body-bg;
+            color: @muted-color;
+          }
+        }
+
+        & ins {
+          background-color: @diff-new-version-ins-color;
+        }
+
+        & del {
+          background-color: @diff-old-version-del-color;
+        }
+
+        & .new.none,
+        & .old.none,
+        & .rep.none {
+          border-color: @diff-info-color-border;
+        }
+      }
+    }
+  }
+
+  & .DiffDropdown .DiffList-header {
+    border-color: @control-bg;
+
+    & > h4 {
+      color: @muted-color;
+    }
+  }
+
+  & .DiffList-container .DiffList-content {
+    & > ul > li.Diff {
+      color: @muted-color;
+
+      &:hover {
+        background: lighten(@control-bg, 5%);
+      }
+
+      &.active {
+        background: @control-bg;
+      }
+
+      & > a,
+      & > button,
+      & > span {
+        color: @text-color;
+      }
+
+      &.SubDiff > button {
+        color: @muted-color;
+      }
+    }
+
+    & .DiffList-empty {
+      color: @muted-color;
+    }
+  }
+
+  @media @tablet-up {
+    & .DiffModal .diff-grid > .diff-grid-item.diff-grid-info .revisionInfo {
+      border-color: @control-bg;
+    }
+  }
+
+  @media @phone {
+    & .DiffModal .diff-grid > .diff-grid-item.diff-grid-controls {
+      border-color: @control-bg;
     }
   }
 }

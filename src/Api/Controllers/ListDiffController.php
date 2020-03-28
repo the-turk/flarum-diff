@@ -21,7 +21,7 @@ class ListDiffController extends AbstractListController
     /**
      * {@inheritdoc}
      */
-    public $include = ['actor', 'deletedUser', 'revertedUser'];
+    public $include = ['actor', 'deletedUser', 'rollbackedUser'];
 
     /**
      * {@inheritdoc}
