@@ -37,7 +37,7 @@ There are new lines & few changes for translators.
 
 - All versions of this extension conflicts with [dem13n/nickname-changer](https://discuss.flarum.org/d/21238-nickname-changer) package. Use [fof/username-request](https://discuss.flarum.org/d/20956-friendsofflarum-username-request) instead.
 
-- If you're using `the-turk/flarum-edit-notifications` extension, you should update it to v0.1.4
+- If you're using [the-turk/flarum-edit-notifications extension](https://discuss.flarum.org/d/22896-edit-notifications/17) extension, you should update it to v0.1.4
   ```bash
   composer update the-turk/flarum-edit-notifications:0.1.4
   ```
