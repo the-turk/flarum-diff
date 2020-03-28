@@ -8,8 +8,8 @@
   + Now they'll be treated as new edits and will not delete other revisions.
 - **Drop** tabular view because it wasn't fit well into community platforms.
 - **Drop** renderer selector from the extension's settings.
-- **Drop** `PostWasRollbacked` event because we're treating them as formal edits now.
   + Now everyone can use any renderer they wish.
+- **Drop** `PostWasRollbacked` event because we're treating them as formal edits now.
 - **Add** original post into revision list.
 - **Add** seperate permissions for rollbacking.
 - **Add** feature for keeping user's renderer preference.
