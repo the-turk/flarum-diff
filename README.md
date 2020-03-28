@@ -6,7 +6,7 @@ This extension adds a "post revision history" feature to your [Flarum](https://g
 
 Screenshots:
 
-![Diff Collage](https://i.ibb.co/HXww3js/Diff-Collage.png)
+![Diff Collage](https://i.ibb.co/FJywHKn/rsz-diff-collage.png)
 
 - [Post-Stream Item](https://i.ibb.co/4m21pnM/post-Stream-Item.png)
 - [Dropdown List](https://i.ibb.co/PTTcWCw/dropdown-List.png)
