@@ -1,3 +1,6 @@
+### 1.0.1
+- **Fix** tooltips won't disappear on Chrome.
+
 ### 1.0.0
 
 **You'll lose all of your previous revisions.** (Hopefully, for the last time.)
