@@ -96,7 +96,7 @@ export default class DiffList extends Component {
                 return items.map(item => {
                   // we can use this class to customize all tooltips
                   // provided by this extension
-                  let tooltipClass = 'diffTooltip';
+                  const tooltipClass = 'diffTooltip';
 
                   let diffButton = DiffButton.component({
                     postDate: this.post.createdAt(),
@@ -110,7 +110,11 @@ export default class DiffList extends Component {
                           moreResults: this.moreResults
                         }));
 
-                        if(this.forModal) {
+                        // fix for Chrome
+                        // tooltips are not disappearing onclick
+                        $('.' + tooltipClass).tooltip('hide');
+
+                        if (this.forModal) {
                           // .DiffList-content container of clicked revision
                           const $listContainer = this.$('li#parentDiff' + item.id());
 
@@ -127,7 +131,7 @@ export default class DiffList extends Component {
                         this.toggleSubDiff(item.id());
                       }
                     },
-                    config: elm => touchDevice() === false ?
+                    config: (elm, isInitialized) => touchDevice() === false && !isInitialized ?
                       $(elm).tooltip({
                         trigger: 'hover',
                         placement: 'left',

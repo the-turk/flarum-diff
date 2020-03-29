@@ -515,7 +515,10 @@ function (_Component) {
                 item: item,
                 post: _this.post,
                 moreResults: _this.moreResults
-              }));
+              })); // fix for Chrome
+              // tooltips are not disappearing onclick
+
+              $('.' + tooltipClass).tooltip('hide');
 
               if (_this.forModal) {
                 // .DiffList-content container of clicked revision
@@ -534,8 +537,8 @@ function (_Component) {
               _this.toggleSubDiff(item.id());
             }
           },
-          config: function config(elm) {
-            return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_7__["default"])() === false ? $(elm).tooltip({
+          config: function config(elm, isInitialized) {
+            return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_7__["default"])() === false && !isInitialized ? $(elm).tooltip({
               trigger: 'hover',
               placement: 'left',
               container: 'body'
@@ -965,6 +968,9 @@ function (_Modal) {
   _proto.content = function content() {
     var _this2 = this;
 
+    // we can use this class to customize all tooltips
+    // provided by this extension
+    var tooltipClass = 'diffTooltip';
     return [m("div", {
       className: "diff-grid"
     }, m("div", {
@@ -974,48 +980,59 @@ function (_Modal) {
     }, this.revision.revision() != 0 && this.comparisonBetween["new"].revision != this.comparisonBetween.old.revision ? [flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-grip-lines',
       onclick: function onclick() {
+        // fix for Chrome
+        // tooltips are not disappearing onclick
+        _this2.$('.' + tooltipClass).tooltip('hide');
+
         _this2.setDiffContent('inline');
       },
       className: 'Button Button--icon Button--link inlineView',
-      config: function config(elm) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+      config: function config(elm, isInitialized) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).tooltip({
           trigger: 'hover'
-        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.inline')) : '';
+        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.inline')) // this is a workaround for adding custom
+        // classes into bootstrap tooltips
+        // https://stackoverflow.com/a/29879041/12866913
+        .data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
     }), flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-columns',
       onclick: function onclick() {
+        _this2.$('.' + tooltipClass).tooltip('hide');
+
         _this2.setDiffContent('sideBySide');
       },
       className: 'Button Button--icon Button--link sideBySideView',
-      config: function config(elm) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+      config: function config(elm, isInitialized) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).tooltip({
           trigger: 'hover'
-        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.sideBySide')) : '';
+        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.sideBySide')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
     }), flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'far fa-square',
       onclick: function onclick() {
-        _this2.setDiffContent('combined');
+        _this2.$('.' + tooltipClass).tooltip('hide');
 
-        m.redraw();
+        _this2.setDiffContent('combined');
       },
       className: 'Button Button--icon Button--link combinedView',
-      config: function config(elm) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+      config: function config(elm, isInitialized) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).tooltip({
           trigger: 'hover'
-        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.combined')) : '';
+        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.combined')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
     })] : '', flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'far fa-eye',
       onclick: function onclick() {
+        _this2.$('.' + tooltipClass).tooltip('hide');
+
         _this2.setDiffContent('preview');
       },
       className: 'Button Button--icon Button--link diffPreview',
-      config: function config(elm) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+      config: function config(elm, isInitialized) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).tooltip({
           trigger: 'hover'
-        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.composer.preview_tooltip')) : '';
+        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.composer.preview_tooltip')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
     }))), m("div", {
       className: "diff-grid-item diff-grid-info"
@@ -1099,7 +1116,8 @@ function (_Modal) {
   _proto.setDiffContent = function setDiffContent(contentType) {
     var diffContentHtml;
     var $diffContainer = this.$('.diffContainer');
-    var $previewContainer = this.$('.previewContainer'); // buttons
+    var $previewContainer = this.$('.previewContainer');
+    var $tooltip = this.$('.diffTooltip'); // buttons
 
     var $sideBySideButton = this.$('.Button.sideBySideView');
     var $inlineButton = this.$('.Button.inlineView');
