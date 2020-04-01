@@ -57,16 +57,6 @@ export default class DiffList extends Component {
      */
     this.selectedItem = this.props.selectedItem;
 
-    /**
-     * Whether there is a pre-selected revision or not.
-     * If user clicks a revision in this list while DiffModal open,
-     * we'll use this value to active & disable selected revision's
-     * DiffButton component.
-     *
-     * @type {Number|Null}
-     */
-    this.selectedItem = this.props.selectedItem;
-
     if (!app.cache.diffs) {
       /**
        * Initialize the cache if it isn't already initialized.
