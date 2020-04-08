@@ -1,3 +1,10 @@
+### 1.0.2
+- **Fix** duplicated variable definition in DiffList Component.
+- **Fix** a char-level typo (thanks to @Csineneo).
+- **Use** `static` variable scope to store old post's content.
+- **Set** conflictions.
+- **Update** dependencies.
+
 ### 1.0.1
 - **Fix** tooltips won't disappear on Chrome.
 
