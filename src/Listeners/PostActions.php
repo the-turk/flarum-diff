@@ -32,7 +32,7 @@ class PostActions
     /**
      * @var string $oldContent
      */
-    private $oldContent = '';
+    private static $oldContent = '';
 
     /**
      * @param SettingsRepositoryInterface $settings
@@ -78,7 +78,7 @@ class PostActions
         // if the post already exists,
         // this means we're trying to edit.
         if ($post->exists) {
-            $this->oldContent = $post->getContentAttribute(
+            self::$oldContent = $post->getContentAttribute(
               $post->getOriginal('content')
           );
         }
@@ -121,7 +121,7 @@ class PostActions
                 0, // save original post as revision 0 before updating it
                 $event->post->id,
                 $event->actor->id,
-                $this->oldContent
+                self::$oldContent
             );
 
             $diff->created_at = $event->post->created_at;
@@ -134,7 +134,7 @@ class PostActions
             $latestDiff = $diffSubject
               ->where('revision', $maxRevisionCount)
               ->firstOrFail();
-            $latestDiff->content = $this->oldContent;
+            $latestDiff->content = self::$oldContent;
             $latestDiff->save();
         }
 
