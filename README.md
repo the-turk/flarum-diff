@@ -29,7 +29,7 @@ Also, it won't load (and cache) anything until you click the "Edited" button so 
 
 You can check your php version by running `php -v` and check if `iconv` is installed by running `php --ri iconv` (which should display `iconv support => enabled`).
 
-You also need to update `s9e/text-formatter` to v2.3.7 for syntax highlighting in "Preview" mode:
+You also need to update `s9e/text-formatter` to v2.3.7 for syntax highlighting in "Preview" mode (**skip this step** if you didn't update `flarum/core` to beta 12 yet):
 
 ```
 composer update s9e/text-formatter:2.3.7
@@ -41,7 +41,7 @@ This extension conflicts with:
 
 - [dem13n/nickname-changer](https://discuss.flarum.org/d/21238-nickname-changer) package. Use [fof/username-request](https://discuss.flarum.org/d/20956-friendsofflarum-username-request) instead.
 
-- If you're using [the-turk/flarum-edit-notifications extension](https://discuss.flarum.org/d/22896-edit-notifications/17), you should update it to v0.1.4
+- If you're using [the-turk/flarum-edit-notifications](https://discuss.flarum.org/d/22896-edit-notifications/17), you should update it to v0.1.4
 ```bash
 composer update the-turk/flarum-edit-notifications:0.1.4
 ```
