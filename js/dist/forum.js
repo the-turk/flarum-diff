@@ -466,16 +466,6 @@ function (_Component) {
      */
 
     this.selectedItem = this.props.selectedItem;
-    /**
-     * Whether there is a pre-selected revision or not.
-     * If user clicks a revision in this list while DiffModal open,
-     * we'll use this value to active & disable selected revision's
-     * DiffButton component.
-     *
-     * @type {Number|Null}
-     */
-
-    this.selectedItem = this.props.selectedItem;
 
     if (!flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.cache.diffs) {
       /**
@@ -987,8 +977,11 @@ function (_Modal) {
         _this2.setDiffContent('inline');
       },
       className: 'Button Button--icon Button--link inlineView',
-      config: function config(elm, isInitialized) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).tooltip({
+      config: function config(elm) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? // we can't use isInitialized here because when you
+        // click original content on revision list,
+        // tooltip for eye icon must be updated
+        $(elm).tooltip({
           trigger: 'hover'
         }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.inline')) // this is a workaround for adding custom
         // classes into bootstrap tooltips
@@ -1003,8 +996,8 @@ function (_Modal) {
         _this2.setDiffContent('sideBySide');
       },
       className: 'Button Button--icon Button--link sideBySideView',
-      config: function config(elm, isInitialized) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).tooltip({
+      config: function config(elm) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
           trigger: 'hover'
         }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.sideBySide')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
@@ -1016,8 +1009,8 @@ function (_Modal) {
         _this2.setDiffContent('combined');
       },
       className: 'Button Button--icon Button--link combinedView',
-      config: function config(elm, isInitialized) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).tooltip({
+      config: function config(elm) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
           trigger: 'hover'
         }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.combined')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
@@ -1029,8 +1022,8 @@ function (_Modal) {
         _this2.setDiffContent('preview');
       },
       className: 'Button Button--icon Button--link diffPreview',
-      config: function config(elm, isInitialized) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).tooltip({
+      config: function config(elm) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
           trigger: 'hover'
         }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.composer.preview_tooltip')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
