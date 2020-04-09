@@ -30,7 +30,7 @@
 - **Add** some informations about comparisons to make things more clear.
 - **Add** informative tooltips to make things even more clear.
 - **Add** preview mode for all revisions.
-  + You need to update `s9e/text-formatter` to v2.3.7 for syntax highlighting in previews.
+  + You need to update `s9e/text-formatter` to v2.3.7 for syntax highlighting in previews. (**skip this step** if you didn't update `flarum/core` to beta 12 yet)
   ```
   composer update s9e/text-formatter:2.3.7
   ```
