@@ -22,7 +22,6 @@
   },
   "require": {
     "flarum/core": ">=0.1.0-beta.10 <0.1.0-beta.13",
-	"s9e/text-formatter": "^2.3.7",
     "fof/console": "^0.5",
     "jfcherng/php-diff": "^6.7.1",
     "ext-json": "*"
