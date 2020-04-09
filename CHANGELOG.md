@@ -1,3 +1,7 @@
+### 1.0.3
+- **Drop** `s9e/text-formatter ^2.3.7` requirement for `flarum/core < beta 12`
+- **Update** dist files.
+
 ### 1.0.2
 - **Fix** duplicated variable definition in DiffList Component.
 - **Fix** a char-level typo (thanks to @Csineneo).
