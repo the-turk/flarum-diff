@@ -22,9 +22,14 @@ the-turk-diff:
         inline:                      Line by Line
         combined:                    Combined
 
-        # {old}, {new} and {content} may refer to: (=> originalContent) key or (=> revisionWithNumber) key
+        # {old}, {new} and {content} may refer to:
+        # (=> originalContent)
+        # (=> currentContent)
+        # (=> revisionWithNumber)
+
         differences:                 "You're viewing differences between {old} and {new}"
         previewMode:                 "You're previewing {content}" # other languages may use: You're in preview mode ({content})
+        #---
         originalContent:             original content # may be {old}, {new} or {content}
         currentContent:              current content # may be {old}, {new} or {content}
         revisionWithNumber:          "revision {number}" # may be {old}, {new} or {content}

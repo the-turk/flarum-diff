@@ -22,9 +22,14 @@ the-turk-diff:
         inline:                      Alt Alta
         combined:                    Kombine
 
-        # {old} and {new} may refer to: (=> originalContent) key or (=> revisionWithNumber) key
+        # {old}, {new} and {content} may refer to:
+        # (=> originalContent)
+        # (=> currentContent)
+        # (=> revisionWithNumber)
+
         differences:                 "{old} ve {new} arasındaki farklılıkları görüntülüyorsunuz"
-        previewMode:                  "{content} için ön izlemeyi görüntülüyorsunuz" # other languages may use: You're in preview mode ({content})
+        previewMode:                 "{content} için ön izlemeyi görüntülüyorsunuz" # other languages may use: You're in preview mode ({content})
+        #---
         originalContent:             orijinal içerik # may be {old}, {new} or {content}
         currentContent:              şimdiki içerik # may be {old}, {new} or {content}
         revisionWithNumber:          "revizyon {number}" # may be {old}, {new} or {content}
