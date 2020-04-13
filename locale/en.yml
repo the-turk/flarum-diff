@@ -37,7 +37,7 @@ the-turk-diff:
         noDiff:                       No differences found between these two contents.
 
         differences:
-           # following keys may refer to {old} or {new} in ‘sentence’ key
+           # one of the following will be used in place of {old} or {new} in ‘sentence’ key
           originalContent:            => the-turk-diff.ref.originalContent
           currentContent:             => the-turk-diff.ref.currentContent
           revisionWithNumber:         => the-turk-diff.ref.revisionWithNumber
@@ -45,7 +45,7 @@ the-turk-diff:
           sentence:                   "You're viewing differences between {old} and {new}"
 
         previewMode:
-          # following keys may refer to {content} in ‘sentence’ key
+          # one of the following will be used in place of {content} in ‘sentence’ key
           originalContent:            => the-turk-diff.ref.originalContent
           currentContent:             => the-turk-diff.ref.currentContent
           revisionWithNumber:         => the-turk-diff.ref.revisionWithNumber
