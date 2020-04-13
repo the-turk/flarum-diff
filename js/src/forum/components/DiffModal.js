@@ -290,84 +290,84 @@ export default class DiffModal extends Modal {
             {this.revision.revision() != 0 &&
               (this.comparisonBetween.new.revision != this.comparisonBetween.old.revision) ?
               [
-                Button.component({
-                  icon: 'fas fa-grip-lines',
-                  onclick: () => {
-                    // fix for Chrome
-                    // tooltips are not disappearing onclick
-                    this.$('.' + tooltipClass).tooltip('hide');
+                <div className="tooltip-wrapper"
+                  data-original-title={app.translator.trans('the-turk-diff.forum.inline')}>
+                  {Button.component({
+                    icon: 'fas fa-grip-lines',
+                    onclick: () => {
+                      // fix for Chrome
+                      // tooltips are not disappearing onclick
+                      this.$('.' + tooltipClass).tooltip('hide');
 
-                    this.setDiffContent('inline');
-                  },
-                  className: 'Button Button--icon Button--link inlineView',
-                  config: (elm) => touchDevice() === false ?
-                    // we can't use isInitialized here because when you
-                    // click original content on revision list,
-                    // tooltip for eye icon must be updated
-                    $(elm).tooltip({
-                      trigger: 'hover'
-                    }).attr(
-                      'data-original-title',
-                      app.translator.trans('the-turk-diff.forum.inline')
-                    )
-                    // this is a workaround for adding custom
-                    // classes into bootstrap tooltips
-                    // https://stackoverflow.com/a/29879041/12866913
-                    .data('bs.tooltip').tip()
-                    .addClass(tooltipClass) : ''
-                }),
-                Button.component({
-                  icon: 'fas fa-columns',
-                  onclick: () => {
-                    this.$('.' + tooltipClass).tooltip('hide');
-                    this.setDiffContent('sideBySide');
-                  },
-                  className: 'Button Button--icon Button--link sideBySideView',
-                  config: (elm) => touchDevice() === false ?
-                    $(elm).tooltip({
-                      trigger: 'hover'
-                    }).attr(
-                      'data-original-title',
-                      app.translator.trans('the-turk-diff.forum.sideBySide')
-                    )
-                    .data('bs.tooltip').tip()
-                    .addClass(tooltipClass) : ''
-                }),
-                Button.component({
-                  icon: 'far fa-square',
-                  onclick: () => {
-                    this.$('.' + tooltipClass).tooltip('hide');
-                    this.setDiffContent('combined');
-                  },
-                  className: 'Button Button--icon Button--link combinedView',
-                  config: (elm) => touchDevice() === false ?
-                    $(elm).tooltip({
-                      trigger: 'hover'
-                    }).attr(
-                      'data-original-title',
-                      app.translator.trans('the-turk-diff.forum.combined')
-                    )
-                    .data('bs.tooltip').tip()
-                    .addClass(tooltipClass) : ''
-                })
+                      this.setDiffContent('inline');
+                    },
+                    className: 'Button Button--icon Button--link inlineView',
+                    config: (elm, isInitialized) => touchDevice() === false && !isInitialized ?
+                      $(elm).parent().tooltip({
+                        trigger: 'hover'
+                      })
+                      // this is a workaround for adding custom
+                      // classes into bootstrap tooltips
+                      // https://stackoverflow.com/a/29879041/12866913
+                      .data('bs.tooltip').tip()
+                      .addClass(tooltipClass) : ''
+                  })}
+                </div>,
+                <div className="tooltip-wrapper"
+                  data-original-title={app.translator.trans('the-turk-diff.forum.sideBySide')}>
+                  {Button.component({
+                    icon: 'fas fa-columns',
+                    onclick: () => {
+                      this.$('.' + tooltipClass).tooltip('hide');
+                      this.setDiffContent('sideBySide');
+                    },
+                    className: 'Button Button--icon Button--link sideBySideView',
+                    config: (elm, isInitialized) => touchDevice() === false && !isInitialized ?
+                      $(elm).parent().tooltip({
+                        trigger: 'hover'
+                      })
+                      .data('bs.tooltip').tip()
+                      .addClass(tooltipClass) : ''
+                  })}
+                </div>,
+                <div className="tooltip-wrapper"
+                  data-original-title={app.translator.trans('the-turk-diff.forum.combined')}>
+                  {Button.component({
+                    icon: 'far fa-square',
+                    onclick: () => {
+                      this.$('.' + tooltipClass).tooltip('hide');
+                      this.setDiffContent('combined');
+                    },
+                    className: 'Button Button--icon Button--link combinedView',
+                    config: (elm, isInitialized) => touchDevice() === false && !isInitialized ?
+                      $(elm).parent().tooltip({
+                        trigger: 'hover'
+                      })
+                      .data('bs.tooltip').tip()
+                      .addClass(tooltipClass) : ''
+                  })}
+                </div>
               ] : ''}
-              {Button.component({
-                icon: 'far fa-eye',
-                onclick: () => {
-                  this.$('.' + tooltipClass).tooltip('hide');
-                  this.setDiffContent('preview');
-                },
-                className: 'Button Button--icon Button--link diffPreview',
-                config: (elm) => touchDevice() === false ?
-                  $(elm).tooltip({
-                    trigger: 'hover'
-                  }).attr(
-                    'data-original-title',
-                    app.translator.trans('core.forum.composer.preview_tooltip')
-                  )
-                  .data('bs.tooltip').tip()
-                  .addClass(tooltipClass) : ''
-              })}
+              <div className="tooltip-wrapper"
+                data-original-title={app.translator.trans('core.forum.composer.preview_tooltip')}>
+                {Button.component({
+                  icon: 'far fa-eye',
+                  onclick: () => {
+                    this.$('.' + tooltipClass).tooltip('hide');
+                    this.setDiffContent('preview');
+                  },
+                  className: 'Button Button--icon Button--link diffPreview',
+                  config: (elm, isInitialized) => touchDevice() === false && !isInitialized ?
+                    $(elm).parent().tooltip({
+                      trigger: 'hover'
+                    }).attr(
+                      'data-original-title',
+                      app.translator.trans('core.forum.composer.preview_tooltip')
+                    )
+                    .data('bs.tooltip').tip()
+                    .addClass(tooltipClass) : ''
+                })}
+              </div>
             </div>
           </div>
 
@@ -484,26 +484,27 @@ export default class DiffModal extends Modal {
           this.revision.data.attributes.sideBySideHtml
         );
         $sideBySideButton.prop('disabled', true);
-        $sideBySideButton.siblings().prop('disabled', false);
+        // what a dynasty - LOL
+        $sideBySideButton.parent().siblings().children().prop('disabled', false);
       } else if (contentType === 'inline') {
         diffContentHtml = this.renderHtml(
           this.revision.data.attributes.inlineHtml
         );
         $inlineButton.prop('disabled', true);
-        $inlineButton.siblings().prop('disabled', false);
+        $inlineButton.parent().siblings().children().prop('disabled', false);
       } else if (contentType === 'combined') {
         diffContentHtml = this.renderHtml(
           this.revision.data.attributes.combinedHtml
         );
         $combinedButton.prop('disabled', true);
-        $combinedButton.siblings().prop('disabled', false);
+        $combinedButton.parent().siblings().children().prop('disabled', false);
       }
     } else {
       $diffContainer.hide();
       this.$('.previewContainer').show();
 
       $previewButton.prop('disabled', true);
-      $previewButton.siblings().prop('disabled', false);
+      $previewButton.parent().siblings().children().prop('disabled', false);
       return this.setInfoContent(true);
     }
 

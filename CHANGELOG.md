@@ -1,3 +1,10 @@
+### 1.0.4
+- **Fix** zeroth revision (original content) gets wrong actor when post edited by another user.
+- **Fix** post owners can't delete or rollback to revisions made by another user.
+- **Fix** misaligned grid and flex layouts for IE.
+- **Fix** tooltips won't appear on disabled buttons.
+- **Fix** mislabeled tooltips for _fa-eye_ and _fa-columns_ icons when you switch to any revision from zeroth revision and vice versa.
+
 ### 1.0.3
 - **Drop** `s9e/text-formatter ^2.3.7` requirement for `flarum/core < beta 12`
 - **Update** dist files.

@@ -4,14 +4,14 @@
  * Diff Extension for Flarum.
  *
  * LICENSE: For the full copyright and license information,
- * please view the LICENSE.md file that was distributed
+ * please view the LICENSE file that was distributed
  * with this source code.
  *
  * @package    the-turk/flarum-diff
  * @author     Hasan Özbey <hasanoozbey@gmail.com>
  * @copyright  2020
  * @license    The MIT License
- * @version    Release: 1.0.0
+ * @version    Release: 1.0.4
  * @link       https://github.com/the-turk/flarum-diff
  */
 
@@ -36,7 +36,7 @@ return [
         ->css(__DIR__ . '/less/forum.less')
         ->js(__DIR__ . '/js/dist/forum.js'),
     (new Extend\Locales(__DIR__ . '/locale')),
-    
+
     static function (Application $app) {
         /** @var Dispatcher $events */
         $events = $app['events'];

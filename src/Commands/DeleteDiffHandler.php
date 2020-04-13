@@ -6,10 +6,16 @@ use Flarum\User\Exception\PermissionDeniedException;
 use TheTurk\Diff\Repositories\DiffArchiveRepository;
 use TheTurk\Diff\Models\Diff;
 use Carbon\Carbon;
+use Flarum\Post\PostRepository;
 
 class DeleteDiffHandler
 {
     use AssertPermissionTrait;
+
+    /**
+     * @var \Flarum\Post\PostRepository
+     */
+    protected $posts;
 
     /**
      * @var DiffArchiveRepository
@@ -17,10 +23,15 @@ class DeleteDiffHandler
     protected $diffArchive;
 
     /**
+     * @param PostRepository $posts
      * @param DiffArchiveRepository $diffArchive
      */
-    public function __construct(DiffArchiveRepository $diffArchive)
+    public function __construct(
+      PostRepository $posts,
+      DiffArchiveRepository $diffArchive
+    )
     {
+        $this->posts = $posts;
         $this->diffArchive = $diffArchive;
     }
 
@@ -32,8 +43,8 @@ class DeleteDiffHandler
     {
         $actor = $command->actor;
         $diff = Diff::findOrFail($command->diffId);
-
-        $isSelf = $actor->id === $diff->actor->id;
+        $post = $this->posts->findOrFail($diff->post_id, $actor);
+        $isSelf = $actor->id === $post->user_id;
 
         if (!$actor->can('deleteEditHistory')
             && !($isSelf && $actor->can('selfDeleteEditHistory'))) {

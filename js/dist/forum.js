@@ -967,7 +967,10 @@ function (_Modal) {
       className: "diff-grid-item diff-grid-controls"
     }, m("div", {
       className: "diffSwitcher"
-    }, this.revision.revision() != 0 && this.comparisonBetween["new"].revision != this.comparisonBetween.old.revision ? [flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+    }, this.revision.revision() != 0 && this.comparisonBetween["new"].revision != this.comparisonBetween.old.revision ? [m("div", {
+      className: "tooltip-wrapper",
+      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.inline')
+    }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-grip-lines',
       onclick: function onclick() {
         // fix for Chrome
@@ -977,18 +980,18 @@ function (_Modal) {
         _this2.setDiffContent('inline');
       },
       className: 'Button Button--icon Button--link inlineView',
-      config: function config(elm) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? // we can't use isInitialized here because when you
-        // click original content on revision list,
-        // tooltip for eye icon must be updated
-        $(elm).tooltip({
+      config: function config(elm, isInitialized) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).parent().tooltip({
           trigger: 'hover'
-        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.inline')) // this is a workaround for adding custom
+        }) // this is a workaround for adding custom
         // classes into bootstrap tooltips
         // https://stackoverflow.com/a/29879041/12866913
         .data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
-    }), flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+    })), m("div", {
+      className: "tooltip-wrapper",
+      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.sideBySide')
+    }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-columns',
       onclick: function onclick() {
         _this2.$('.' + tooltipClass).tooltip('hide');
@@ -996,12 +999,15 @@ function (_Modal) {
         _this2.setDiffContent('sideBySide');
       },
       className: 'Button Button--icon Button--link sideBySideView',
-      config: function config(elm) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+      config: function config(elm, isInitialized) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).parent().tooltip({
           trigger: 'hover'
-        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.sideBySide')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
+        }).data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
-    }), flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+    })), m("div", {
+      className: "tooltip-wrapper",
+      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.combined')
+    }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'far fa-square',
       onclick: function onclick() {
         _this2.$('.' + tooltipClass).tooltip('hide');
@@ -1009,12 +1015,15 @@ function (_Modal) {
         _this2.setDiffContent('combined');
       },
       className: 'Button Button--icon Button--link combinedView',
-      config: function config(elm) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+      config: function config(elm, isInitialized) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).parent().tooltip({
           trigger: 'hover'
-        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.combined')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
+        }).data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
-    })] : '', flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
+    }))] : '', m("div", {
+      className: "tooltip-wrapper",
+      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.composer.preview_tooltip')
+    }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'far fa-eye',
       onclick: function onclick() {
         _this2.$('.' + tooltipClass).tooltip('hide');
@@ -1022,12 +1031,12 @@ function (_Modal) {
         _this2.setDiffContent('preview');
       },
       className: 'Button Button--icon Button--link diffPreview',
-      config: function config(elm) {
-        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false ? $(elm).tooltip({
+      config: function config(elm, isInitialized) {
+        return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).parent().tooltip({
           trigger: 'hover'
         }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.composer.preview_tooltip')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
-    }))), m("div", {
+    })))), m("div", {
       className: "diff-grid-item diff-grid-info"
     }, m("div", {
       className: "revisionInfo"
@@ -1120,22 +1129,23 @@ function (_Modal) {
     if (contentType !== 'preview') {
       if (contentType === 'sideBySide') {
         diffContentHtml = this.renderHtml(this.revision.data.attributes.sideBySideHtml);
-        $sideBySideButton.prop('disabled', true);
-        $sideBySideButton.siblings().prop('disabled', false);
+        $sideBySideButton.prop('disabled', true); // what a dynasty - LOL
+
+        $sideBySideButton.parent().siblings().children().prop('disabled', false);
       } else if (contentType === 'inline') {
         diffContentHtml = this.renderHtml(this.revision.data.attributes.inlineHtml);
         $inlineButton.prop('disabled', true);
-        $inlineButton.siblings().prop('disabled', false);
+        $inlineButton.parent().siblings().children().prop('disabled', false);
       } else if (contentType === 'combined') {
         diffContentHtml = this.renderHtml(this.revision.data.attributes.combinedHtml);
         $combinedButton.prop('disabled', true);
-        $combinedButton.siblings().prop('disabled', false);
+        $combinedButton.parent().siblings().children().prop('disabled', false);
       }
     } else {
       $diffContainer.hide();
       this.$('.previewContainer').show();
       $previewButton.prop('disabled', true);
-      $previewButton.siblings().prop('disabled', false);
+      $previewButton.parent().siblings().children().prop('disabled', false);
       return this.setInfoContent(true);
     }
 

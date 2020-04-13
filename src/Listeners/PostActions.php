@@ -120,7 +120,7 @@ class PostActions
             $diff = Diff::build(
                 0, // save original post as revision 0 before updating it
                 $event->post->id,
-                $event->actor->id,
+                $event->post->user_id, // original post's creator
                 self::$oldContent
             );
 

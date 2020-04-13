@@ -55,7 +55,8 @@ class RollbackToDiffHandler
     {
         $actor = $command->actor;
         $diff = Diff::findOrFail($command->diffId);
-        $isSelf = $actor->id === $diff->actor->id;
+        $post = $this->posts->findOrFail($diff->post_id, $actor);
+        $isSelf = $actor->id === $post->user_id;
 
         if (!$actor->can('rollbackEditHistory')
             && !($isSelf && $actor->can('selfRollbackEditHistory'))) {
@@ -63,8 +64,6 @@ class RollbackToDiffHandler
         }
 
         $maxRevisionCount = Diff::where('post_id', $diff->post_id)->max('revision');
-
-        $post = $this->posts->findOrFail($diff->post_id, $actor);
 
         // if we want to rollback to archived revision
         if ($diff->archive_id !== null) {
