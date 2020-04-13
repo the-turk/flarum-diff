@@ -95,7 +95,7 @@ export default class DiffModal extends Modal {
         ago: humanTime(this.revision.createdAt())
       }) :
       // x created y ago
-      app.translator.trans('the-turk-diff.forum.createdTooltip', {
+      app.translator.trans('the-turk-diff.forum.createdInfo', {
         username:
           <a href={app.route.user(this.revision.actor())} config={m.route}>
             {username(this.revision.actor())}
@@ -291,7 +291,7 @@ export default class DiffModal extends Modal {
               (this.comparisonBetween.new.revision != this.comparisonBetween.old.revision) ?
               [
                 <div className="tooltip-wrapper"
-                  data-original-title={app.translator.trans('the-turk-diff.forum.inline')}>
+                  data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.inline')}>
                   {Button.component({
                     icon: 'fas fa-grip-lines',
                     onclick: () => {
@@ -314,7 +314,7 @@ export default class DiffModal extends Modal {
                   })}
                 </div>,
                 <div className="tooltip-wrapper"
-                  data-original-title={app.translator.trans('the-turk-diff.forum.sideBySide')}>
+                  data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.sideBySide')}>
                   {Button.component({
                     icon: 'fas fa-columns',
                     onclick: () => {
@@ -331,7 +331,7 @@ export default class DiffModal extends Modal {
                   })}
                 </div>,
                 <div className="tooltip-wrapper"
-                  data-original-title={app.translator.trans('the-turk-diff.forum.combined')}>
+                  data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.combined')}>
                   {Button.component({
                     icon: 'far fa-square',
                     onclick: () => {
@@ -538,22 +538,22 @@ export default class DiffModal extends Modal {
     let infoContentHtml = !preview && this.revision.revision() != 0 &&
       (this.comparisonBetween.new.revision != this.comparisonBetween.old.revision) ?
       extractText(app.translator.trans(
-        'the-turk-diff.forum.differences',
+        'the-turk-diff.forum.differences.sentence',
         {
           old:
             this.comparisonBetween.old.revision == -1 ?
               /* we're viewing differences between current content and {new} */
               app.translator.trans(
-                'the-turk-diff.forum.currentContent'
+                'the-turk-diff.forum.differences.currentContent'
               ) :
               this.comparisonBetween.old.revision == 0 ?
                 /* we're viewing differences between original content and {new} */
                 app.translator.trans(
-                  'the-turk-diff.forum.originalContent'
+                  'the-turk-diff.forum.differences.originalContent'
                 ) :
                 /* we're viewing differences between revision X and {new} */
                 app.translator.trans(
-                  'the-turk-diff.forum.revisionWithNumber', {
+                  'the-turk-diff.forum.differences.revisionWithNumber', {
                     number: this.comparisonBetween.old.revision
                   }
                 ),
@@ -561,37 +561,37 @@ export default class DiffModal extends Modal {
             this.comparisonBetween.new.revision == 0 ?
               /* we're viewing differences between {old} and original content */
               app.translator.trans(
-                'the-turk-diff.forum.originalContent'
+                'the-turk-diff.forum.differences.originalContent'
               ) :
               this.comparisonBetween.new.revision == this.post.revisionCount() ?
                 /* we're viewing differences between {old} and current content */
                 app.translator.trans(
-                  'the-turk-diff.forum.currentContent'
+                  'the-turk-diff.forum.differences.currentContent'
                 ) :
                 /* we're viewing differences between {old} and revision X */
                 app.translator.trans(
-                  'the-turk-diff.forum.revisionWithNumber', {
+                  'the-turk-diff.forum.differences.revisionWithNumber', {
                     number: this.comparisonBetween.new.revision
                   }
                 )
         }
       )) :
       extractText(app.translator.trans(
-        'the-turk-diff.forum.previewMode',
+        'the-turk-diff.forum.previewMode.sentence',
         {
           content: this.comparisonBetween.new.revision == 0 ?
             /* we're previewing original content */
             app.translator.trans(
-              'the-turk-diff.forum.originalContent'
+              'the-turk-diff.forum.previewMode.originalContent'
             ) :
             this.comparisonBetween.new.revision == this.post.revisionCount() ?
               /* we're previewing current content */
               app.translator.trans(
-                'the-turk-diff.forum.currentContent'
+                'the-turk-diff.forum.previewMode.currentContent'
               ) :
               /* we're previewing revision X */
               app.translator.trans(
-                'the-turk-diff.forum.revisionWithNumber', {
+                'the-turk-diff.forum.previewMode.revisionWithNumber', {
                   number: this.comparisonBetween.new.revision
                 }
               )

@@ -31,7 +31,7 @@ export default class DiffButton extends Button {
     let buttonText = revision.revision() == 0 ?
       /* {username} created {ago} */
       extractText(app.translator.trans(
-        'the-turk-diff.forum.createdTooltip', {
+        'the-turk-diff.forum.createdInfo', {
           username: username(revision.actor()),
           ago: humanTime(this.props.postDate)
         }
@@ -54,7 +54,7 @@ export default class DiffButton extends Button {
         actor = revision.deletedUser();
         /* {actor} deleted this content {ago} */
         buttonText = extractText(app.translator.trans(
-          'the-turk-diff.forum.deletedTooltip', {
+          'the-turk-diff.forum.deletedInfo', {
             username: username(revision.deletedUser()),
             ago: humanTime(revision.deletedAt())
           }

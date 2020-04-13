@@ -214,7 +214,7 @@ function (_Button) {
     var actor = revision.actor();
     var buttonText = revision.revision() == 0 ?
     /* {username} created {ago} */
-    flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('the-turk-diff.forum.createdTooltip', {
+    flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('the-turk-diff.forum.createdInfo', {
       username: flarum_helpers_username__WEBPACK_IMPORTED_MODULE_5___default()(revision.actor()),
       ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(this.props.postDate)
     })) :
@@ -233,7 +233,7 @@ function (_Button) {
         actor = revision.deletedUser();
         /* {actor} deleted this content {ago} */
 
-        buttonText = flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('the-turk-diff.forum.deletedTooltip', {
+        buttonText = flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('the-turk-diff.forum.deletedInfo', {
           username: flarum_helpers_username__WEBPACK_IMPORTED_MODULE_5___default()(revision.deletedUser()),
           ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(revision.deletedAt())
         }));
@@ -533,9 +533,9 @@ function (_Component) {
               placement: 'left',
               container: 'body'
             }).attr('data-original-title', flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_6___default()(item.revision() == _this.post.revisionCount() ? // we're hovering on latest revision's button
-            flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.mostRecent') : item.revision() == 0 ? // we're hovering on zeroth revision's button
-            flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.originalContent') : // we're hovering on other revision's button
-            flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.revisionWithNumber', {
+            flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.tooltips.mostRecent') : item.revision() == 0 ? // we're hovering on zeroth revision's button
+            flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.tooltips.originalContent') : // we're hovering on other revision's button
+            flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.tooltips.revisionWithNumber', {
               number: item.revision()
             }))) // this is a workaround for adding custom
             // classes into bootstrap tooltips
@@ -834,7 +834,7 @@ function (_Modal) {
       }, flarum_helpers_username__WEBPACK_IMPORTED_MODULE_4___default()(this.revision.actor())),
       ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_5___default()(this.revision.createdAt())
     }) : // x created y ago
-    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.createdTooltip', {
+    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.createdInfo', {
       username: m("a", {
         href: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.route.user(this.revision.actor()),
         config: m.route
@@ -969,7 +969,7 @@ function (_Modal) {
       className: "diffSwitcher"
     }, this.revision.revision() != 0 && this.comparisonBetween["new"].revision != this.comparisonBetween.old.revision ? [m("div", {
       className: "tooltip-wrapper",
-      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.inline')
+      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.tooltips.inline')
     }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-grip-lines',
       onclick: function onclick() {
@@ -990,7 +990,7 @@ function (_Modal) {
       }
     })), m("div", {
       className: "tooltip-wrapper",
-      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.sideBySide')
+      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.tooltips.sideBySide')
     }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'fas fa-columns',
       onclick: function onclick() {
@@ -1006,7 +1006,7 @@ function (_Modal) {
       }
     })), m("div", {
       className: "tooltip-wrapper",
-      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.combined')
+      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.tooltips.combined')
     }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'far fa-square',
       onclick: function onclick() {
@@ -1179,33 +1179,33 @@ function (_Modal) {
     }
 
     var $infoContainer = this.$('.diffInfoContainer');
-    var infoContentHtml = !preview && this.revision.revision() != 0 && this.comparisonBetween["new"].revision != this.comparisonBetween.old.revision ? flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.differences', {
+    var infoContentHtml = !preview && this.revision.revision() != 0 && this.comparisonBetween["new"].revision != this.comparisonBetween.old.revision ? flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.differences.sentence', {
       old: this.comparisonBetween.old.revision == -1 ?
       /* we're viewing differences between current content and {new} */
-      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.currentContent') : this.comparisonBetween.old.revision == 0 ?
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.differences.currentContent') : this.comparisonBetween.old.revision == 0 ?
       /* we're viewing differences between original content and {new} */
-      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.originalContent') :
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.differences.originalContent') :
       /* we're viewing differences between revision X and {new} */
-      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.revisionWithNumber', {
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.differences.revisionWithNumber', {
         number: this.comparisonBetween.old.revision
       }),
       "new": this.comparisonBetween["new"].revision == 0 ?
       /* we're viewing differences between {old} and original content */
-      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.originalContent') : this.comparisonBetween["new"].revision == this.post.revisionCount() ?
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.differences.originalContent') : this.comparisonBetween["new"].revision == this.post.revisionCount() ?
       /* we're viewing differences between {old} and current content */
-      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.currentContent') :
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.differences.currentContent') :
       /* we're viewing differences between {old} and revision X */
-      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.revisionWithNumber', {
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.differences.revisionWithNumber', {
         number: this.comparisonBetween["new"].revision
       })
-    })) : flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.previewMode', {
+    })) : flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.previewMode.sentence', {
       content: this.comparisonBetween["new"].revision == 0 ?
       /* we're previewing original content */
-      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.originalContent') : this.comparisonBetween["new"].revision == this.post.revisionCount() ?
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.previewMode.originalContent') : this.comparisonBetween["new"].revision == this.post.revisionCount() ?
       /* we're previewing current content */
-      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.currentContent') :
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.previewMode.currentContent') :
       /* we're previewing revision X */
-      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.revisionWithNumber', {
+      flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.previewMode.revisionWithNumber', {
         number: this.comparisonBetween["new"].revision
       })
     }));

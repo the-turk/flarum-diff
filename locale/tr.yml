@@ -1,38 +1,55 @@
 the-turk-diff:
     forum:
-        revisionInfo:                "{revisionCount} kere düzeltildi, yenisi en üstte|{revisionCount} kere düzeltildi, yenisi en üstte"
-        revisionCount:               "{revisionCount} revizyon | {revisionCount} revizyon"
+        revisions:                   "{revisionCount} revizyon | {revisionCount} revizyon"
         emptyText:                   Düzenleme Bulunamadı
-        confirmDelete:               Bu düzenleme içeriğini geçmişten silmek istediğinize emin misiniz?
-        confirmRollback:             Mesajınızı değiştirmek istediğinize emin misiniz?
-        deleteSuccessMessage:        Düzenleme içeriği, geçmişten silindi.
-        deleteErrorMessage:          Düzenleme içeriği silinemedi.
-        rollbackSuccessMessage:      Düzenlemeler geri alındı.
-        rollbackErrorMessage:        Düzenlemeler geri alınamadı.
         deletedText:                 (silinmiş)
-        deletedTooltip:              "{username}, bu içeriği {ago} sildi"
-        createdTooltip:              "{username}, {ago} yazdı"
+        tooltips:
+          # Revision List Tooltips
+          mostRecent:                en güncel
+          originalContent:           => the-turk-diff.ref.originalContent
+          revisionWithNumber:        => the-turk-diff.ref.revisionWithNumber
+          ## Renderer Switcher Tooltips
+          sideBySide:                Yan Yana
+          inline:                    Alt Alta
+          combined:                  Kombine
+
+        # Buttons
         optionsButton:               Seçenekler
         rollbackButton:              "{number}. Revizyona Geri Dön"
         rollbackToOriginalButton:    Orijinale Geri Dön
         revertChangesButton:         Düzenlemeyi Geri Al
+
+        # Confirmation Messages
+        confirmRollback:             Mesajınızı değiştirmek istediğinize emin misiniz?
+        confirmDelete:               Bu düzenleme içeriğini geçmişten silmek istediğinize emin misiniz?
+
+        # Error Messages
+        rollbackErrorMessage:        Düzenlemeler geri alınamadı.
+        deleteErrorMessage:          Düzenleme içeriği silinemedi.
+
+        # Informative Messages
+        rollbackSuccessMessage:      Düzenlemeler geri alındı.
+        deleteSuccessMessage:        Düzenleme içeriği, geçmişten silindi.
+        deletedInfo:                 "{username}, bu içeriği {ago} sildi"
+        createdInfo:                 "{username}, {ago} yazdı"
+        revisionInfo:                "{revisionCount} kere düzeltildi, yenisi en üstte|{revisionCount} kere düzeltildi, yenisi en üstte"
         noDiff:                      İki içerik arasında gösterilecek bir değişiklik bulunamadı.
-        mostRecent:                  en güncel
-        sideBySide:                  Yan Yana
-        inline:                      Alt Alta
-        combined:                    Kombine
 
-        # {old}, {new} and {content} may refer to:
-        # (=> originalContent)
-        # (=> currentContent)
-        # (=> revisionWithNumber)
+        differences:
+           # following keys may refer to {old} or {new} in ‘sentence’ key
+          originalContent:           => the-turk-diff.ref.originalContent
+          currentContent:            => the-turk-diff.ref.currentContent
+          revisionWithNumber:        => the-turk-diff.ref.revisionWithNumber
+          #---
+          sentence:                  "{old} ve {new} arasındaki farklılıkları görüntülüyorsunuz"
 
-        differences:                 "{old} ve {new} arasındaki farklılıkları görüntülüyorsunuz"
-        previewMode:                 "{content} için ön izlemeyi görüntülüyorsunuz" # other languages may use: You're in preview mode ({content})
-        #---
-        originalContent:             orijinal içerik # may be {old}, {new} or {content}
-        currentContent:              şimdiki içerik # may be {old}, {new} or {content}
-        revisionWithNumber:          "revizyon {number}" # may be {old}, {new} or {content}
+        previewMode:
+          # following keys may refer to {content} in ‘sentence’ key
+          originalContent:           => the-turk-diff.ref.originalContent
+          currentContent:            => the-turk-diff.ref.currentContent
+          revisionWithNumber:        => the-turk-diff.ref.revisionWithNumber
+          #---
+          sentence:                  "{content} için ön izlemeyi görüntülüyorsunuz"
     admin:
         settings:
             title:                   Diff Ayarları
@@ -62,3 +79,7 @@ the-turk-diff:
             selfDeleteEditHistory:   Kendi düzenleme geçmişini sil
             rollbackEditHistory:     Başkalarının düzenleme geçmişlerini döndür
             selfRollbackEditHistory: Kendi düzenleme geçmişini döndür
+    ref:
+        originalContent:             orijinal içerik
+        currentContent:              şimdiki içerik
+        revisionWithNumber:          "revizyon {number}"
