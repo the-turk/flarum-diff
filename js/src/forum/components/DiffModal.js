@@ -400,7 +400,9 @@ export default class DiffModal extends Modal {
                 // .previewContainer is hidden by default
                 // we'll do some nasty switches later
               }
-              <div className="previewContainer Post-body">
+              <div className={'previewContainer Post-body'
+                  + (app.forum.attribute('textFormattingForDiffPreviews') === false
+                      ? ' diff-skip-formatting' : '')}>
                 {this.renderHtml(this.revision.data.attributes.previewHtml)}
               </div>
               <div className="diffContainer"/>

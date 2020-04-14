@@ -1051,7 +1051,7 @@ function (_Modal) {
     }, m("div", {
       className: "diffContents"
     }, m("div", {
-      className: "previewContainer Post-body"
+      className: 'previewContainer Post-body' + (flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('textFormattingForDiffPreviews') === false ? ' diff-skip-formatting' : '')
     }, this.renderHtml(this.revision.data.attributes.previewHtml)), m("div", {
       className: "diffContainer"
     }))), flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_11___default.a.component({

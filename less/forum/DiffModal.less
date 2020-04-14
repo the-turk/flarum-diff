@@ -145,10 +145,18 @@
             width: 100%;
             height: 100%;
             padding: 20px;
+
             // i'll switch this later
             // when user click on the preview button
             // or for the original content
             display: none;
+
+            // additional preview container
+            // when text formatting disabled
+            &.diff-skip-formatting {
+              white-space: pre-wrap;
+              word-break: break-word;
+            }
           }
         }
       }

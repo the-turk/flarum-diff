@@ -15,6 +15,7 @@ use Flarum\Api\Event\Serializing;
 use Flarum\Api\Serializer\BasicPostSerializer;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Api\Serializer\PostSerializer;
+use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\Post\CommentPost;
 
@@ -111,6 +112,11 @@ class AddDiffRelationship
      */
     public function prepareApiAttributes(Serializing $event)
     {
+        if ($event->isSerializer(ForumSerializer::class)) {
+            $event->attributes['textFormattingForDiffPreviews'] = (bool)
+                $this->settings->get($this->settingsPrefix . 'textFormatting', true);
+        }
+
         if ($event->isSerializer(PostSerializer::class)) {
             $isSelf = $event->actor->id === $event->model->user_id;
 
