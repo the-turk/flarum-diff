@@ -35,7 +35,7 @@ app.initializers.add('the-turk/diff', () => {
   extend(DiscussionPage.prototype, 'init', function() {
     const $body = $('body');
 
-    $body.on('click', 'li.ParentDiff.has-sub', function(e) {
+    $body.on('click', 'li.ParentDiff.DeletedDiff', function(e) {
       e.stopPropagation();
     });
 

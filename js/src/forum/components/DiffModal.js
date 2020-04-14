@@ -149,7 +149,8 @@ export default class DiffModal extends Modal {
           }
           {((this.post.canDeleteEditHistory() &&
               this.revision.revision() != this.post.revisionCount()) ||
-              this.post.canRollbackEditHistory() ?
+              (this.post.canRollbackEditHistory() &&
+                this.$('.DeletedDiff').length != this.post.revisionCount()) ?
             <Dropdown
               className="diffCotrollerDropdown App-primaryControl"
               icon="fas fa-ellipsis-v"

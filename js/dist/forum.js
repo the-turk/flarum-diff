@@ -545,7 +545,7 @@ function (_Component) {
         }); // returns the template for revision list items
 
         return [m("li", {
-          className: 'Diff ParentDiff' + (item.deletedAt() ? ' has-sub' : ''),
+          className: 'Diff ParentDiff' + (item.deletedAt() ? ' DeletedDiff' : ''),
           id: 'parentDiff' + item.id()
         }, diffButton), item.deletedAt() ? m("li", {
           className: "Diff SubDiff",
@@ -877,7 +877,7 @@ function (_Modal) {
       icon: 'fas fa-times',
       onclick: this.hide.bind(this),
       className: 'Button Button--icon Button--link'
-    })), this.post.canDeleteEditHistory() && this.revision.revision() != this.post.revisionCount() || this.post.canRollbackEditHistory() ? m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_12___default.a, {
+    })), this.post.canDeleteEditHistory() && this.revision.revision() != this.post.revisionCount() || this.post.canRollbackEditHistory() && this.$('.DeletedDiff').length != this.post.revisionCount() ? m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_12___default.a, {
       className: "diffCotrollerDropdown App-primaryControl",
       icon: "fas fa-ellipsis-v",
       buttonClassName: "Button",
@@ -1274,7 +1274,7 @@ flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.initializers.add('the-turk/dif
 
   Object(flarum_extend__WEBPACK_IMPORTED_MODULE_1__["extend"])(flarum_components_DiscussionPage__WEBPACK_IMPORTED_MODULE_7___default.a.prototype, 'init', function () {
     var $body = $('body');
-    $body.on('click', 'li.ParentDiff.has-sub', function (e) {
+    $body.on('click', 'li.ParentDiff.DeletedDiff', function (e) {
       e.stopPropagation();
     });
     $body.on('click', 'li.SubDiff', function (e) {

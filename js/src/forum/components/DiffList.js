@@ -158,7 +158,7 @@ export default class DiffList extends Component {
 
                   // returns the template for revision list items
                   return [
-                      <li className={'Diff ParentDiff' + (item.deletedAt() ? ' has-sub' : '')}
+                      <li className={'Diff ParentDiff' + (item.deletedAt() ? ' DeletedDiff' : '')}
                           id={'parentDiff' + item.id()}>
                         {diffButton}
                       </li>,
