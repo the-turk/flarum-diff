@@ -87,7 +87,7 @@ export default class DiffModal extends Modal {
       this.revision.actor().username() ? avatar(this.revision.actor()) : '',
       this.revision.revision() != 0 ?
       // x edited y ago
-      app.translator.trans('core.forum.post.edited_tooltip', {
+      app.translator.trans('the-turk-diff.forum.editedInfo', {
         username:
           <a href={app.route.user(this.revision.actor())} config={m.route}>
             {username(this.revision.actor())}
@@ -238,7 +238,7 @@ export default class DiffModal extends Modal {
               {(this.post.canDeleteEditHistory() &&
                 this.revision.revision() != this.post.revisionCount() ?
                 Button.component({
-                  children: app.translator.trans('core.forum.post_controls.delete_button'),
+                  children: app.translator.trans('the-turk-diff.forum.deleteButton'),
                   icon: 'far fa-trash-alt',
                   onclick: () => {
                     if (confirm(app.translator.trans('the-turk-diff.forum.confirmDelete'))) {
@@ -349,7 +349,7 @@ export default class DiffModal extends Modal {
                 </div>
               ] : ''}
               <div className="tooltip-wrapper"
-                data-original-title={app.translator.trans('core.forum.composer.preview_tooltip')}>
+                data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.preview')}>
                 {Button.component({
                   icon: 'far fa-eye',
                   onclick: () => {
@@ -362,7 +362,7 @@ export default class DiffModal extends Modal {
                       trigger: 'hover'
                     }).attr(
                       'data-original-title',
-                      app.translator.trans('core.forum.composer.preview_tooltip')
+                      app.translator.trans('the-turk-diff.forum.tooltips.preview')
                     )
                     .data('bs.tooltip').tip()
                     .addClass(tooltipClass) : ''

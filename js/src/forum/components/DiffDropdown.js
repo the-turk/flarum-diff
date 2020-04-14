@@ -12,7 +12,7 @@ export default class DiffDropdown extends Dropdown {
     props.className = 'DiffDropdown';
     props.buttonClassName = 'Button Button--link';
     props.menuClassName = props.menuClassName;
-    props.label = app.translator.trans('core.forum.post.edited_text');
+    props.label = app.translator.trans('the-turk-diff.forum.editedText');
     props.icon = 'fas fa-history';
 
     super.initProps(props);

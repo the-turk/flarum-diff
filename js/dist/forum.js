@@ -219,7 +219,7 @@ function (_Button) {
       ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(this.props.postDate)
     })) :
     /* {username} edited {ago} */
-    flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('core.forum.post.edited_tooltip', {
+    flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('the-turk-diff.forum.editedInfo', {
       username: flarum_helpers_username__WEBPACK_IMPORTED_MODULE_5___default()(revision.actor()),
       ago: flarum_helpers_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(revision.createdAt())
     }));
@@ -299,7 +299,7 @@ function (_Dropdown) {
     props.className = 'DiffDropdown';
     props.buttonClassName = 'Button Button--link';
     props.menuClassName = props.menuClassName;
-    props.label = app.translator.trans('core.forum.post.edited_text');
+    props.label = app.translator.trans('the-turk-diff.forum.editedText');
     props.icon = 'fas fa-history';
 
     _Dropdown.initProps.call(this, props);
@@ -827,7 +827,7 @@ function (_Modal) {
   _proto.title = function title() {
     return [// we also should consider deleted users here
     this.revision.actor().username() ? flarum_helpers_avatar__WEBPACK_IMPORTED_MODULE_6___default()(this.revision.actor()) : '', this.revision.revision() != 0 ? // x edited y ago
-    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.post.edited_tooltip', {
+    flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.editedInfo', {
       username: m("a", {
         href: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.route.user(this.revision.actor()),
         config: m.route
@@ -925,7 +925,7 @@ function (_Modal) {
         }
       }
     }) : '', this.post.canDeleteEditHistory() && this.revision.revision() != this.post.revisionCount() ? flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
-      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.post_controls.delete_button'),
+      children: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.deleteButton'),
       icon: 'far fa-trash-alt',
       onclick: function onclick() {
         if (confirm(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.confirmDelete'))) {
@@ -1022,7 +1022,7 @@ function (_Modal) {
       }
     }))] : '', m("div", {
       className: "tooltip-wrapper",
-      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.composer.preview_tooltip')
+      "data-original-title": flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.tooltips.preview')
     }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
       icon: 'far fa-eye',
       onclick: function onclick() {
@@ -1034,7 +1034,7 @@ function (_Modal) {
       config: function config(elm, isInitialized) {
         return Object(_utils_touchDevice__WEBPACK_IMPORTED_MODULE_8__["default"])() === false && !isInitialized ? $(elm).parent().tooltip({
           trigger: 'hover'
-        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('core.forum.composer.preview_tooltip')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
+        }).attr('data-original-title', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('the-turk-diff.forum.tooltips.preview')).data('bs.tooltip').tip().addClass(tooltipClass) : '';
       }
     })))), m("div", {
       className: "diff-grid-item diff-grid-info"

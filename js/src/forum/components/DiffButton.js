@@ -38,7 +38,7 @@ export default class DiffButton extends Button {
       )) :
       /* {username} edited {ago} */
       extractText(app.translator.trans(
-        'core.forum.post.edited_tooltip', {
+        'the-turk-diff.forum.editedInfo', {
           username: username(revision.actor()),
           ago: humanTime(revision.createdAt())
         }
