@@ -3,7 +3,7 @@
 - **Fix** post owners can't delete or rollback to revisions made by another user.
 - **Fix** misaligned grid and flex layouts for IE.
 - **Fix** tooltips won't appear on disabled buttons.
-- **Fix** some strings can't be translated to other languages properly.
+- **Fix** some strings can't be translated to other languages properly. ([issue #7](https://github.com/the-turk/flarum-diff/issues/7))
 - **Fix** mislabeled tooltips for _fa-eye_ and _fa-columns_ icons when you switch to any revision from zeroth revision and vice versa.
 
 ### 1.0.3
