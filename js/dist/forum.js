@@ -540,7 +540,7 @@ function (_Component) {
             }))) // this is a workaround for adding custom
             // classes into bootstrap tooltips
             // https://stackoverflow.com/a/29879041/12866913
-            .data('bs.tooltip').tip().addClass(item.deletedAt() ? tooltipClass + 'deletedDiffTooltip' : tooltipClass) : '';
+            .data('bs.tooltip').tip().addClass(item.deletedAt() ? tooltipClass + ' deletedDiffTooltip' : tooltipClass) : '';
           }
         }); // returns the template for revision list items
 

@@ -151,7 +151,7 @@ export default class DiffList extends Component {
                       .data('bs.tooltip').tip()
                       .addClass(
                         item.deletedAt() ?
-                          tooltipClass + 'deletedDiffTooltip'
+                          tooltipClass + ' deletedDiffTooltip'
                           : tooltipClass
                       ) : ''
                   });
