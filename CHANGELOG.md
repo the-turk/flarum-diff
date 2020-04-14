@@ -1,3 +1,9 @@
+### 1.0.5
+- **Fix** a **SECURITY** related **issue** which arises **when you disable text formatting for previews**.
+- **Fix** "Options" should be hidden for last revision if it's the only non-deleted revision. ([issue #8](https://github.com/the-turk/flarum-diff/issues/8))
+- **Fix** tooltip color for deleted revisions. ([issue #9](https://github.com/the-turk/flarum-diff/issues/9))
+- **Fix** can't render new lines if you disable text formatting for previews. ([issue #10](https://github.com/the-turk/flarum-diff/issues/10))
+
 ### 1.0.4
 - **Fix** zeroth revision (original content) gets wrong actor when post edited by another user.
 - **Fix** post owners can't delete or rollback to revisions made by another user.
