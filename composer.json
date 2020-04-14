@@ -30,6 +30,9 @@
     "dem13n/nickname-changer": ">=0.1.0",
     "the-turk/flarum-edit-notifications": "<0.1.4"
   },
+  "suggest": {
+    "the-turk/flarum-quiet-edits": "Recommended if you want to save storage volume"
+  },
   "autoload": {
     "psr-4": {
       "TheTurk\\Diff\\": "src/"
