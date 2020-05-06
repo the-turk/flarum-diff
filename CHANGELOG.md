@@ -1,3 +1,6 @@
+### 1.0.6
+- **Update** version constraints for Flarum 0.1.0-beta.13.
+
 ### 1.0.5
 - **Fix** a **SECURITY** related **issue** which arises **when you disable text formatting for previews**.
 - **Fix** "Options" should be hidden for last revision if it's the only non-deleted revision. ([issue #8](https://github.com/the-turk/flarum-diff/issues/8))
