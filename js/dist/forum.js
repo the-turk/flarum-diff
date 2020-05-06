@@ -186,9 +186,7 @@ __webpack_require__.r(__webpack_exports__);
  * for all revisions created in DiffList.
  */
 
-var DiffButton =
-/*#__PURE__*/
-function (_Button) {
+var DiffButton = /*#__PURE__*/function (_Button) {
   Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__["default"])(DiffButton, _Button);
 
   function DiffButton() {
@@ -286,9 +284,7 @@ __webpack_require__.r(__webpack_exports__);
  * It also contains DiffList components.
  */
 
-var DiffDropdown =
-/*#__PURE__*/
-function (_Dropdown) {
+var DiffDropdown = /*#__PURE__*/function (_Dropdown) {
   Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(DiffDropdown, _Dropdown);
 
   function DiffDropdown() {
@@ -411,9 +407,7 @@ __webpack_require__.r(__webpack_exports__);
  * It also contains DiffButton components.
  */
 
-var DiffList =
-/*#__PURE__*/
-function (_Component) {
+var DiffList = /*#__PURE__*/function (_Component) {
   Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(DiffList, _Component);
 
   function DiffList() {
@@ -748,9 +742,7 @@ __webpack_require__.r(__webpack_exports__);
  * It also contains DiffList components.
  */
 
-var DiffModal =
-/*#__PURE__*/
-function (_Modal) {
+var DiffModal = /*#__PURE__*/function (_Modal) {
   Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(DiffModal, _Modal);
 
   function DiffModal() {
@@ -1304,9 +1296,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var Diff =
-/*#__PURE__*/
-function (_mixin) {
+var Diff = /*#__PURE__*/function (_mixin) {
   Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(Diff, _mixin);
 
   function Diff() {
