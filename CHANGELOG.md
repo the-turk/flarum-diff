@@ -1,3 +1,7 @@
+### 1.0.7
+- **Integration** with `kvothe/reply-to-see` extension.
+- **Add** more vendor prefixes into less files.
+
 ### 1.0.6
 - **Update** version constraints for Flarum 0.1.0-beta.13.
 
