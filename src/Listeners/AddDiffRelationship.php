@@ -120,9 +120,23 @@ class AddDiffRelationship
         if ($event->isSerializer(PostSerializer::class)) {
             $isSelf = $event->actor->id === $event->model->user_id;
 
+            // integration with kvothe/reply-to-see extension
+            $replied = true;
+
+            if ($this->extensions->isEnabled('kvothe-reply-to-see')) {
+              $users = [];
+              $usersModel = $event->model['discussion']->participants()->get('id');
+
+              foreach ($usersModel as $user) {
+                $users[] = $user->id;
+              }
+
+              $replied = !$event->actor->isGuest() && in_array($event->actor->id, $users);
+            }
+
             // set permission attributes
-            $event->attributes['canViewEditHistory'] = (bool)
-                $event->actor->can('viewEditHistory');
+            $event->attributes['canViewEditHistory'] =
+                $event->actor->can('viewEditHistory') && $replied;
 
             $event->attributes['canDeleteEditHistory'] =
                 ($event->actor->can('deleteEditHistory')
