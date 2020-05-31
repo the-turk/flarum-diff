@@ -1,3 +1,8 @@
+### 1.0.8 (WIP)
+- **Remove** deprecated `GetModelRelationship` event related parts.
+  + Thus, it requires Flarum 0.1.0-beta.13
+- **Apply** StyleCI fixes.
+
 ### 1.0.7
 - **Integration** with `kvothe/reply-to-see` extension.
 - **Add** more vendor prefixes into less files.
