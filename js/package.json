@@ -8,12 +8,23 @@
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
   },
+  "devDependencies": {
+    "husky": "^4.2.5",
+    "prettier": "^2.0.5"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/the-turk/flarum-diff.git"
   },
   "scripts": {
     "dev": "webpack --mode development --watch",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "format": "prettier --write src",
+    "format-check": "prettier --check src"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run format"
+    }
   }
 }

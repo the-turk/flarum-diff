@@ -5,5 +5,5 @@
  * https://stackoverflow.com/a/24647710/12866913
  */
 export default function touchDevice() {
-  return true == ('ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch);
+  return true == ('ontouchstart' in window || (window.DocumentTouch && document instanceof DocumentTouch));
 }

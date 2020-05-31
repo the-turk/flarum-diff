@@ -49,32 +49,32 @@ export default class DiffModal extends Modal {
      */
     this.post = this.props.post;
 
-     /**
-      * This is the current revision object.
-      *
-      * @type {Diff[]}
-      */
-     this.revision = this.props.item;
+    /**
+     * This is the current revision object.
+     *
+     * @type {Diff[]}
+     */
+    this.revision = this.props.item;
 
-     /**
-      * Create a new revision list.
-      * This approach may not work with newer Mithril versions.
-      *
-      * @type {DiffList}
-      */
-      this.list = new DiffList({
-        post: this.post,
-        forModal: true,
-        selectedItem: this.revision.id(),
-        moreResults: this.props.moreResults
-      });
+    /**
+     * Create a new revision list.
+     * This approach may not work with newer Mithril versions.
+     *
+     * @type {DiffList}
+     */
+    this.list = new DiffList({
+      post: this.post,
+      forModal: true,
+      selectedItem: this.revision.id(),
+      moreResults: this.props.moreResults,
+    });
 
-     /**
-      * This holds information about which revisions are subjects for comparison.
-      *
-      * @type {Object}
-      */
-     this.comparisonBetween = JSON.parse(this.revision.comparisonBetween());
+    /**
+     * This holds information about which revisions are subjects for comparison.
+     *
+     * @type {Object}
+     */
+    this.comparisonBetween = JSON.parse(this.revision.comparisonBetween());
   }
 
   className() {
@@ -85,23 +85,25 @@ export default class DiffModal extends Modal {
     return [
       // we also should consider deleted users here
       this.revision.actor().username() ? avatar(this.revision.actor()) : '',
-      this.revision.revision() != 0 ?
-      // x edited y ago
-      app.translator.trans('the-turk-diff.forum.editedInfo', {
-        username:
-          <a href={app.route.user(this.revision.actor())} config={m.route}>
-            {username(this.revision.actor())}
-          </a>,
-        ago: humanTime(this.revision.createdAt())
-      }) :
-      // x created y ago
-      app.translator.trans('the-turk-diff.forum.createdInfo', {
-        username:
-          <a href={app.route.user(this.revision.actor())} config={m.route}>
-            {username(this.revision.actor())}
-          </a>,
-        ago: humanTime(this.post.createdAt())
-      })
+      this.revision.revision() != 0
+        ? // x edited y ago
+          app.translator.trans('the-turk-diff.forum.editedInfo', {
+            username: (
+              <a href={app.route.user(this.revision.actor())} config={m.route}>
+                {username(this.revision.actor())}
+              </a>
+            ),
+            ago: humanTime(this.revision.createdAt()),
+          })
+        : // x created y ago
+          app.translator.trans('the-turk-diff.forum.createdInfo', {
+            username: (
+              <a href={app.route.user(this.revision.actor())} config={m.route}>
+                {username(this.revision.actor())}
+              </a>
+            ),
+            ago: humanTime(this.post.createdAt()),
+          }),
     ];
   }
 
@@ -119,15 +121,10 @@ export default class DiffModal extends Modal {
     this.showing = true;
     this.diffId = this.revision.id();
 
-    if (this.revision.revision() != 0 &&
-      (this.comparisonBetween.new.revision != this.comparisonBetween.old.revision)) {
+    if (this.revision.revision() != 0 && this.comparisonBetween.new.revision != this.comparisonBetween.old.revision) {
       // we'll use Side By Side renderer as a fallback
       // if there is no renderer choice
-      return this.setDiffContent(
-        app.session.user.preferences().diffRenderer ?
-        app.session.user.preferences().diffRenderer :
-        'sideBySide'
-      );
+      return this.setDiffContent(app.session.user.preferences().diffRenderer ? app.session.user.preferences().diffRenderer : 'sideBySide');
     } else {
       return this.setDiffContent('preview');
     }
@@ -141,138 +138,128 @@ export default class DiffModal extends Modal {
             {Button.component({
               icon: 'fas fa-times',
               onclick: this.hide.bind(this),
-              className: 'Button Button--icon Button--link'
+              className: 'Button Button--icon Button--link',
             })}
           </div>
           {
             // Revision Options Button
           }
-          {((this.post.canDeleteEditHistory() &&
-              this.revision.revision() != this.post.revisionCount()) ||
-              (this.post.canRollbackEditHistory() &&
-                this.$('.DeletedDiff').length != this.post.revisionCount()) ?
+          {(this.post.canDeleteEditHistory() && this.revision.revision() != this.post.revisionCount()) ||
+          (this.post.canRollbackEditHistory() && this.$('.DeletedDiff').length != this.post.revisionCount()) ? (
             <Dropdown
               className="diffCotrollerDropdown App-primaryControl"
               icon="fas fa-ellipsis-v"
               buttonClassName="Button"
               menuClassName="Dropdown-menu--right"
-              label={app.translator.trans('the-turk-diff.forum.optionsButton')}>
-
+              label={app.translator.trans('the-turk-diff.forum.optionsButton')}
+            >
               {
                 // Rollback
                 // there must be a revision to rollback,
                 // as we can't rollback to current post.
               }
-              {(this.post.canRollbackEditHistory() && this.comparisonBetween.old.diffId ?
-                Button.component({
-                  children:
-                    this.revision.revision() == 0 ?
-                      /* we're viewing the original content */
-                      app.translator.trans(
-                        'the-turk-diff.forum.rollbackToOriginalButton'
-                      ) :
-                      this.revision.revision() == this.post.revisionCount() ?
-                        (this.comparisonBetween.old.revision != 0 ?
-                          /* we're comparing this revision with current content. */
-                          app.translator.trans(
-                            'the-turk-diff.forum.revertChangesButton'
-                          ) :
-                          /* we're comparing this revision with original content */
-                          app.translator.trans(
-                            'the-turk-diff.forum.rollbackToOriginalButton'
-                          )
-                        ) :
-                        /* we're comparing this revision with another revision */
-                        app.translator.trans(
-                          'the-turk-diff.forum.rollbackButton',
-                          {
-                            number: this.revision.revision()
-                          }
-                        ),
-                  icon: 'fas fa-reply',
-                  onclick: () => {
-                    if (confirm(app.translator.trans(
-                        'the-turk-diff.forum.confirmRollback',
-                        {
-                          number: this.revision.revision()
-                        }
-                      ))) {
-                      this.loading = true;
-                      m.redraw();
+              {this.post.canRollbackEditHistory() && this.comparisonBetween.old.diffId
+                ? Button.component({
+                    children:
+                      this.revision.revision() == 0
+                        ? /* we're viewing the original content */
+                          app.translator.trans('the-turk-diff.forum.rollbackToOriginalButton')
+                        : this.revision.revision() == this.post.revisionCount()
+                        ? this.comparisonBetween.old.revision != 0
+                          ? /* we're comparing this revision with current content. */
+                            app.translator.trans('the-turk-diff.forum.revertChangesButton')
+                          : /* we're comparing this revision with original content */
+                            app.translator.trans('the-turk-diff.forum.rollbackToOriginalButton')
+                        : /* we're comparing this revision with another revision */
+                          app.translator.trans('the-turk-diff.forum.rollbackButton', {
+                            number: this.revision.revision(),
+                          }),
+                    icon: 'fas fa-reply',
+                    onclick: () => {
+                      if (
+                        confirm(
+                          app.translator.trans('the-turk-diff.forum.confirmRollback', {
+                            number: this.revision.revision(),
+                          })
+                        )
+                      ) {
+                        this.loading = true;
+                        m.redraw();
 
-                      let rollbackTo =
-                        this.revision.revision() == this.post.revisionCount() ?
-                        this.comparisonBetween.old.diffId :
-                        this.revision.id();
+                        let rollbackTo =
+                          this.revision.revision() == this.post.revisionCount() ? this.comparisonBetween.old.diffId : this.revision.id();
 
-                      app.request({
-                          url: `${app.forum.attribute('apiUrl')}/diff/${rollbackTo}`,
-                          method: 'POST'
-                        })
-                        .then(() => {
-                          redrawPost(this.post);
-                          app.modal.close();
+                        app
+                          .request({
+                            url: `${app.forum.attribute('apiUrl')}/diff/${rollbackTo}`,
+                            method: 'POST',
+                          })
+                          .then(() => {
+                            redrawPost(this.post);
+                            app.modal.close();
 
-                          if (app.cache.diffs && app.cache.diffs[this.post.id()]) {
-                            delete app.cache.diffs[this.post.id()];
-                          }
+                            if (app.cache.diffs && app.cache.diffs[this.post.id()]) {
+                              delete app.cache.diffs[this.post.id()];
+                            }
 
-                          this.showAlert('success', 'rollback');
-                        })
-                        .catch(() => {
-                          this.loading = false;
-                          m.redraw();
-                          redrawPost(this.post);
+                            this.showAlert('success', 'rollback');
+                          })
+                          .catch(() => {
+                            this.loading = false;
+                            m.redraw();
+                            redrawPost(this.post);
 
-                          this.showAlert('error', 'rollback');
-                        });
-                    }
-                  }
-                }) : ''
-              )}
+                            this.showAlert('error', 'rollback');
+                          });
+                      }
+                    },
+                  })
+                : ''}
 
               {
                 // Delete
                 // you can't delete last item on the list
                 // because it's the current post actually.
               }
-              {(this.post.canDeleteEditHistory() &&
-                this.revision.revision() != this.post.revisionCount() ?
-                Button.component({
-                  children: app.translator.trans('the-turk-diff.forum.deleteButton'),
-                  icon: 'far fa-trash-alt',
-                  onclick: () => {
-                    if (confirm(app.translator.trans('the-turk-diff.forum.confirmDelete'))) {
-                      this.loading = true;
-                      m.redraw();
-
-                      this.revision.delete().then(() => {
-                        app.modal.close();
-
-                        if (app.cache.diffs && app.cache.diffs[this.post.id()]) {
-                          delete app.cache.diffs[this.post.id()];
-                        }
-
-                        this.showAlert('success', 'delete');
-                      }).catch(() => {
-                        this.loading = false;
+              {this.post.canDeleteEditHistory() && this.revision.revision() != this.post.revisionCount()
+                ? Button.component({
+                    children: app.translator.trans('the-turk-diff.forum.deleteButton'),
+                    icon: 'far fa-trash-alt',
+                    onclick: () => {
+                      if (confirm(app.translator.trans('the-turk-diff.forum.confirmDelete'))) {
+                        this.loading = true;
                         m.redraw();
 
-                        this.showAlert('error', 'delete');
-                      });
-                    }
-                  }
-                }) : ''
-              )}
-            </Dropdown>
-          : '')}
+                        this.revision
+                          .delete()
+                          .then(() => {
+                            app.modal.close();
 
-        <div className="Modal-header">
-          <h3 className="App-titleControl App-titleControl--text">
-            {this.title()}
-          </h3>
-        </div>
-        {this.content()}
+                            if (app.cache.diffs && app.cache.diffs[this.post.id()]) {
+                              delete app.cache.diffs[this.post.id()];
+                            }
+
+                            this.showAlert('success', 'delete');
+                          })
+                          .catch(() => {
+                            this.loading = false;
+                            m.redraw();
+
+                            this.showAlert('error', 'delete');
+                          });
+                      }
+                    },
+                  })
+                : ''}
+            </Dropdown>
+          ) : (
+            ''
+          )}
+
+          <div className="Modal-header">
+            <h3 className="App-titleControl App-titleControl--text">{this.title()}</h3>
+          </div>
+          {this.content()}
         </div>
       </div>
     );
@@ -288,130 +275,140 @@ export default class DiffModal extends Modal {
         {/* Renderer Switcher Container */}
         <div className="diff-grid-item diff-grid-controls">
           <div className="diffSwitcher">
-            {this.revision.revision() != 0 &&
-              (this.comparisonBetween.new.revision != this.comparisonBetween.old.revision) ?
-              [
-                <div className="tooltip-wrapper"
-                  data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.inline')}>
-                  {Button.component({
-                    icon: 'fas fa-grip-lines',
-                    onclick: () => {
-                      // fix for Chrome
-                      // tooltips are not disappearing onclick
-                      this.$('.' + tooltipClass).tooltip('hide');
+            {this.revision.revision() != 0 && this.comparisonBetween.new.revision != this.comparisonBetween.old.revision
+              ? [
+                  <div className="tooltip-wrapper" data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.inline')}>
+                    {Button.component({
+                      icon: 'fas fa-grip-lines',
+                      onclick: () => {
+                        // fix for Chrome
+                        // tooltips are not disappearing onclick
+                        this.$('.' + tooltipClass).tooltip('hide');
 
-                      this.setDiffContent('inline');
-                    },
-                    className: 'Button Button--icon Button--link inlineView',
-                    config: (elm, isInitialized) => touchDevice() === false && !isInitialized ?
-                      $(elm).parent().tooltip({
-                        trigger: 'hover'
-                      })
-                      // this is a workaround for adding custom
-                      // classes into bootstrap tooltips
-                      // https://stackoverflow.com/a/29879041/12866913
-                      .data('bs.tooltip').tip()
-                      .addClass(tooltipClass) : ''
-                  })}
-                </div>,
-                <div className="tooltip-wrapper"
-                  data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.sideBySide')}>
-                  {Button.component({
-                    icon: 'fas fa-columns',
-                    onclick: () => {
-                      this.$('.' + tooltipClass).tooltip('hide');
-                      this.setDiffContent('sideBySide');
-                    },
-                    className: 'Button Button--icon Button--link sideBySideView',
-                    config: (elm, isInitialized) => touchDevice() === false && !isInitialized ?
-                      $(elm).parent().tooltip({
-                        trigger: 'hover'
-                      })
-                      .data('bs.tooltip').tip()
-                      .addClass(tooltipClass) : ''
-                  })}
-                </div>,
-                <div className="tooltip-wrapper"
-                  data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.combined')}>
-                  {Button.component({
-                    icon: 'far fa-square',
-                    onclick: () => {
-                      this.$('.' + tooltipClass).tooltip('hide');
-                      this.setDiffContent('combined');
-                    },
-                    className: 'Button Button--icon Button--link combinedView',
-                    config: (elm, isInitialized) => touchDevice() === false && !isInitialized ?
-                      $(elm).parent().tooltip({
-                        trigger: 'hover'
-                      })
-                      .data('bs.tooltip').tip()
-                      .addClass(tooltipClass) : ''
-                  })}
-                </div>
-              ] : ''}
-              <div className="tooltip-wrapper"
-                data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.preview')}>
-                {Button.component({
-                  icon: 'far fa-eye',
-                  onclick: () => {
-                    this.$('.' + tooltipClass).tooltip('hide');
-                    this.setDiffContent('preview');
-                  },
-                  className: 'Button Button--icon Button--link diffPreview',
-                  config: (elm, isInitialized) => touchDevice() === false && !isInitialized ?
-                    $(elm).parent().tooltip({
-                      trigger: 'hover'
-                    }).attr(
-                      'data-original-title',
-                      app.translator.trans('the-turk-diff.forum.tooltips.preview')
-                    )
-                    .data('bs.tooltip').tip()
-                    .addClass(tooltipClass) : ''
-                })}
-              </div>
+                        this.setDiffContent('inline');
+                      },
+                      className: 'Button Button--icon Button--link inlineView',
+                      config: (elm, isInitialized) =>
+                        touchDevice() === false && !isInitialized
+                          ? $(elm)
+                              .parent()
+                              .tooltip({
+                                trigger: 'hover',
+                              })
+                              // this is a workaround for adding custom
+                              // classes into bootstrap tooltips
+                              // https://stackoverflow.com/a/29879041/12866913
+                              .data('bs.tooltip')
+                              .tip()
+                              .addClass(tooltipClass)
+                          : '',
+                    })}
+                  </div>,
+                  <div className="tooltip-wrapper" data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.sideBySide')}>
+                    {Button.component({
+                      icon: 'fas fa-columns',
+                      onclick: () => {
+                        this.$('.' + tooltipClass).tooltip('hide');
+                        this.setDiffContent('sideBySide');
+                      },
+                      className: 'Button Button--icon Button--link sideBySideView',
+                      config: (elm, isInitialized) =>
+                        touchDevice() === false && !isInitialized
+                          ? $(elm)
+                              .parent()
+                              .tooltip({
+                                trigger: 'hover',
+                              })
+                              .data('bs.tooltip')
+                              .tip()
+                              .addClass(tooltipClass)
+                          : '',
+                    })}
+                  </div>,
+                  <div className="tooltip-wrapper" data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.combined')}>
+                    {Button.component({
+                      icon: 'far fa-square',
+                      onclick: () => {
+                        this.$('.' + tooltipClass).tooltip('hide');
+                        this.setDiffContent('combined');
+                      },
+                      className: 'Button Button--icon Button--link combinedView',
+                      config: (elm, isInitialized) =>
+                        touchDevice() === false && !isInitialized
+                          ? $(elm)
+                              .parent()
+                              .tooltip({
+                                trigger: 'hover',
+                              })
+                              .data('bs.tooltip')
+                              .tip()
+                              .addClass(tooltipClass)
+                          : '',
+                    })}
+                  </div>,
+                ]
+              : ''}
+            <div className="tooltip-wrapper" data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.preview')}>
+              {Button.component({
+                icon: 'far fa-eye',
+                onclick: () => {
+                  this.$('.' + tooltipClass).tooltip('hide');
+                  this.setDiffContent('preview');
+                },
+                className: 'Button Button--icon Button--link diffPreview',
+                config: (elm, isInitialized) =>
+                  touchDevice() === false && !isInitialized
+                    ? $(elm)
+                        .parent()
+                        .tooltip({
+                          trigger: 'hover',
+                        })
+                        .attr('data-original-title', app.translator.trans('the-turk-diff.forum.tooltips.preview'))
+                        .data('bs.tooltip')
+                        .tip()
+                        .addClass(tooltipClass)
+                    : '',
+              })}
             </div>
           </div>
+        </div>
 
-          {/* Comparison Info Container */}
-          <div className="diff-grid-item diff-grid-info">
-            <div className="revisionInfo">
-              <h4>
-                {app.translator.transChoice(
-                  'the-turk-diff.forum.revisions',
-                  this.post.revisionCount(),
-                  {
-                    revisionCount: this.post.revisionCount()
-                  }
-                )}
-              </h4>
-              <p class="diffInfoContainer"/>
-            </div>
+        {/* Comparison Info Container */}
+        <div className="diff-grid-item diff-grid-info">
+          <div className="revisionInfo">
+            <h4>
+              {app.translator.transChoice('the-turk-diff.forum.revisions', this.post.revisionCount(), {
+                revisionCount: this.post.revisionCount(),
+              })}
+            </h4>
+            <p class="diffInfoContainer" />
           </div>
+        </div>
 
-          {/* Revision List Container */}
-          <div className="diff-grid-item diff-grid-revisions">
-            {this.list.render()}
-          </div>
+        {/* Revision List Container */}
+        <div className="diff-grid-item diff-grid-revisions">{this.list.render()}</div>
 
-          {/* Diffs Container */}
-          <div className="diff-grid-item diff-grid-diff">
-            <div className="diffContents">
-              {
-                // .previewContainer is hidden by default
-                // we'll do some nasty switches later
+        {/* Diffs Container */}
+        <div className="diff-grid-item diff-grid-diff">
+          <div className="diffContents">
+            {
+              // .previewContainer is hidden by default
+              // we'll do some nasty switches later
+            }
+            <div
+              className={
+                'previewContainer Post-body' + (app.forum.attribute('textFormattingForDiffPreviews') === false ? ' diff-skip-formatting' : '')
               }
-              <div className={'previewContainer Post-body'
-                  + (app.forum.attribute('textFormattingForDiffPreviews') === false
-                      ? ' diff-skip-formatting' : '')}>
-                {this.renderHtml(this.revision.data.attributes.previewHtml)}
-              </div>
-              <div className="diffContainer"/>
+            >
+              {this.renderHtml(this.revision.data.attributes.previewHtml)}
             </div>
+            <div className="diffContainer" />
           </div>
-          {LoadingIndicator.component({
-            className: 'DiffModal-loading' + (this.loading ? ' active' : '')
-          })}
-      </div>
+        </div>
+        {LoadingIndicator.component({
+          className: 'DiffModal-loading' + (this.loading ? ' active' : ''),
+        })}
+      </div>,
     ];
   }
 
@@ -423,7 +420,7 @@ export default class DiffModal extends Modal {
     let $selectedItem = this.$('li#parentDiff' + this.revision.id());
 
     $revisions.animate({
-      scrollTop: $selectedItem.offset().top - $revisions.offset().top + $revisions.scrollTop()
+      scrollTop: $selectedItem.offset().top - $revisions.offset().top + $revisions.scrollTop(),
     });
   }
 
@@ -437,12 +434,14 @@ export default class DiffModal extends Modal {
     const message = {
       success: 'the-turk-diff.forum.' + key + 'SuccessMessage',
       error: 'the-turk-diff.forum.' + key + 'ErrorMessage',
-    } [type];
+    }[type];
 
-    app.alerts.show(new Alert({
-      type,
-      children: app.translator.trans(message)
-    }));
+    app.alerts.show(
+      new Alert({
+        type,
+        children: app.translator.trans(message),
+      })
+    );
   }
 
   /**
@@ -483,22 +482,16 @@ export default class DiffModal extends Modal {
 
     if (contentType !== 'preview') {
       if (contentType === 'sideBySide') {
-        diffContentHtml = this.renderHtml(
-          this.revision.data.attributes.sideBySideHtml
-        );
+        diffContentHtml = this.renderHtml(this.revision.data.attributes.sideBySideHtml);
         $sideBySideButton.prop('disabled', true);
         // what a dynasty - LOL
         $sideBySideButton.parent().siblings().children().prop('disabled', false);
       } else if (contentType === 'inline') {
-        diffContentHtml = this.renderHtml(
-          this.revision.data.attributes.inlineHtml
-        );
+        diffContentHtml = this.renderHtml(this.revision.data.attributes.inlineHtml);
         $inlineButton.prop('disabled', true);
         $inlineButton.parent().siblings().children().prop('disabled', false);
       } else if (contentType === 'combined') {
-        diffContentHtml = this.renderHtml(
-          this.revision.data.attributes.combinedHtml
-        );
+        diffContentHtml = this.renderHtml(this.revision.data.attributes.combinedHtml);
         $combinedButton.prop('disabled', true);
         $combinedButton.parent().siblings().children().prop('disabled', false);
       }
@@ -521,7 +514,7 @@ export default class DiffModal extends Modal {
 
       // let's remember their renderer choice
       app.session.user.savePreferences({
-        'diffRenderer': contentType
+        diffRenderer: contentType,
       });
 
       return this.setInfoContent();
@@ -538,68 +531,49 @@ export default class DiffModal extends Modal {
   setInfoContent(preview = false) {
     const $infoContainer = this.$('.diffInfoContainer');
 
-    let infoContentHtml = !preview && this.revision.revision() != 0 &&
-      (this.comparisonBetween.new.revision != this.comparisonBetween.old.revision) ?
-      extractText(app.translator.trans(
-        'the-turk-diff.forum.differences.sentence',
-        {
-          old:
-            this.comparisonBetween.old.revision == -1 ?
-              /* we're viewing differences between current content and {new} */
-              app.translator.trans(
-                'the-turk-diff.forum.differences.currentContent'
-              ) :
-              this.comparisonBetween.old.revision == 0 ?
-                /* we're viewing differences between original content and {new} */
-                app.translator.trans(
-                  'the-turk-diff.forum.differences.originalContent'
-                ) :
-                /* we're viewing differences between revision X and {new} */
-                app.translator.trans(
-                  'the-turk-diff.forum.differences.revisionWithNumber', {
-                    number: this.comparisonBetween.old.revision
-                  }
-                ),
-          new:
-            this.comparisonBetween.new.revision == 0 ?
-              /* we're viewing differences between {old} and original content */
-              app.translator.trans(
-                'the-turk-diff.forum.differences.originalContent'
-              ) :
-              this.comparisonBetween.new.revision == this.post.revisionCount() ?
-                /* we're viewing differences between {old} and current content */
-                app.translator.trans(
-                  'the-turk-diff.forum.differences.currentContent'
-                ) :
-                /* we're viewing differences between {old} and revision X */
-                app.translator.trans(
-                  'the-turk-diff.forum.differences.revisionWithNumber', {
-                    number: this.comparisonBetween.new.revision
-                  }
-                )
-        }
-      )) :
-      extractText(app.translator.trans(
-        'the-turk-diff.forum.previewMode.sentence',
-        {
-          content: this.comparisonBetween.new.revision == 0 ?
-            /* we're previewing original content */
-            app.translator.trans(
-              'the-turk-diff.forum.previewMode.originalContent'
-            ) :
-            this.comparisonBetween.new.revision == this.post.revisionCount() ?
-              /* we're previewing current content */
-              app.translator.trans(
-                'the-turk-diff.forum.previewMode.currentContent'
-              ) :
-              /* we're previewing revision X */
-              app.translator.trans(
-                'the-turk-diff.forum.previewMode.revisionWithNumber', {
-                  number: this.comparisonBetween.new.revision
-                }
-              )
-        }
-      ));
+    let infoContentHtml =
+      !preview && this.revision.revision() != 0 && this.comparisonBetween.new.revision != this.comparisonBetween.old.revision
+        ? extractText(
+            app.translator.trans('the-turk-diff.forum.differences.sentence', {
+              old:
+                this.comparisonBetween.old.revision == -1
+                  ? /* we're viewing differences between current content and {new} */
+                    app.translator.trans('the-turk-diff.forum.differences.currentContent')
+                  : this.comparisonBetween.old.revision == 0
+                  ? /* we're viewing differences between original content and {new} */
+                    app.translator.trans('the-turk-diff.forum.differences.originalContent')
+                  : /* we're viewing differences between revision X and {new} */
+                    app.translator.trans('the-turk-diff.forum.differences.revisionWithNumber', {
+                      number: this.comparisonBetween.old.revision,
+                    }),
+              new:
+                this.comparisonBetween.new.revision == 0
+                  ? /* we're viewing differences between {old} and original content */
+                    app.translator.trans('the-turk-diff.forum.differences.originalContent')
+                  : this.comparisonBetween.new.revision == this.post.revisionCount()
+                  ? /* we're viewing differences between {old} and current content */
+                    app.translator.trans('the-turk-diff.forum.differences.currentContent')
+                  : /* we're viewing differences between {old} and revision X */
+                    app.translator.trans('the-turk-diff.forum.differences.revisionWithNumber', {
+                      number: this.comparisonBetween.new.revision,
+                    }),
+            })
+          )
+        : extractText(
+            app.translator.trans('the-turk-diff.forum.previewMode.sentence', {
+              content:
+                this.comparisonBetween.new.revision == 0
+                  ? /* we're previewing original content */
+                    app.translator.trans('the-turk-diff.forum.previewMode.originalContent')
+                  : this.comparisonBetween.new.revision == this.post.revisionCount()
+                  ? /* we're previewing current content */
+                    app.translator.trans('the-turk-diff.forum.previewMode.currentContent')
+                  : /* we're previewing revision X */
+                    app.translator.trans('the-turk-diff.forum.previewMode.revisionWithNumber', {
+                      number: this.comparisonBetween.new.revision,
+                    }),
+            })
+          );
 
     return $infoContainer.html(infoContentHtml);
   }

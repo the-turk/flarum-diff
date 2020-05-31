@@ -6,7 +6,5 @@
  * @param {Object} post
  */
 export default function redrawPost(post) {
-  return post.save({}).then(
-    () => m.redraw()
-  );
+  return post.save({}).then(() => m.redraw());
 }

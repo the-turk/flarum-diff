@@ -28,22 +28,22 @@ export default class DiffButton extends Button {
     const revision = this.props.item;
     let actor = revision.actor();
 
-    let buttonText = revision.revision() == 0 ?
-      /* {username} created {ago} */
-      extractText(app.translator.trans(
-        'the-turk-diff.forum.createdInfo', {
-          username: username(revision.actor()),
-          ago: humanTime(this.props.postDate)
-        }
-      )) :
-      /* {username} edited {ago} */
-      extractText(app.translator.trans(
-        'the-turk-diff.forum.editedInfo', {
-          username: username(revision.actor()),
-          ago: humanTime(revision.createdAt())
-        }
-      ));
-
+    let buttonText =
+      revision.revision() == 0
+        ? /* {username} created {ago} */
+          extractText(
+            app.translator.trans('the-turk-diff.forum.createdInfo', {
+              username: username(revision.actor()),
+              ago: humanTime(this.props.postDate),
+            })
+          )
+        : /* {username} edited {ago} */
+          extractText(
+            app.translator.trans('the-turk-diff.forum.editedInfo', {
+              username: username(revision.actor()),
+              ago: humanTime(revision.createdAt()),
+            })
+          );
 
     if (revision.deletedAt()) {
       if (this.props.subButton === false) {
@@ -53,12 +53,12 @@ export default class DiffButton extends Button {
         /* sub button text that appears when you click on caret icon */
         actor = revision.deletedUser();
         /* {actor} deleted this content {ago} */
-        buttonText = extractText(app.translator.trans(
-          'the-turk-diff.forum.deletedInfo', {
+        buttonText = extractText(
+          app.translator.trans('the-turk-diff.forum.deletedInfo', {
             username: username(revision.deletedUser()),
-            ago: humanTime(revision.deletedAt())
-          }
-        ));
+            ago: humanTime(revision.deletedAt()),
+          })
+        );
       }
     }
 
@@ -66,19 +66,20 @@ export default class DiffButton extends Button {
       // we also should consider deleted users here
       actor.username() ? avatar(actor) : '',
       // does this button have an icon?
-      revision.deletedAt() && this.props.subButton === false ?
-      icon('fas fa-caret-down', {
-        className: 'Button-caret'
-      }) : '',
+      revision.deletedAt() && this.props.subButton === false
+        ? icon('fas fa-caret-down', {
+            className: 'Button-caret',
+          })
+        : '',
       // button label
       <span className="Button-label" title={buttonText}>
-        {
-          revision.deletedAt() && this.props.subButton === true ?
-            /* emphasize deleted revision's information */
-            <em>{buttonText}</em> :
-            buttonText
-        }
-      </span>
-      ];
-    }
+        {revision.deletedAt() && this.props.subButton === true ? (
+          /* emphasize deleted revision's information */
+          <em>{buttonText}</em>
+        ) : (
+          buttonText
+        )}
+      </span>,
+    ];
   }
+}

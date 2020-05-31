@@ -13,5 +13,5 @@ export default class Diff extends mixin(Model, {
   sideBySideHtml: Model.attribute('sideBySideHtml'),
   combinedHtml: Model.attribute('combinedHtml'),
   previewHtml: Model.attribute('previewHtml'),
-  comparisonBetween: Model.attribute('comparisonBetween')
+  comparisonBetween: Model.attribute('comparisonBetween'),
 }) {}

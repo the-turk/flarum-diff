@@ -74,118 +74,116 @@ export default class DiffList extends Component {
       <div className="DiffList-container">
         <div className="DiffList-content">
           <ul>
-            {
-              pages.length ? pages.map(diffs => {
-                const items = [];
+            {pages.length
+              ? pages.map((diffs) => {
+                  const items = [];
 
-                // This allows us to use .map function
-                diffs.forEach(diff => {
-                  items.push(diff);
-                });
-
-                return items.map(item => {
-                  // we can use this class to customize all tooltips
-                  // provided by this extension
-                  const tooltipClass = 'diffTooltip';
-
-                  let diffButton = DiffButton.component({
-                    postDate: this.post.createdAt(),
-                    subButton: false,
-                    item,
-                    onclick: () => {
-                      if (!item.deletedAt()) {
-                        app.modal.show(new DiffModal({
-                          item,
-                          post: this.post,
-                          moreResults: this.moreResults
-                        }));
-
-                        // fix for Chrome
-                        // tooltips are not disappearing onclick
-                        $('.' + tooltipClass).tooltip('hide');
-
-                        if (this.forModal) {
-                          // .DiffList-content container of clicked revision
-                          const $listContainer = this.$('li#parentDiff' + item.id());
-
-                          // disable clicked revision, enable others
-                          $listContainer.find('button').prop('disabled', true);
-                          $listContainer.siblings().find('button').prop('disabled', false);
-                          // add 'active' class to clicked revision, remove it from others
-                          $listContainer.siblings().removeClass('active');
-                          $listContainer.addClass('active');
-                        }
-                      } else {
-                        // if revision is deleted, we'll toggle the info
-                        // like GitHub does.
-                        this.toggleSubDiff(item.id());
-                      }
-                    },
-                    config: (elm, isInitialized) => touchDevice() === false && !isInitialized ?
-                      $(elm).tooltip({
-                        trigger: 'hover',
-                        placement: 'left',
-                        container: 'body'
-                      }).attr(
-                        'data-original-title',
-                        extractText(item.revision() == this.post.revisionCount() ?
-                          // we're hovering on latest revision's button
-                          app.translator.trans(
-                            'the-turk-diff.forum.tooltips.mostRecent'
-                          ) : item.revision() == 0 ?
-                          // we're hovering on zeroth revision's button
-                          app.translator.trans(
-                            'the-turk-diff.forum.tooltips.originalContent'
-                          ) :
-                          // we're hovering on other revision's button
-                          app.translator.trans(
-                            'the-turk-diff.forum.tooltips.revisionWithNumber', {
-                              number: item.revision()
-                            }
-                          )
-                        )
-                      )
-                      // this is a workaround for adding custom
-                      // classes into bootstrap tooltips
-                      // https://stackoverflow.com/a/29879041/12866913
-                      .data('bs.tooltip').tip()
-                      .addClass(
-                        item.deletedAt() ?
-                          tooltipClass + ' deletedDiffTooltip'
-                          : tooltipClass
-                      ) : ''
+                  // This allows us to use .map function
+                  diffs.forEach((diff) => {
+                    items.push(diff);
                   });
 
-                  // returns the template for revision list items
-                  return [
-                      <li className={'Diff ParentDiff' + (item.deletedAt() ? ' DeletedDiff' : '')}
-                          id={'parentDiff' + item.id()}>
+                  return items.map((item) => {
+                    // we can use this class to customize all tooltips
+                    // provided by this extension
+                    const tooltipClass = 'diffTooltip';
+
+                    let diffButton = DiffButton.component({
+                      postDate: this.post.createdAt(),
+                      subButton: false,
+                      item,
+                      onclick: () => {
+                        if (!item.deletedAt()) {
+                          app.modal.show(
+                            new DiffModal({
+                              item,
+                              post: this.post,
+                              moreResults: this.moreResults,
+                            })
+                          );
+
+                          // fix for Chrome
+                          // tooltips are not disappearing onclick
+                          $('.' + tooltipClass).tooltip('hide');
+
+                          if (this.forModal) {
+                            // .DiffList-content container of clicked revision
+                            const $listContainer = this.$('li#parentDiff' + item.id());
+
+                            // disable clicked revision, enable others
+                            $listContainer.find('button').prop('disabled', true);
+                            $listContainer.siblings().find('button').prop('disabled', false);
+                            // add 'active' class to clicked revision, remove it from others
+                            $listContainer.siblings().removeClass('active');
+                            $listContainer.addClass('active');
+                          }
+                        } else {
+                          // if revision is deleted, we'll toggle the info
+                          // like GitHub does.
+                          this.toggleSubDiff(item.id());
+                        }
+                      },
+                      config: (elm, isInitialized) =>
+                        touchDevice() === false && !isInitialized
+                          ? $(elm)
+                              .tooltip({
+                                trigger: 'hover',
+                                placement: 'left',
+                                container: 'body',
+                              })
+                              .attr(
+                                'data-original-title',
+                                extractText(
+                                  item.revision() == this.post.revisionCount()
+                                    ? // we're hovering on latest revision's button
+                                      app.translator.trans('the-turk-diff.forum.tooltips.mostRecent')
+                                    : item.revision() == 0
+                                    ? // we're hovering on zeroth revision's button
+                                      app.translator.trans('the-turk-diff.forum.tooltips.originalContent')
+                                    : // we're hovering on other revision's button
+                                      app.translator.trans('the-turk-diff.forum.tooltips.revisionWithNumber', {
+                                        number: item.revision(),
+                                      })
+                                )
+                              )
+                              // this is a workaround for adding custom
+                              // classes into bootstrap tooltips
+                              // https://stackoverflow.com/a/29879041/12866913
+                              .data('bs.tooltip')
+                              .tip()
+                              .addClass(item.deletedAt() ? tooltipClass + ' deletedDiffTooltip' : tooltipClass)
+                          : '',
+                    });
+
+                    // returns the template for revision list items
+                    return [
+                      <li className={'Diff ParentDiff' + (item.deletedAt() ? ' DeletedDiff' : '')} id={'parentDiff' + item.id()}>
                         {diffButton}
                       </li>,
-                      item.deletedAt() ?
+                      item.deletedAt() ? (
                         <li className="Diff SubDiff" id={'subDiff' + item.id()}>
                           {DiffButton.component({
                             postDate: this.post.createdAt(),
                             subButton: true,
-                            item
+                            item,
                           })}
                         </li>
-                      : ''
-                  ];
-                });
-              }) : ''
-            }
-            {
-              this.loading ?
-                LoadingIndicator.component({
-                  className: 'LoadingIndicator--block'
-                }) :
-                (!pages.length ?
-                  <div className="DiffList-empty">
-                    {app.translator.trans('the-turk-diff.forum.emptyText')}
-                  </div>
-                : '')
-            }
+                      ) : (
+                        ''
+                      ),
+                    ];
+                  });
+                })
+              : ''}
+            {this.loading ? (
+              LoadingIndicator.component({
+                className: 'LoadingIndicator--block',
+              })
+            ) : !pages.length ? (
+              <div className="DiffList-empty">{app.translator.trans('the-turk-diff.forum.emptyText')}</div>
+            ) : (
+              ''
+            )}
           </ul>
         </div>
       </div>
@@ -195,10 +193,10 @@ export default class DiffList extends Component {
   config(isInitialized, context) {
     if (isInitialized) return;
 
-    if(this.forModal && this.selectedItem) {
-        let $selectedItem = this.$('li#parentDiff' + this.selectedItem);
-        $selectedItem.find('button').prop('disabled', true);
-        $selectedItem.addClass('active');
+    if (this.forModal && this.selectedItem) {
+      let $selectedItem = this.$('li#parentDiff' + this.selectedItem);
+      $selectedItem.find('button').prop('disabled', true);
+      $selectedItem.addClass('active');
     }
 
     const $revisions = this.$('.DiffList-content');
@@ -248,24 +246,24 @@ export default class DiffList extends Component {
     this.redrawList();
 
     // don't do anthing if we already cached ALL revisions for the post.
-    if (app.cache.diffs[this.post.id()]
-          && (app.cache.diffs[this.post.id()].length == this.post.revisionCount())) {
+    if (app.cache.diffs[this.post.id()] && app.cache.diffs[this.post.id()].length == this.post.revisionCount()) {
       return;
     }
 
     // set URL parameters
-    const params = app.cache.diffs[this.post.id()] ?
-      {
-        id: this.post.id(),
-        page: {
-          offset: app.cache.diffs[this.post.id()].length * 10
+    const params = app.cache.diffs[this.post.id()]
+      ? {
+          id: this.post.id(),
+          page: {
+            offset: app.cache.diffs[this.post.id()].length * 10,
+          },
         }
-      } :
-      {
-        id: this.post.id()
-      };
+      : {
+          id: this.post.id(),
+        };
 
-    return app.store.find('diff', params)
+    return app.store
+      .find('diff', params)
       .then(this.parseResults.bind(this))
       .catch(() => {})
       .then(() => {

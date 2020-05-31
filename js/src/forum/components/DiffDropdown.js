@@ -38,7 +38,7 @@ export default class DiffDropdown extends Dropdown {
       post: this.post,
       forModal: false,
       selectedItem: null,
-      moreResults: null
+      moreResults: null,
     });
   }
 
@@ -54,11 +54,9 @@ export default class DiffDropdown extends Dropdown {
   getButtonContent() {
     return [
       icon(this.props.icon, {
-        className: 'Button-icon'
+        className: 'Button-icon',
       }),
-      <span className="Button-label">
-        {this.props.label}
-      </span>
+      <span className="Button-label">{this.props.label}</span>,
     ];
   }
 
@@ -68,12 +66,9 @@ export default class DiffDropdown extends Dropdown {
         <div className="DiffList-header">
           <h4>
             {/* edited 1 time | edited x times */}
-            {app.translator.transChoice(
-              'the-turk-diff.forum.revisionInfo',
-              this.props.post.revisionCount(), {
-                revisionCount: this.props.post.revisionCount()
-              }
-            )}
+            {app.translator.transChoice('the-turk-diff.forum.revisionInfo', this.props.post.revisionCount(), {
+              revisionCount: this.props.post.revisionCount(),
+            })}
           </h4>
         </div>
         {this.showing ? this.list.render() : ''}
