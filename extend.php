@@ -11,7 +11,7 @@
  * @author     Hasan Özbey <hasanoozbey@gmail.com>
  * @copyright  2020
  * @license    The MIT License
- * @version    Release: 1.0.7
+ * @version    Release: 1.0.8
  * @link       https://github.com/the-turk/flarum-diff
  */
 
