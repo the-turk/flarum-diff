@@ -2,8 +2,8 @@
 
 namespace TheTurk\Diff\Providers;
 
-use FoF\Console\Providers\ConsoleProvider as Console;
 use Flarum\Foundation\AbstractServiceProvider;
+use FoF\Console\Providers\ConsoleProvider as Console;
 use Illuminate\Console\Scheduling\Schedule;
 
 class ConsoleProvider extends AbstractServiceProvider

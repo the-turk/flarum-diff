@@ -1,8 +1,7 @@
 <?php
+
 namespace TheTurk\Diff\Repositories;
 
-use Carbon\Carbon;
-use Illuminate\Database\Query\Expression;
 use TheTurk\Diff\Models\Diff;
 
 class DiffRepository
@@ -20,10 +19,11 @@ class DiffRepository
     /**
      * Find revisions that match certain conditions.
      *
-     * @param array $where
-     * @param array $sort
+     * @param array    $where
+     * @param array    $sort
      * @param int|null $limit
-     * @param int $offset
+     * @param int      $offset
+     *
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function findWhere(array $where = [], $sort = [], $limit = null, $offset = 0)

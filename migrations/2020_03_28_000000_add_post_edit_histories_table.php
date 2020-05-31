@@ -1,11 +1,12 @@
 <?php
+
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 
 return [
     /**
-    * Run the migrations.
-    */
+     * Run the migrations.
+     */
     'up' => function (Builder $schema) {
         $schema->dropIfExists('post_edit_histories');
 
@@ -29,17 +30,16 @@ return [
             $table->foreign('deleted_user_id')->references('id')->on('users')->onDelete('set null')->onUpdate('set null');
             $table->foreign('rollbacked_user_id')->references('id')->on('users')->onDelete('set null')->onUpdate('set null');
         });
-        
-        // workaround for self-referencing
-        $schema->table('post_edit_histories', function(Blueprint $table) {
-           $table->foreign('rollbacked_to')->references('id')->on('post_edit_histories')->onUpdate('set null')->onDelete('set null');
-       });
 
+        // workaround for self-referencing
+        $schema->table('post_edit_histories', function (Blueprint $table) {
+            $table->foreign('rollbacked_to')->references('id')->on('post_edit_histories')->onUpdate('set null')->onDelete('set null');
+        });
     },
 
     /**
-    * Reverse the migrations.
-    */
+     * Reverse the migrations.
+     */
     'down' => function (Builder $schema) {
         $schema->dropIfExists('post_edit_histories');
     },

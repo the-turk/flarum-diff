@@ -1,13 +1,14 @@
 <?php
+
 namespace TheTurk\Diff\Api\Controllers;
 
-use TheTurk\Diff\Api\Serializers\DiffSerializer;
-use TheTurk\Diff\Repositories\DiffRepository;
-use Flarum\User\AssertPermissionTrait;
-use Psr\Http\Message\ServerRequestInterface;
-use Tobscure\JsonApi\Document;
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\UrlGenerator;
+use Flarum\User\AssertPermissionTrait;
+use Psr\Http\Message\ServerRequestInterface;
+use TheTurk\Diff\Api\Serializers\DiffSerializer;
+use TheTurk\Diff\Repositories\DiffRepository;
+use Tobscure\JsonApi\Document;
 
 class ListDiffController extends AbstractListController
 {
@@ -40,7 +41,7 @@ class ListDiffController extends AbstractListController
 
     /**
      * @param DiffRepository $diff
-     * @param UrlGenerator $url
+     * @param UrlGenerator   $url
      */
     public function __construct(DiffRepository $diff, UrlGenerator $url)
     {

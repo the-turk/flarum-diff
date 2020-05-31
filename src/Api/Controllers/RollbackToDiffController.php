@@ -1,12 +1,13 @@
 <?php
+
 namespace TheTurk\Diff\Api\Controllers;
 
-use TheTurk\Diff\Api\Serializers\DiffSerializer;
-use TheTurk\Diff\Commands\RollbackToDiff;
+use Flarum\Api\Controller\AbstractShowController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
-use Flarum\Api\Controller\AbstractShowController;
+use TheTurk\Diff\Api\Serializers\DiffSerializer;
+use TheTurk\Diff\Commands\RollbackToDiff;
 use Tobscure\JsonApi\Document;
 
 class RollbackToDiffController extends AbstractShowController
