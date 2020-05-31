@@ -1,22 +1,23 @@
 <?php
+
 namespace TheTurk\Diff\Listeners;
 
-use Jfcherng\Diff\Factory\RendererFactory;
-use Flarum\Post\Post;
-use Jfcherng\Diff\Differ;
+use Flarum\Api\Event\Serializing;
+use Flarum\Api\Serializer\BasicPostSerializer;
+use Flarum\Api\Serializer\ForumSerializer;
+use Flarum\Api\Serializer\PostSerializer;
 use Flarum\Event\GetApiRelationship;
+use Flarum\Extension\ExtensionManager;
+use Flarum\Post\CommentPost;
+use Flarum\Post\Post;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Translation\Translator;
+use Jfcherng\Diff\Differ;
+use Jfcherng\Diff\Factory\RendererFactory;
 use TheTurk\Diff\Api\Serializers\DiffSerializer;
 use TheTurk\Diff\Models\Diff;
 use TheTurk\Diff\Repositories\DiffArchiveRepository;
-use Flarum\Api\Event\Serializing;
-use Flarum\Api\Serializer\BasicPostSerializer;
-use Flarum\Extension\ExtensionManager;
-use Flarum\Api\Serializer\PostSerializer;
-use Flarum\Api\Serializer\ForumSerializer;
-use Flarum\Settings\SettingsRepositoryInterface;
-use Flarum\Post\CommentPost;
 
 class AddDiffRelationship
 {
@@ -41,7 +42,7 @@ class AddDiffRelationship
     protected $diffArchive;
 
     /**
-     * @var string $settingsPrefix
+     * @var string
      */
     public $settingsPrefix = 'the-turk-diff.';
 
@@ -52,10 +53,10 @@ class AddDiffRelationship
 
     /**
      * @param SettingsRepositoryInterface $settings
-     * @param CommentPost $commentPost
-     * @param ExtensionManager $extensions
-     * @param Translator $translator
-     * @param DiffArchiveRepository $diffArchive
+     * @param CommentPost                 $commentPost
+     * @param ExtensionManager            $extensions
+     * @param Translator                  $translator
+     * @param DiffArchiveRepository       $diffArchive
      */
     public function __construct(
         SettingsRepositoryInterface $settings,
@@ -82,6 +83,7 @@ class AddDiffRelationship
 
     /**
      * @param GetApiRelationship $event
+     *
      * @return \Tobscure\JsonApi\Relationship|null
      */
     public function getApiRelationship(GetApiRelationship $event)
@@ -93,13 +95,14 @@ class AddDiffRelationship
 
     /**
      * @param Serializing $event
+     *
      * @throws \Jfcherng\Diff\Exception\UnsupportedFunctionException
      */
     public function prepareApiAttributes(Serializing $event)
     {
         if ($event->isSerializer(ForumSerializer::class)) {
             $event->attributes['textFormattingForDiffPreviews'] = (bool)
-                $this->settings->get($this->settingsPrefix . 'textFormatting', true);
+                $this->settings->get($this->settingsPrefix.'textFormatting', true);
         }
 
         if ($event->isSerializer(PostSerializer::class)) {
@@ -109,14 +112,14 @@ class AddDiffRelationship
             $replied = true;
 
             if ($this->extensions->isEnabled('kvothe-reply-to-see')) {
-              $users = [];
-              $usersModel = $event->model['discussion']->participants()->get('id');
+                $users = [];
+                $usersModel = $event->model['discussion']->participants()->get('id');
 
-              foreach ($usersModel as $user) {
-                $users[] = $user->id;
-              }
+                foreach ($usersModel as $user) {
+                    $users[] = $user->id;
+                }
 
-              $replied = !$event->actor->isGuest() && in_array($event->actor->id, $users);
+                $replied = !$event->actor->isGuest() && in_array($event->actor->id, $users);
             }
 
             // set permission attributes
@@ -142,11 +145,11 @@ class AddDiffRelationship
             // set initial values for attributes
             $event->attributes += [
                 'canDeleteEditHistory' => false,
-                'inlineHtml' => null,
-                'sideBySideHtml' => null,
-                'combinedHtml' => null,
-                'previewHtml' => null,
-                'comparisonBetween' => null
+                'inlineHtml'           => null,
+                'sideBySideHtml'       => null,
+                'combinedHtml'         => null,
+                'previewHtml'          => null,
+                'comparisonBetween'    => null,
             ];
 
             // set attributes if revision is not deleted
@@ -169,11 +172,10 @@ class AddDiffRelationship
                 // with one of the (old) previous revisions.
                 // this array is very useful to give informations about
                 // comparisons to users.
-                $comparisonArray = ['new' =>
-                    [
-                        'revision' => $event->model->revision,
-                        'diffId' => $event->model->id
-                    ]
+                $comparisonArray = ['new' => [
+                    'revision' => $event->model->revision,
+                    'diffId'   => $event->model->id,
+                ],
                 ];
 
                 // we don't know anything about are there any previous revisions
@@ -205,7 +207,7 @@ class AddDiffRelationship
                     // if this condition happens.
                     $comparisonArray['old'] = [
                         'revision' => $event->model->revision,
-                        'diffId' => $event->model->id
+                        'diffId'   => $event->model->id,
                     ];
                 } else {
                     // if there are nothing to compare with,
@@ -214,9 +216,9 @@ class AddDiffRelationship
                     if ($compareWith === null) {
                         $oldRevision = Post::findOrFail($event->model->post_id)->content;
                         $comparisonArray['old'] = [
-                              'revision' => -1,
-                              'diffId' => null
-                          ];
+                            'revision' => -1,
+                            'diffId'   => null,
+                        ];
                     } else {
                         if ($compareWith->archive_id !== null) {
                             // get uncompressed revision content for comparison.
@@ -230,7 +232,7 @@ class AddDiffRelationship
 
                         $comparisonArray['old'] = [
                             'revision' => $compareWith->revision,
-                            'diffId' => $compareWith->id
+                            'diffId'   => $compareWith->id,
                         ];
                     }
 
@@ -248,41 +250,39 @@ class AddDiffRelationship
                         explode("\n", $oldRevision),
                         explode("\n", $currentRevision),
                         [
-                              // how many neighbor lines do we want to show?
-                              'context' => (int)
-                                  $this->settings->get($this->settingsPrefix . 'neighborLines', 2),
-                              // iGnoRe cAsE diFfErEnceS
-                              'ignoreCase' => $ignoreCase,
-                              // i g nore white spac e dif feren ces
-                              'ignoreWhitespace' => $ignoreWhiteSpace,
-                          ]
+                            // how many neighbor lines do we want to show?
+                            'context' => (int)
+                                $this->settings->get($this->settingsPrefix.'neighborLines', 2),
+                            // iGnoRe cAsE diFfErEnceS
+                            'ignoreCase' => $ignoreCase,
+                            // i g nore white spac e dif feren ces
+                            'ignoreWhitespace' => $ignoreWhiteSpace,
+                        ]
                     );
 
                     $rendererOptions = [
-                          // line-level is the default level
-                          'detailLevel' => $this->settings->get(
-                              $this->settingsPrefix . 'detailLevel',
-                              'line'
-                          ),
-                          // show a separator between different diff hunks in HTML renderers
-                          'separateBlock' => (bool)$this->settings->get(
-                              $this->settingsPrefix . 'separateBlock',
-                              true
-                          ),
-                          'lineNumbers' => false,
-                          'wrapperClasses' => ['TheTurkDiff', 'CustomDiff', 'diff-wrapper'],
-                          // shows when there are no differences found between revisions
-                          'resultForIdenticals' =>
-                            '<div class="noDiff"><p>'
-                               . $this->translator->trans('the-turk-diff.forum.noDiff') .
-                            '</p></div>',
-                          // this option is just for Combined renderer
-                          'mergeThreshold' =>
-                              \TheTurk\Diff\Jobs\ArchiveDiffs::sanitizeFloat($this->settings->get(
-                                  $this->settingsPrefix . 'mergeThreshold',
-                                  0.8
-                              ))
-                      ];
+                        // line-level is the default level
+                        'detailLevel' => $this->settings->get(
+                            $this->settingsPrefix.'detailLevel',
+                            'line'
+                        ),
+                        // show a separator between different diff hunks in HTML renderers
+                        'separateBlock' => (bool) $this->settings->get(
+                            $this->settingsPrefix.'separateBlock',
+                            true
+                        ),
+                        'lineNumbers'    => false,
+                        'wrapperClasses' => ['TheTurkDiff', 'CustomDiff', 'diff-wrapper'],
+                        // shows when there are no differences found between revisions
+                        'resultForIdenticals' => '<div class="noDiff"><p>'
+                             .$this->translator->trans('the-turk-diff.forum.noDiff').
+                          '</p></div>',
+                        // this option is just for Combined renderer
+                        'mergeThreshold' => \TheTurk\Diff\Jobs\ArchiveDiffs::sanitizeFloat($this->settings->get(
+                            $this->settingsPrefix.'mergeThreshold',
+                            0.8
+                        )),
+                    ];
 
                     $inlineRenderer = RendererFactory::make('Inline', $rendererOptions);
                     $inlineHtml = $inlineRenderer->render($differ);
@@ -313,16 +313,16 @@ class AddDiffRelationship
      */
     public function formatter(string $content)
     {
-      if ($this->settings->get($this->settingsPrefix . 'textFormatting', true)) {
-        return $this->commentPost->getFormatter()->render(
-            $this->commentPost->getFormatter()->parse(
+        if ($this->settings->get($this->settingsPrefix.'textFormatting', true)) {
+            return $this->commentPost->getFormatter()->render(
+                $this->commentPost->getFormatter()->parse(
                 $content,
                 $this->commentPost
             ),
-            $this->commentPost
-        );
-      }
+                $this->commentPost
+            );
+        }
 
-      return \htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
+        return \htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
     }
 }

@@ -2,10 +2,9 @@
 
 namespace TheTurk\Diff\Console;
 
-use TheTurk\Diff\Diff;
-use TheTurk\Diff\Jobs\ArchiveDiffs;
-use Illuminate\Console\Command;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
+use TheTurk\Diff\Jobs\ArchiveDiffs;
 
 class ArchiveCommand extends Command
 {
@@ -27,6 +26,7 @@ class ArchiveCommand extends Command
         $job = app()->make(ArchiveDiffs::class);
         $time = Carbon::now();
         $this->info("Archive post's revisions {$time}");
+
         return $job->archiveAll();
     }
 }

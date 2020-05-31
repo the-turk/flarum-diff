@@ -1,4 +1,5 @@
 <?php
+
 namespace TheTurk\Diff\Commands;
 
 use Flarum\User\User;

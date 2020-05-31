@@ -1,12 +1,13 @@
 <?php
+
 namespace TheTurk\Diff\Api\Controllers;
 
 use Flarum\Api\Controller\AbstractDeleteController;
-use TheTurk\Diff\Api\Serializers\DiffSerializer;
-use TheTurk\Diff\Commands\DeleteDiff;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
+use TheTurk\Diff\Api\Serializers\DiffSerializer;
+use TheTurk\Diff\Commands\DeleteDiff;
 
 class DeleteDiffController extends AbstractDeleteController
 {

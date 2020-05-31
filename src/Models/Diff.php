@@ -1,4 +1,5 @@
 <?php
+
 namespace TheTurk\Diff\Models;
 
 use Flarum\Database\AbstractModel;
@@ -41,6 +42,7 @@ class Diff extends AbstractModel
      * @param $postId
      * @param $actorId
      * @param $content
+     *
      * @return static
      */
     public static function build($revision, $postId, $actorId, $content)

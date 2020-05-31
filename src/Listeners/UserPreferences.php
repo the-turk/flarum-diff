@@ -1,4 +1,5 @@
 <?php
+
 namespace TheTurk\Diff\Listeners;
 
 use Flarum\Event\ConfigureUserPreferences;

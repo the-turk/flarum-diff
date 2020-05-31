@@ -1,11 +1,12 @@
 <?php
+
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 
 return [
     /**
-    * Run the migrations.
-    */
+     * Run the migrations.
+     */
     'up' => function (Builder $schema) {
         $schema->dropIfExists('post_edit_histories_archive');
 
@@ -19,7 +20,7 @@ return [
             $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade')->onUpdate('cascade');
         });
 
-        $schema->table('post_edit_histories', function(Blueprint $table) {
+        $schema->table('post_edit_histories', function (Blueprint $table) {
             $table->foreign('archive_id')->references('id')->on('post_edit_histories_archive')->onUpdate('set null')->onDelete('set null');
         });
 
@@ -30,8 +31,8 @@ return [
     },
 
     /**
-    * Reverse the migrations.
-    */
+     * Reverse the migrations.
+     */
     'down' => function (Builder $schema) {
         $schema->dropIfExists('post_edit_histories_archive');
     },

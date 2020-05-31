@@ -2,11 +2,11 @@
 
 namespace TheTurk\Diff\Jobs;
 
-use TheTurk\Diff\Models\Diff;
-use Psr\Log\LoggerInterface;
-use TheTurk\Diff\Repositories\DiffArchiveRepository;
-use Flarum\Settings\SettingsRepositoryInterface;
 use Carbon\Carbon;
+use Flarum\Settings\SettingsRepositoryInterface;
+use Psr\Log\LoggerInterface;
+use TheTurk\Diff\Models\Diff;
+use TheTurk\Diff\Repositories\DiffArchiveRepository;
 
 /**
  * We're using a linear equation (y=mx+b) where the x is post's revision count.
@@ -39,14 +39,13 @@ class ArchiveDiffs
 
     /**
      * @param SettingsRepositoryInterface $settings
-     * @param DiffArchiveRepository $diffArchive
+     * @param DiffArchiveRepository       $diffArchive
      */
     public function __construct(
-      SettingsRepositoryInterface $settings,
-      LoggerInterface $log,
-      DiffArchiveRepository $diffArchive
-    )
-    {
+        SettingsRepositoryInterface $settings,
+        LoggerInterface $log,
+        DiffArchiveRepository $diffArchive
+    ) {
         $this->settings = $settings;
         $this->log = $log;
         $this->diffArchive = $diffArchive;
@@ -65,7 +64,9 @@ class ArchiveDiffs
      */
     public function archiveForPost(int $postId, int $maxRevision)
     {
-        if(!($maxRevision >= $this->revLimit)) return;
+        if (!($maxRevision >= $this->revLimit)) {
+            return;
+        }
         // this is the m value
         $slope = self::sanitizeFloat(
             $this->settings->get('the-turk-diff.archiveSlope', 0.4)
@@ -76,9 +77,9 @@ class ArchiveDiffs
         );
         // y = mx + b
         // float values of y will be rounded to the next lowest integer value.
-        $linearEquation = (int)floor($slope * $maxRevision + $coefficient);
+        $linearEquation = (int) floor($slope * $maxRevision + $coefficient);
 
-        if($linearEquation > 0) {
+        if ($linearEquation > 0) {
             try {
                 $diffsToBeArchived = Diff::where('revision', '<=', $linearEquation)
                     ->where('archive_id', null)
@@ -86,25 +87,25 @@ class ArchiveDiffs
                     ->where('post_id', $postId)
                     ->get();
 
-                if($diffsToBeArchived->count() > 0) {
-                      // archive revisions one by one
-                      foreach($diffsToBeArchived as $diff) {
-                          $this->log->info(
-                              "[the-turk/flarum-diff] |> archiving revision #{$diff->id} from post #{$postId}"
-                          );
+                if ($diffsToBeArchived->count() > 0) {
+                    // archive revisions one by one
+                    foreach ($diffsToBeArchived as $diff) {
+                        $this->log->info(
+                            "[the-turk/flarum-diff] |> archiving revision #{$diff->id} from post #{$postId}"
+                        );
 
-                          $archiveContent = $this->diffArchive->archiveContent(
-                              $diff->post_id,
-                              $diff->id,
-                              $diff->content
-                          );
+                        $archiveContent = $this->diffArchive->archiveContent(
+                            $diff->post_id,
+                            $diff->id,
+                            $diff->content
+                        );
 
-                          // set archive id for revision
-                          $diff->archive_id = $archiveContent->id;
-                          // set revision content to null
-                          $diff->content = null;
-                          $diff->save();
-                      }
+                        // set archive id for revision
+                        $diff->archive_id = $archiveContent->id;
+                        // set revision content to null
+                        $diff->content = null;
+                        $diff->save();
+                    }
                 }
             } catch (\Exception $e) {
                 $this->log->error($e->getMessage());
@@ -129,8 +130,8 @@ class ArchiveDiffs
             ->groupBy('post_id')
             ->get();
 
-        if($postsToBeArchived->count() > 0) {
-            foreach($postsToBeArchived as $post) {
+        if ($postsToBeArchived->count() > 0) {
+            foreach ($postsToBeArchived as $post) {
                 $this->archiveForPost($post->post_id, $post->revision);
             }
         }
@@ -138,9 +139,11 @@ class ArchiveDiffs
 
     /**
      * @param float $number
+     *
      * @return float
      */
-    public static function sanitizeFloat(float $number) {
+    public static function sanitizeFloat(float $number)
+    {
         return floatval(preg_replace('/[^-0-9\.]/', '', $number));
     }
 }

@@ -1,16 +1,16 @@
 <?php
+
 namespace TheTurk\Diff\Listeners;
 
-use TheTurk\Diff\Models\Diff;
+use Carbon\Carbon;
+use Flarum\Extension\ExtensionManager;
+use Flarum\Post\Event\Revised as PostRevised;
+use Flarum\Post\Event\Saving as PostSaving;
+use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Contracts\Events\Dispatcher;
-use Flarum\Post\Event\Saving as PostSaving;
-use Flarum\Post\Event\Revised as PostRevised;
-use Flarum\Extension\ExtensionManager;
 use TheTurk\Diff\Jobs\ArchiveDiffs;
-use Carbon\Carbon;
-use Flarum\Post\Post;
-use Flarum\User\User;
+use TheTurk\Diff\Models\Diff;
 
 class PostActions
 {
@@ -30,14 +30,14 @@ class PostActions
     protected $job;
 
     /**
-     * @var string $oldContent
+     * @var string
      */
     private static $oldContent = '';
 
     /**
      * @param SettingsRepositoryInterface $settings
-     * @param ExtensionManager $extensions
-     * @param ArchiveDiffs $job
+     * @param ExtensionManager            $extensions
+     * @param ArchiveDiffs                $job
      */
     public function __construct(
         SettingsRepositoryInterface $settings,
@@ -50,7 +50,7 @@ class PostActions
     }
 
     /**
-     * Subscribes to the Flarum events
+     * Subscribes to the Flarum events.
      *
      * @param Dispatcher $events
      */
@@ -62,13 +62,13 @@ class PostActions
             ($this->extensions->isEnabled('the-turk-quiet-edits')
             ? \TheTurk\QuietEdits\Events\PostWasRevisedLoudly::class
             : PostRevised::class),
-              [$this, 'whenRevisedPost']
+            [$this, 'whenRevisedPost']
         );
     }
 
     /**
      * Catch the content of the old post
-     * just before saving the new one
+     * just before saving the new one.
      *
      * @param PostSaving $event
      */
@@ -79,8 +79,8 @@ class PostActions
         // this means we're trying to edit.
         if ($post->exists) {
             self::$oldContent = $post->getContentAttribute(
-              $post->getOriginal('content')
-          );
+                $post->getOriginal('content')
+            );
         }
     }
 
@@ -90,7 +90,7 @@ class PostActions
      */
     public function whenRevisedPost($event)
     {
-        $mainPostOnly = (bool)$this->settings->get(
+        $mainPostOnly = (bool) $this->settings->get(
             'the-turk-diff.mainPostOnly',
             false
         );
