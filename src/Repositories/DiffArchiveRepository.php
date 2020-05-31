@@ -1,4 +1,5 @@
 <?php
+
 namespace TheTurk\Diff\Repositories;
 
 use Illuminate\Support\Arr;
@@ -23,8 +24,8 @@ class DiffArchiveRepository
      * We're uncompressing them, merging with new revision
      * and compressing them again altogether.
      *
-     * @param int $postId
-     * @param int $diffId
+     * @param int    $postId
+     * @param int    $diffId
      * @param string $diff
      */
     public function archiveContent(int $postId, int $diffId, string $diff)
@@ -49,7 +50,7 @@ class DiffArchiveRepository
             // if this new addition exceeds MEDIUMBLOB
             // which can store max. (2^24 - 1) bytes
             if (mb_strlen($newContent, '8bit') > (2 ** 24) - 1) {
-                $query = new DiffArchive;
+                $query = new DiffArchive();
                 $query->post_id = $postId;
                 $query->archive_no = $lastArchiveNo + 1;
             } else {
@@ -60,14 +61,14 @@ class DiffArchiveRepository
             $query->contents = $newContent;
         } else {
             // create a new row for the post
-            $query = new DiffArchive;
+            $query = new DiffArchive();
             $query->post_id = $postId;
 
             // compress revision contents
             // [revisionId] => [revisionContent]
             $query->contents = $this->setContents(
                 [
-                    $diffId => $diff
+                    $diffId => $diff,
                 ]
             );
         }
@@ -83,6 +84,7 @@ class DiffArchiveRepository
      *
      * @param int $archiveId
      * @param int $diffId
+     *
      * @return string
      */
     public function getArchivedContent(int $archiveId, int $diffId)
@@ -136,6 +138,7 @@ class DiffArchiveRepository
      * Uncompress the compressed content.
      *
      * @param string $contents
+     *
      * @return array
      */
     public function getContents(string $contents)
@@ -147,6 +150,7 @@ class DiffArchiveRepository
      * Compress the array content.
      *
      * @param array $contents
+     *
      * @return string
      */
     public function setContents(array $contents)

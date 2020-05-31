@@ -1,15 +1,15 @@
 <?php
+
 namespace TheTurk\Diff\Commands;
 
+use Carbon\Carbon;
+use Flarum\Post\Command\EditPost;
+use Flarum\Post\PostRepository;
 use Flarum\User\AssertPermissionTrait;
 use Flarum\User\Exception\PermissionDeniedException;
-use TheTurk\Diff\Models\Diff;
-use TheTurk\Diff\Events\PostWasRollbacked;
-use TheTurk\Diff\Repositories\DiffArchiveRepository;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Flarum\Post\Command\EditPost;
-use Carbon\Carbon;
-use Flarum\Post\PostRepository;
+use TheTurk\Diff\Models\Diff;
+use TheTurk\Diff\Repositories\DiffArchiveRepository;
 
 class RollbackToDiffHandler
 {
@@ -31,16 +31,15 @@ class RollbackToDiffHandler
     protected $diffArchive;
 
     /**
-     * @param PostRepository $posts
-     * @param Dispatcher $bus
+     * @param PostRepository        $posts
+     * @param Dispatcher            $bus
      * @param DiffArchiveRepository $diffArchive
      */
     public function __construct(
-      PostRepository $posts,
-      Dispatcher $bus,
-      DiffArchiveRepository $diffArchive
-    )
-    {
+        PostRepository $posts,
+        Dispatcher $bus,
+        DiffArchiveRepository $diffArchive
+    ) {
         $this->posts = $posts;
         $this->bus = $bus;
         $this->diffArchive = $diffArchive;
@@ -80,19 +79,19 @@ class RollbackToDiffHandler
             // this rollback operation so we need to convert this
             // null value into current content first. Revision after
             // rollbacking will be null again because it's the post itself.
-            if($diff->revision == $maxRevisionCount
+            if ($diff->revision == $maxRevisionCount
                   && null === $diff->content) {
-                    $diff->content = $post->content;
+                $diff->content = $post->content;
             }
         }
 
         $postData = [
             'attributes' => [
-                'content' => $postContent
-            ]
+                'content' => $postContent,
+            ],
         ];
 
-        if($post->content !== $postContent) {
+        if ($post->content !== $postContent) {
             // dispatching events occuring when post edited
             // this will also validate our new post
             $this->bus->dispatch(

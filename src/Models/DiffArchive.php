@@ -1,8 +1,8 @@
 <?php
+
 namespace TheTurk\Diff\Models;
 
 use Flarum\Database\AbstractModel;
-use Illuminate\Support\Arr;
 
 class DiffArchive extends AbstractModel
 {

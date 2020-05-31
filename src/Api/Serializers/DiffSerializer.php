@@ -1,4 +1,5 @@
 <?php
+
 namespace TheTurk\Diff\Api\Serializers;
 
 use Flarum\Api\Serializer\AbstractSerializer;
@@ -8,14 +9,14 @@ use TheTurk\Diff\Models\Diff;
 class DiffSerializer extends AbstractSerializer
 {
     /**
-     * Resource type
+     * Resource type.
      *
      * @var string
      */
     protected $type = 'diff'; //used on line app.store.models.$type
 
     /**
-     * Get the default set of serialized attributes for a model
+     * Get the default set of serialized attributes for a model.
      *
      * @param Diff $diff
      *
@@ -24,10 +25,10 @@ class DiffSerializer extends AbstractSerializer
     protected function getDefaultAttributes($diff)
     {
         return [
-            'revision'      => (int)$diff->revision,
+            'revision'      => (int) $diff->revision,
             'createdAt'     => $this->formatDate($diff->created_at),
             'deletedAt'     => $this->formatDate($diff->deleted_at),
-            'rollbackedAt'  => $this->formatDate($diff->rollbacked_at)
+            'rollbackedAt'  => $this->formatDate($diff->rollbacked_at),
         ];
     }
 

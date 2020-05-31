@@ -2,10 +2,10 @@
 
 namespace TheTurk\Diff\Listeners;
 
-use TheTurk\Diff\Console\ArchiveCommand;
 use Flarum\Console\Event\Configuring;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
+use TheTurk\Diff\Console\ArchiveCommand;
 
 class RegisterConsoleCommand
 {

@@ -1,12 +1,13 @@
 <?php
+
 namespace TheTurk\Diff\Commands;
 
-use Flarum\User\AssertPermissionTrait;
-use Flarum\User\Exception\PermissionDeniedException;
-use TheTurk\Diff\Repositories\DiffArchiveRepository;
-use TheTurk\Diff\Models\Diff;
 use Carbon\Carbon;
 use Flarum\Post\PostRepository;
+use Flarum\User\AssertPermissionTrait;
+use Flarum\User\Exception\PermissionDeniedException;
+use TheTurk\Diff\Models\Diff;
+use TheTurk\Diff\Repositories\DiffArchiveRepository;
 
 class DeleteDiffHandler
 {
@@ -23,14 +24,13 @@ class DeleteDiffHandler
     protected $diffArchive;
 
     /**
-     * @param PostRepository $posts
+     * @param PostRepository        $posts
      * @param DiffArchiveRepository $diffArchive
      */
     public function __construct(
-      PostRepository $posts,
-      DiffArchiveRepository $diffArchive
-    )
-    {
+        PostRepository $posts,
+        DiffArchiveRepository $diffArchive
+    ) {
         $this->posts = $posts;
         $this->diffArchive = $diffArchive;
     }
@@ -52,7 +52,7 @@ class DeleteDiffHandler
         }
 
         // if this is an archived revision
-        if($diff->archive_id !== null) {
+        if ($diff->archive_id !== null) {
             $this->diffArchive->deleteArchivedContent(
                 $diff->archive_id,
                 $diff->id
@@ -61,7 +61,9 @@ class DeleteDiffHandler
             $diff->archive_id = null;
         }
 
-        if($diff->archive_id === null) $diff->content = null;
+        if ($diff->archive_id === null) {
+            $diff->content = null;
+        }
         $diff->deleted_user_id = $actor->id;
         $diff->deleted_at = Carbon::now();
         $diff->save();
