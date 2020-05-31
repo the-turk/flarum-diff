@@ -21,7 +21,7 @@
     "source": "https://github.com/the-turk/flarum-diff"
   },
   "require": {
-    "flarum/core": ">=0.1.0-beta.10 <0.1.0-beta.14",
+    "flarum/core": ">=0.1.0-beta.13 <0.1.0-beta.14",
     "fof/console": "^0.5",
     "jfcherng/php-diff": "^6.7.1",
     "ext-json": "*"
