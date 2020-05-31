@@ -4,11 +4,11 @@
 .DiffModal {
   max-width: 960px;
 
-  & .Modal-header {
+  .Modal-header {
     text-align: left;
     background: @control-bg;
 
-    & .Avatar {
+    .Avatar {
       margin: -2px 5px -2px -6px;
       .Avatar--size(24px);
     }
@@ -24,12 +24,12 @@
     }
   }
 
-  & .Modal-body {
+  .Modal-body {
     background: @body-bg;
   }
 
   // the "Options" button
-  & .diffCotrollerDropdown {
+  .diffCotrollerDropdown {
     & .Button {
       padding-left: 20px;
       padding-right: 20px;
@@ -44,7 +44,7 @@
   // grids are partially supported and
   // grid-areas are not supported by Internet Explorer
   // https://caniuse.com/#feat=css-grid
-  & .diff-grid {
+  .diff-grid {
     display: -ms-grid;
     display: grid;
 
@@ -101,7 +101,7 @@
           bottom: 0;
         }
 
-        & .DiffList-content {
+        .DiffList-content {
           max-height: 100%;
           overflow: auto;
         }
@@ -112,14 +112,14 @@
         border-right: 1px solid @control-bg;
         position: relative;
 
-        & .diffContents {
+        .diffContents {
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
 
-          & .diffContainer {
+          .diffContainer {
             max-height: 100%;
             overflow: auto;
             width: 100%;
@@ -147,7 +147,7 @@
             }
           }
 
-          & .previewContainer {
+          .previewContainer {
             max-height: 100%;
             overflow: auto;
             width: 100%;
@@ -171,7 +171,7 @@
     }
   }
 
-  & .DiffModal-loading {
+  .DiffModal-loading {
     position: absolute;
     top: 0;
     left: 0;
@@ -188,7 +188,7 @@
   }
 
   // diff display
-  & .TheTurkDiff.CustomDiff.diff-wrapper {
+  .TheTurkDiff.CustomDiff.diff-wrapper {
     border-collapse: collapse;
     border-spacing: 0;
     font-family: 'Menlo', 'Consolas', monospace;
@@ -202,20 +202,20 @@
     // https://stackoverflow.com/a/25689081/12866913
     .diff-stripes(lighten(@control-bg, 4%), darken(@control-bg, 3%));
 
-    & th.sign,
-    & thead {
+    th.sign,
+    thead {
       display: none;
     }
 
-    & td {
+    td {
       padding: 10px;
     }
 
     &.diff-html {
       white-space: pre-wrap;
 
-      & .change {
-        & .old {
+      .change {
+        .old {
           border-left: 3px solid @diff-old-version-bg-color-border;
           // blank changes will be striped in SideBySide view
           &:not(.none) {
@@ -223,7 +223,7 @@
           }
         }
 
-        & .new {
+        .new {
           border-left: 3px solid @diff-new-version-bg-color-border;
           // blank changes will be striped in SideBySide view
           &:not(.none) {
@@ -231,31 +231,31 @@
           }
         }
 
-        & .rep {
+        .rep {
           border-left: 3px solid @diff-change-version-del-color-border;
           background: @body-bg;
         }
 
-        & .rep-del {
+        .rep-del {
           border-left: 3px solid @diff-change-version-del-color-border;
           background: @diff-change-version-del-color;
         }
 
-        & .rep-ins {
+        .rep-ins {
           border-left: 3px solid @diff-change-version-ins-color-border;
           background: @diff-change-version-ins-color;
         }
 
         &.change-eq {
-          & .new,
-          & .old {
+          .new,
+          .old {
             border-left: 3px solid @diff-info-color-border;
             background: @body-bg;
             color: @muted-color;
           }
         }
 
-        & ins {
+        ins {
           display: inline-block;
           margin-top: -1px;
           text-decoration: none;
@@ -263,7 +263,7 @@
           border-radius: 0.2em;
         }
 
-        & del {
+        del {
           display: inline-block;
           margin-top: -1px;
           text-decoration: none;
@@ -271,9 +271,9 @@
           border-radius: 0.2em;
         }
 
-        & .new.none,
-        & .old.none,
-        & .rep.none {
+        .new.none,
+        .old.none,
+        .rep.none {
           border-left: 3px solid @diff-info-color-border;
         }
       }
@@ -281,13 +281,13 @@
   }
 
   @media @tablet-up {
-    & .diffCotrollerDropdown {
+    .diffCotrollerDropdown {
       position: absolute;
       top: 10px;
       right: 50px;
     }
 
-    & .diff-grid {
+    .diff-grid {
       max-height: 465px;
       min-height: 115px;
       -ms-grid-rows: 0.2fr auto 0.3fr;
@@ -334,7 +334,7 @@
   @media @phone {
     // this will be positioned relatively to .Modal-content
     // to fill the full height on narrow views
-    & .diff-grid {
+    .diff-grid {
       -ms-grid-rows: 0.5fr 1.3fr 0.2fr 3fr;
       grid-template-rows: 0.5fr 1.3fr 0.2fr 3fr;
       position: absolute;
@@ -367,16 +367,16 @@
       }
     }
 
-    & .Modal-header {
+    .Modal-header {
       // fix for username links
       // on default Flarum theme
       & when (@config-colored-header = true) {
-        & a {
+        a {
           color: @header-control-color;
         }
       }
 
-      & .Avatar {
+      .Avatar {
         margin-top: 10px;
         // fix for long usernames
         margin-left: 6px;

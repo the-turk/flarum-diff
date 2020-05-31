@@ -17,12 +17,12 @@ body.dark {
   // variables for the diff's dark mode
   @import "variables/dark-mode.less";
 
-  & .DiffModal {
-    & .Modal-body {
+  .DiffModal {
+    .Modal-body {
       background: @body-bg;
     }
 
-    & .diff-grid {
+    .diff-grid {
       & > .diff-grid-item {
         &.diff-grid-info .revisionInfo {
           color: @control-color;
@@ -35,22 +35,22 @@ body.dark {
         &.diff-grid-diff {
           border-color: @control-bg;
 
-          & .diffContents .diffContainer > div.noDiff > p {
+          .diffContents .diffContainer > div.noDiff > p {
             color: @control-color;
           }
         }
       }
     }
 
-    & .DiffModal-loading {
+    .DiffModal-loading {
       background: fade(@body-bg, 90%);
     }
 
-    & .TheTurkDiff.CustomDiff.diff-wrapper {
+    .TheTurkDiff.CustomDiff.diff-wrapper {
       .diff-stripes(lighten(@control-bg, 4%), darken(@control-bg, 3%));
 
       &.diff-html .change {
-        & .old {
+        .old {
           border-color: @diff-old-version-bg-color-border;
 
           &:not(.none) {
@@ -58,7 +58,7 @@ body.dark {
           }
         }
 
-        & .new {
+        .new {
           border-color: @diff-new-version-bg-color-border;
 
           &:not(.none) {
@@ -66,48 +66,48 @@ body.dark {
           }
         }
 
-        & .rep {
+        .rep {
           border-color: @diff-change-version-del-color-border;
           background: @body-bg;
         }
 
-        & .rep-del {
+        .rep-del {
           border-color: @diff-change-version-del-color-border;
           background: @diff-change-version-del-color;
         }
 
-        & .rep-ins {
+        .rep-ins {
           border-color: @diff-change-version-ins-color-border;
           background: @diff-change-version-ins-color;
         }
 
         &.change-eq {
-          & .new,
-          & .old {
+          .new,
+          .old {
             border-color: @diff-info-color-border;
             background: @body-bg;
             color: @muted-color;
           }
         }
 
-        & ins {
+        ins {
           background-color: @diff-new-version-ins-color;
         }
 
-        & del {
+        del {
           background-color: @diff-old-version-del-color;
         }
 
-        & .new.none,
-        & .old.none,
-        & .rep.none {
+        .new.none,
+        .old.none,
+        .rep.none {
           border-color: @diff-info-color-border;
         }
       }
     }
   }
 
-  & .DiffDropdown .DiffList-header {
+  .DiffDropdown .DiffList-header {
     border-color: @control-bg;
 
     & > h4 {
@@ -115,7 +115,7 @@ body.dark {
     }
   }
 
-  & .DiffList-container .DiffList-content {
+  .DiffList-container .DiffList-content {
     & > ul > li.Diff {
       color: @muted-color;
 
@@ -138,19 +138,19 @@ body.dark {
       }
     }
 
-    & .DiffList-empty {
+    .DiffList-empty {
       color: @muted-color;
     }
   }
 
   @media @tablet-up {
-    & .DiffModal .diff-grid > .diff-grid-item.diff-grid-info {
+    .DiffModal .diff-grid > .diff-grid-item.diff-grid-info {
       border-color: @control-bg;
     }
   }
 
   @media @phone {
-    & .DiffModal .diff-grid > .diff-grid-item.diff-grid-controls {
+    .DiffModal .diff-grid > .diff-grid-item.diff-grid-controls {
       border-color: @control-bg;
     }
   }
