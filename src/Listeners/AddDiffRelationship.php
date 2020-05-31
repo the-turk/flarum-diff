@@ -4,7 +4,6 @@ namespace TheTurk\Diff\Listeners;
 use Jfcherng\Diff\Factory\RendererFactory;
 use Flarum\Post\Post;
 use Jfcherng\Diff\Differ;
-use Flarum\Event\GetModelRelationship;
 use Flarum\Event\GetApiRelationship;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Translation\Translator;
@@ -77,22 +76,8 @@ class AddDiffRelationship
      */
     public function subscribe(Dispatcher $events)
     {
-        $events->listen(GetModelRelationship::class, [$this, 'getModelRelationship']);
         $events->listen(GetApiRelationship::class, [$this, 'getApiRelationship']);
         $events->listen(Serializing::class, [$this, 'prepareApiAttributes']);
-    }
-
-    /**
-     *  One post has many revisions.
-     *
-     * @param GetModelRelationship $event
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany|null
-     */
-    public function getModelRelationship(GetModelRelationship $event)
-    {
-        if ($event->isRelationship(Post::class, 'diff')) {
-            return $event->model->hasMany(Diff::class, 'post_id');
-        }
     }
 
     /**

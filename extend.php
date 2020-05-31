@@ -23,6 +23,8 @@ use Illuminate\Contracts\Events\Dispatcher;
 use TheTurk\Diff\Api\Controllers;
 use TheTurk\Diff\Listeners;
 use TheTurk\Diff\Providers;
+use Flarum\Post\Post;
+use TheTurk\Diff\Models\Diff;
 
 return [
     (new Extend\Routes('api'))
@@ -35,7 +37,13 @@ return [
     (new Extend\Frontend('forum'))
         ->css(__DIR__ . '/less/forum.less')
         ->js(__DIR__ . '/js/dist/forum.js'),
+
     (new Extend\Locales(__DIR__ . '/locale')),
+
+    // GetModelRelationship event is deprecated by
+    // https://github.com/flarum/core/pull/2100
+    (new Extend\Model(Post::class))
+        ->hasMany('diff', Diff::class, 'post_id'),
 
     static function (Application $app) {
         /** @var Dispatcher $events */
