@@ -316,9 +316,9 @@ class AddDiffRelationship
         if ($this->settings->get($this->settingsPrefix.'textFormatting', true)) {
             return $this->commentPost->getFormatter()->render(
                 $this->commentPost->getFormatter()->parse(
-                $content,
-                $this->commentPost
-            ),
+                    $content,
+                    $this->commentPost
+                ),
                 $this->commentPost
             );
         }
