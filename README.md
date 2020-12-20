@@ -1,6 +1,12 @@
 # Diff for Flarum
 
-[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/the-turk/flarum-diff/blob/master/LICENSE) [![Latest Stable Version](https://img.shields.io/packagist/v/the-turk/flarum-diff.svg)](https://packagist.org/packages/the-turk/flarum-diff) [![Total Downloads](https://img.shields.io/packagist/dt/the-turk/flarum-diff.svg)](https://packagist.org/packages/the-turk/flarum-diff)
+[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/imorland/flarum-diff/blob/master/LICENSE) [![Latest Stable Version](https://img.shields.io/packagist/v/ianm/flarum-diff.svg)](https://packagist.org/packages/ianm/flarum-diff) [![Total Downloads](https://img.shields.io/packagist/dt/ianm/flarum-diff.svg)](https://packagist.org/packages/ianm/flarum-diff)
+
+## This is a temporary maintained fork
+
+> I have [volunteered](https://discuss.flarum.org/d/22779-diff-for-flarum/136) to maintain this extension whilst [Kylo / the-turk is away](https://discuss.flarum.org/d/22779-diff-for-flarum/132). My hope is that this fork can be re-integrated in due course.
+
+> ~ IanM - December 2020
 
 This extension adds a "post revision history" feature to your [Flarum](https://github.com/flarum) forum. I did this one for my personal Flarum project and decided to share it.
 
@@ -51,13 +57,13 @@ composer update the-turk/flarum-edit-notifications:0.1.4
 Use [Bazaar](https://discuss.flarum.org/d/5151) or install manually:
 
 ```bash
-composer require the-turk/flarum-diff
+composer require ianm/flarum-diff
 ```
 
 ## Updating
 
 ```bash
-composer update the-turk/flarum-diff
+composer update ianm/flarum-diff
 php flarum migrate
 php flarum cache:clear
 ```
@@ -81,7 +87,7 @@ If you want to archive old revisions, please consider enabling _cron job option_
 ## Links
 
 - [Flarum Discuss post](https://discuss.flarum.org/d/22779-diff-for-flarum)
-- [Source code on GitHub](https://github.com/the-turk/flarum-diff)
-- [Changelog](https://github.com/the-turk/flarum-diff/blob/master/CHANGELOG.md)
-- [Report an issue](https://github.com/the-turk/flarum-diff/issues)
-- [Download via Packagist](https://packagist.org/packages/the-turk/flarum-diff)
+- [Source code on GitHub](https://github.com/imorland/flarum-diff)
+- [Changelog](https://github.com/the-turk/imorland/blob/master/CHANGELOG.md)
+- [Report an issue](https://github.com/imorland/flarum-diff/issues)
+- [Download via Packagist](https://packagist.org/packages/ianm/flarum-diff)

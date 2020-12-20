@@ -1,6 +1,6 @@
 <?php
 
-namespace TheTurk\Diff\Listeners;
+namespace IanM\Diff\Listeners;
 
 use Flarum\Event\ConfigureUserPreferences;
 use Illuminate\Contracts\Events\Dispatcher;

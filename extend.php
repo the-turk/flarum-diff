@@ -16,14 +16,16 @@
  * @link       https://github.com/the-turk/flarum-diff
  */
 
-namespace TheTurk\Diff;
+namespace IanM\Diff;
 
+use Flarum\Api\Serializer\BasicPostSerializer;
 use Flarum\Extend;
-use Flarum\Foundation\Application;
 use Flarum\Post\Post;
 use Illuminate\Contracts\Events\Dispatcher;
-use TheTurk\Diff\Api\Controllers;
-use TheTurk\Diff\Models\Diff;
+use IanM\Diff\Api\Controllers;
+use IanM\Diff\Api\Serializers\DiffSerializer;
+use IanM\Diff\Console\ArchiveCommand;
+use IanM\Diff\Models\Diff;
 
 return [
     (new Extend\Routes('api'))
@@ -44,15 +46,29 @@ return [
     (new Extend\Model(Post::class))
         ->hasMany('diff', Diff::class, 'post_id'),
 
-    static function (Application $app) {
-        /** @var Dispatcher $events */
-        $events = $app['events'];
+    static function (Dispatcher $events) {
+
 
         $events->subscribe(Listeners\PostActions::class);
         $events->subscribe(Listeners\AddDiffRelationship::class);
-        $events->subscribe(Listeners\RegisterConsoleCommand::class);
         $events->subscribe(Listeners\UserPreferences::class);
 
-        $app->register(Providers\ConsoleProvider::class);
+        //$app->register(Providers\ConsoleProvider::class);
     },
+
+    (new Extend\Console())
+        ->command(ArchiveCommand::class),
+
+    (new Extend\ApiSerializer(BasicPostSerializer::class))
+        ->hasMany('diff', DiffSerializer::class),
+
+    (new Extend\Settings())
+        ->serializeToForum('textFormattingForDiffPreviews', 'the-turk-diff.textFormatting', function ($value) {
+            if ($value === '' || $value === null) {
+                // Default value
+                $value = true;
+            }
+
+            return (bool) $value;
+        }),
 ];

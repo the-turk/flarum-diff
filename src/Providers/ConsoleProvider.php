@@ -1,6 +1,6 @@
 <?php
 
-namespace TheTurk\Diff\Providers;
+namespace IanM\Diff\Providers;
 
 use Flarum\Foundation\AbstractServiceProvider;
 use FoF\Console\Providers\ConsoleProvider as Console;

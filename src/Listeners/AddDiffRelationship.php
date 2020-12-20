@@ -1,12 +1,9 @@
 <?php
 
-namespace TheTurk\Diff\Listeners;
+namespace IanM\Diff\Listeners;
 
 use Flarum\Api\Event\Serializing;
-use Flarum\Api\Serializer\BasicPostSerializer;
-use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Api\Serializer\PostSerializer;
-use Flarum\Event\GetApiRelationship;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Post\CommentPost;
 use Flarum\Post\Post;
@@ -15,9 +12,9 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Translation\Translator;
 use Jfcherng\Diff\Differ;
 use Jfcherng\Diff\Factory\RendererFactory;
-use TheTurk\Diff\Api\Serializers\DiffSerializer;
-use TheTurk\Diff\Models\Diff;
-use TheTurk\Diff\Repositories\DiffArchiveRepository;
+use IanM\Diff\Api\Serializers\DiffSerializer;
+use IanM\Diff\Models\Diff;
+use IanM\Diff\Repositories\DiffArchiveRepository;
 
 class AddDiffRelationship
 {
@@ -77,20 +74,7 @@ class AddDiffRelationship
      */
     public function subscribe(Dispatcher $events)
     {
-        $events->listen(GetApiRelationship::class, [$this, 'getApiRelationship']);
         $events->listen(Serializing::class, [$this, 'prepareApiAttributes']);
-    }
-
-    /**
-     * @param GetApiRelationship $event
-     *
-     * @return \Tobscure\JsonApi\Relationship|null
-     */
-    public function getApiRelationship(GetApiRelationship $event)
-    {
-        if ($event->isRelationship(BasicPostSerializer::class, 'diff')) {
-            return $event->serializer->hasMany($event->model, DiffSerializer::class, 'diff');
-        }
     }
 
     /**
@@ -100,11 +84,6 @@ class AddDiffRelationship
      */
     public function prepareApiAttributes(Serializing $event)
     {
-        if ($event->isSerializer(ForumSerializer::class)) {
-            $event->attributes['textFormattingForDiffPreviews'] = (bool)
-                $this->settings->get($this->settingsPrefix.'textFormatting', true);
-        }
-
         if ($event->isSerializer(PostSerializer::class)) {
             $isSelf = $event->actor->id === $event->model->user_id;
 
@@ -278,7 +257,7 @@ class AddDiffRelationship
                              .$this->translator->trans('the-turk-diff.forum.noDiff').
                           '</p></div>',
                         // this option is just for Combined renderer
-                        'mergeThreshold' => \TheTurk\Diff\Jobs\ArchiveDiffs::sanitizeFloat($this->settings->get(
+                        'mergeThreshold' => \IanM\Diff\Jobs\ArchiveDiffs::sanitizeFloat($this->settings->get(
                             $this->settingsPrefix.'mergeThreshold',
                             0.8
                         )),

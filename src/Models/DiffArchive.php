@@ -1,6 +1,6 @@
 <?php
 
-namespace TheTurk\Diff\Models;
+namespace IanM\Diff\Models;
 
 use Flarum\Database\AbstractModel;
 

@@ -1,19 +1,17 @@
 <?php
 
-namespace TheTurk\Diff\Api\Controllers;
+namespace IanM\Diff\Api\Controllers;
 
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\UrlGenerator;
-use Flarum\User\AssertPermissionTrait;
 use Psr\Http\Message\ServerRequestInterface;
-use TheTurk\Diff\Api\Serializers\DiffSerializer;
-use TheTurk\Diff\Repositories\DiffRepository;
+use IanM\Diff\Api\Serializers\DiffSerializer;
+use IanM\Diff\Repositories\DiffRepository;
+use Illuminate\Support\Arr;
 use Tobscure\JsonApi\Document;
 
 class ListDiffController extends AbstractListController
 {
-    use AssertPermissionTrait;
-
     /**
      * {@inheritdoc}
      */
@@ -56,9 +54,9 @@ class ListDiffController extends AbstractListController
     {
         $actor = $request->getAttribute('actor');
 
-        $this->assertCan($actor, 'viewEditHistory');
+        $actor->assertCan('viewEditHistory');
 
-        $postId = array_get($request->getQueryParams(), 'id');
+        $postId = Arr::get($request->getQueryParams(), 'id');
 
         $limit = $this->extractLimit($request);
         $offset = $this->extractOffset($request);

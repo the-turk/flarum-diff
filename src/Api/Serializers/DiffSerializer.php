@@ -1,10 +1,10 @@
 <?php
 
-namespace TheTurk\Diff\Api\Serializers;
+namespace IanM\Diff\Api\Serializers;
 
 use Flarum\Api\Serializer\AbstractSerializer;
 use Flarum\Api\Serializer\BasicUserSerializer;
-use TheTurk\Diff\Models\Diff;
+use IanM\Diff\Models\Diff;
 
 class DiffSerializer extends AbstractSerializer
 {

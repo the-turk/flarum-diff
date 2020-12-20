@@ -1,18 +1,15 @@
 <?php
 
-namespace TheTurk\Diff\Commands;
+namespace IanM\Diff\Commands;
 
 use Carbon\Carbon;
 use Flarum\Post\PostRepository;
-use Flarum\User\AssertPermissionTrait;
 use Flarum\User\Exception\PermissionDeniedException;
-use TheTurk\Diff\Models\Diff;
-use TheTurk\Diff\Repositories\DiffArchiveRepository;
+use IanM\Diff\Models\Diff;
+use IanM\Diff\Repositories\DiffArchiveRepository;
 
 class DeleteDiffHandler
 {
-    use AssertPermissionTrait;
-
     /**
      * @var \Flarum\Post\PostRepository
      */

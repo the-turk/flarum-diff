@@ -13,7 +13,8 @@ import redrawPost from '../utils/redrawPost';
  * It also contains DiffButton components.
  */
 export default class DiffList extends Component {
-  init() {
+  oninit(vnode) {
+    super.oninit(vnode);
     /**
      * Whether or not the revisions are loading.
      *
@@ -26,15 +27,15 @@ export default class DiffList extends Component {
      *
      * @type {Post[]}
      */
-    this.post = this.props.post;
+    this.post = this.attrs.post;
 
     /**
      * Whether or not there are more results that can be loaded.
      *
      * @type {Boolean|Null}
      */
-    if (null !== this.props.moreResults) {
-      this.moreResults = this.props.moreResults;
+    if (null !== this.attrs.moreResults) {
+      this.moreResults = this.attrs.moreResults;
     } else {
       this.moreResults = false;
     }
@@ -45,7 +46,7 @@ export default class DiffList extends Component {
      *
      * @type {Boolean}
      */
-    this.forModal = this.props.forModal;
+    this.forModal = this.attrs.forModal;
 
     /**
      * Whether there is a pre-selected revision or not.
@@ -55,7 +56,7 @@ export default class DiffList extends Component {
      *
      * @type {Number|Null}
      */
-    this.selectedItem = this.props.selectedItem;
+    this.selectedItem = this.attrs.selectedItem;
 
     if (!app.cache.diffs) {
       /**
@@ -123,9 +124,9 @@ export default class DiffList extends Component {
                           this.toggleSubDiff(item.id());
                         }
                       },
-                      config: (elm, isInitialized) =>
-                        touchDevice() === false && !isInitialized
-                          ? $(elm)
+                      oncreate: (vnode) =>
+                        touchDevice() === false
+                          ? $(vnode)
                               .tooltip({
                                 trigger: 'hover',
                                 placement: 'left',
@@ -190,9 +191,7 @@ export default class DiffList extends Component {
     );
   }
 
-  config(isInitialized, context) {
-    if (isInitialized) return;
-
+  oncreate(vnode) {
     if (this.forModal && this.selectedItem) {
       let $selectedItem = this.$('li#parentDiff' + this.selectedItem);
       $selectedItem.find('button').prop('disabled', true);

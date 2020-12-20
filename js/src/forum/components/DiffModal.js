@@ -17,8 +17,8 @@ import DiffList from './DiffList';
  * It also contains DiffList components.
  */
 export default class DiffModal extends Modal {
-  init() {
-    super.init();
+  oninit(vnode) {
+    super.oninit(vnode);
 
     /**
      * Whether or not the modal is loading.
@@ -107,7 +107,17 @@ export default class DiffModal extends Modal {
     ];
   }
 
-  config(isInitialized) {
+  oncreate(vnode) {
+    super.oncreate(vnode);
+
+    this.config(vnode);
+  }
+
+  onupdate(vnode) {
+    this.config(vnode);
+  }
+
+  config(vnode) {
     // workaround for missing 'in' class on .ModalManager
     // after redrawing the DiffList component.
     // because i'm done with this shit.
@@ -116,7 +126,7 @@ export default class DiffModal extends Modal {
 
     // we should re-Initialize this component after user
     // clicks a different revision while modal is open
-    if (isInitialized && this.diffId == this.revision.id()) return;
+    if (this.diffId == this.revision.id()) return;
 
     this.showing = true;
     this.diffId = this.revision.id();
@@ -160,20 +170,6 @@ export default class DiffModal extends Modal {
               }
               {this.post.canRollbackEditHistory() && this.comparisonBetween.old.diffId
                 ? Button.component({
-                    children:
-                      this.revision.revision() == 0
-                        ? /* we're viewing the original content */
-                          app.translator.trans('the-turk-diff.forum.rollbackToOriginalButton')
-                        : this.revision.revision() == this.post.revisionCount()
-                        ? this.comparisonBetween.old.revision != 0
-                          ? /* we're comparing this revision with current content. */
-                            app.translator.trans('the-turk-diff.forum.revertChangesButton')
-                          : /* we're comparing this revision with original content */
-                            app.translator.trans('the-turk-diff.forum.rollbackToOriginalButton')
-                        : /* we're comparing this revision with another revision */
-                          app.translator.trans('the-turk-diff.forum.rollbackButton', {
-                            number: this.revision.revision(),
-                          }),
                     icon: 'fas fa-reply',
                     onclick: () => {
                       if (
@@ -213,7 +209,19 @@ export default class DiffModal extends Modal {
                           });
                       }
                     },
-                  })
+                  }, this.revision.revision() == 0
+                  ? /* we're viewing the original content */
+                    app.translator.trans('the-turk-diff.forum.rollbackToOriginalButton')
+                  : this.revision.revision() == this.post.revisionCount()
+                  ? this.comparisonBetween.old.revision != 0
+                    ? /* we're comparing this revision with current content. */
+                      app.translator.trans('the-turk-diff.forum.revertChangesButton')
+                    : /* we're comparing this revision with original content */
+                      app.translator.trans('the-turk-diff.forum.rollbackToOriginalButton')
+                  : /* we're comparing this revision with another revision */
+                    app.translator.trans('the-turk-diff.forum.rollbackButton', {
+                      number: this.revision.revision(),
+                    }))
                 : ''}
 
               {
@@ -223,7 +231,6 @@ export default class DiffModal extends Modal {
               }
               {this.post.canDeleteEditHistory() && this.revision.revision() != this.post.revisionCount()
                 ? Button.component({
-                    children: app.translator.trans('the-turk-diff.forum.deleteButton'),
                     icon: 'far fa-trash-alt',
                     onclick: () => {
                       if (confirm(app.translator.trans('the-turk-diff.forum.confirmDelete'))) {
@@ -249,7 +256,7 @@ export default class DiffModal extends Modal {
                           });
                       }
                     },
-                  })
+                  }, app.translator.trans('the-turk-diff.forum.deleteButton'))
                 : ''}
             </Dropdown>
           ) : (
@@ -288,9 +295,9 @@ export default class DiffModal extends Modal {
                         this.setDiffContent('inline');
                       },
                       className: 'Button Button--icon Button--link inlineView',
-                      config: (elm, isInitialized) =>
-                        touchDevice() === false && !isInitialized
-                          ? $(elm)
+                      oncreate: (vnode) =>
+                        touchDevice() === false
+                          ? $(vnode)
                               .parent()
                               .tooltip({
                                 trigger: 'hover',
@@ -312,9 +319,9 @@ export default class DiffModal extends Modal {
                         this.setDiffContent('sideBySide');
                       },
                       className: 'Button Button--icon Button--link sideBySideView',
-                      config: (elm, isInitialized) =>
-                        touchDevice() === false && !isInitialized
-                          ? $(elm)
+                      oncreate: (vnode) =>
+                        touchDevice() === false
+                          ? $(vnode)
                               .parent()
                               .tooltip({
                                 trigger: 'hover',
@@ -333,9 +340,9 @@ export default class DiffModal extends Modal {
                         this.setDiffContent('combined');
                       },
                       className: 'Button Button--icon Button--link combinedView',
-                      config: (elm, isInitialized) =>
-                        touchDevice() === false && !isInitialized
-                          ? $(elm)
+                      oncreate: (vnode) =>
+                        touchDevice() === false
+                          ? $(vnode)
                               .parent()
                               .tooltip({
                                 trigger: 'hover',
@@ -356,9 +363,9 @@ export default class DiffModal extends Modal {
                   this.setDiffContent('preview');
                 },
                 className: 'Button Button--icon Button--link diffPreview',
-                config: (elm, isInitialized) =>
-                  touchDevice() === false && !isInitialized
-                    ? $(elm)
+                oncreate: (vnode) =>
+                  touchDevice() === false
+                    ? $(vnode)
                         .parent()
                         .tooltip({
                           trigger: 'hover',

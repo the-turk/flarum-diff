@@ -1,5 +1,5 @@
 {
-  "name": "the-turk/flarum-diff",
+  "name": "ianm/flarum-diff",
   "description": "View post edit histories.",
   "keywords": [
     "flarum",
@@ -17,12 +17,13 @@
     "homepage": "https://github.com/the-turk"
   }],
   "support": {
-    "issues": "https://github.com/the-turk/flarum-diff/issues",
-    "source": "https://github.com/the-turk/flarum-diff"
+    "issues": "https://github.com/imorland/flarum-diff/issues",
+    "source": "https://github.com/imorland/flarum-diff",
+    "forum": "https://discuss.flarum.org/d/22779-diff-for-flarum"
   },
   "require": {
-    "flarum/core": ">=0.1.0-beta.13 <0.1.0-beta.14",
-    "fof/console": "^0.5",
+    "flarum/core": "^0.1.0-beta.15",
+    "fof/console": "^0.6.1",
     "jfcherng/php-diff": "^6.7.1",
     "ext-json": "*"
   },
@@ -30,17 +31,21 @@
     "dem13n/nickname-changer": ">=0.1.0",
     "the-turk/flarum-edit-notifications": "<0.1.4"
   },
+  "replace": {
+    "the-turk/flarum-diff": "*"
+  },
   "suggest": {
     "the-turk/flarum-quiet-edits": "Recommended if you want to save storage volume"
   },
   "autoload": {
     "psr-4": {
-      "TheTurk\\Diff\\": "src/"
+      "IanM\\Diff\\": "src/"
     }
   },
   "extra": {
     "flarum-extension": {
       "title": "Diff",
+      "category": "feature",
       "icon": {
         "name": "fas fa-history",
         "backgroundColor": "#b72a2a",

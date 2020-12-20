@@ -1,5 +1,5 @@
 {
-  "name": "@the-turk/flarum-diff",
+  "name": "@ianm/flarum-diff",
   "description": "View post edit histories.",
   "license": "MIT",
   "version": "1.0.8",

@@ -1,51 +1,58 @@
 import app from 'flarum/app';
-import { extend } from 'flarum/extend';
-import PermissionGrid from 'flarum/components/PermissionGrid';
-import DiffSettingsModal from './modals/DiffSettingsModal';
+import DiffSettingsPage from './DiffSettingsPage';
 
-app.initializers.add('the-turk-diff', (app) => {
-  // show extension's settings modal
-  app.extensionSettings['the-turk-diff'] = () => app.modal.show(new DiffSettingsModal());
-
-  extend(PermissionGrid.prototype, 'viewItems', (items) => {
-    // who can view edit history?
-    items.add('viewEditHistory', {
-      icon: 'fas fa-history',
-      label: app.translator.trans('the-turk-diff.admin.permissions.viewEditHistory'),
-      permission: 'viewEditHistory',
-      allowGuest: false,
-    });
-  });
-
-  extend(PermissionGrid.prototype, 'moderateItems', (items) => {
-    // who can delete others edit history?
-    items.add('deleteEditHistory', {
-      icon: 'fas fa-times',
-      label: app.translator.trans('the-turk-diff.admin.permissions.deleteEditHistory'),
-      permission: 'deleteEditHistory',
-      allowGuest: false,
-    });
-    // who can delete their own edit history?
-    items.add('selfDeleteEditHistory', {
-      icon: 'fas fa-times',
-      label: app.translator.trans('the-turk-diff.admin.permissions.selfDeleteEditHistory'),
-      permission: 'selfDeleteEditHistory',
-      allowGuest: false,
-    });
-
-    // who can rollback others edit history?
-    items.add('rollbackEditHistory', {
-      icon: 'fas fa-history',
-      label: app.translator.trans('the-turk-diff.admin.permissions.rollbackEditHistory'),
-      permission: 'rollbackEditHistory',
-      allowGuest: false,
-    });
-    // who can rollback their own edit history?
-    items.add('selfRollbackEditHistory', {
-      icon: 'fas fa-history',
-      label: app.translator.trans('the-turk-diff.admin.permissions.selfRollbackEditHistory'),
-      permission: 'selfRollbackEditHistory',
-      allowGuest: false,
-    });
-  });
+app.initializers.add('ianm-diff', (app) => {
+  app.extensionData
+    .for('ianm-diff')
+    .registerPage(DiffSettingsPage)
+    .registerPermission(
+      {
+        // who can view edit history?
+        icon: 'fas fa-history',
+        label: app.translator.trans('the-turk-diff.admin.permissions.viewEditHistory'),
+        permission: 'viewEditHistory',
+        allowGuest: false,
+      },
+      'view'
+    )
+    .registerPermission(
+      {
+        // who can delete others edit history?
+        icon: 'fas fa-times',
+        label: app.translator.trans('the-turk-diff.admin.permissions.deleteEditHistory'),
+        permission: 'deleteEditHistory',
+        allowGuest: false,
+      },
+      'moderate'
+    )
+    .registerPermission(
+      {
+        // who can delete their own edit history?
+        icon: 'fas fa-times',
+        label: app.translator.trans('the-turk-diff.admin.permissions.selfDeleteEditHistory'),
+        permission: 'selfDeleteEditHistory',
+        allowGuest: false,
+      },
+      'moderate'
+    )
+    .registerPermission(
+      {
+        // who can rollback others edit history?
+        icon: 'fas fa-history',
+        label: app.translator.trans('the-turk-diff.admin.permissions.rollbackEditHistory'),
+        permission: 'rollbackEditHistory',
+        allowGuest: false,
+      },
+      'moderate'
+    )
+    .registerPermission(
+      {
+        // who can rollback their own edit history?
+        icon: 'fas fa-history',
+        label: app.translator.trans('the-turk-diff.admin.permissions.selfRollbackEditHistory'),
+        permission: 'selfRollbackEditHistory',
+        allowGuest: false,
+      },
+      'moderate'
+    );
 });
