@@ -62,7 +62,7 @@ class Diff extends AbstractModel
      */
     public function actor()
     {
-        return $this->belongsTo(User::class, 'actor_id')->withDefault();
+        return $this->belongsTo(User::class, 'actor_id');
     }
 
     /**
@@ -70,7 +70,7 @@ class Diff extends AbstractModel
      */
     public function deletedUser()
     {
-        return $this->belongsTo(User::class, 'deleted_user_id')->withDefault();
+        return $this->belongsTo(User::class, 'deleted_user_id');
     }
 
     /**
@@ -78,6 +78,6 @@ class Diff extends AbstractModel
      */
     public function rollbackedUser()
     {
-        return $this->belongsTo(User::class, 'rollbacked_user_id')->withDefault();
+        return $this->belongsTo(User::class, 'rollbacked_user_id');
     }
 }
