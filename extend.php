@@ -19,10 +19,12 @@
 namespace IanM\Diff;
 
 use Flarum\Api\Serializer\BasicPostSerializer;
+use Flarum\Api\Serializer\PostSerializer;
 use Flarum\Extend;
 use Flarum\Post\Post;
 use Illuminate\Contracts\Events\Dispatcher;
 use IanM\Diff\Api\Controllers;
+use IanM\Diff\Api\SerializeDiffsOnPosts;
 use IanM\Diff\Api\Serializers\DiffSerializer;
 use IanM\Diff\Console\ArchiveCommand;
 use IanM\Diff\Models\Diff;
@@ -32,17 +34,17 @@ return [
         ->get('/diff', 'diff.index', Controllers\ListDiffController::class)
         ->delete('/diff/{id}', 'diff.delete', Controllers\DeleteDiffController::class)
         ->post('/diff/{id}', 'diff.rollback', Controllers\RollbackToDiffController::class),
+
     (new Extend\Frontend('admin'))
         ->css(__DIR__.'/less/admin.less')
         ->js(__DIR__.'/js/dist/admin.js'),
+
     (new Extend\Frontend('forum'))
         ->css(__DIR__.'/less/forum.less')
         ->js(__DIR__.'/js/dist/forum.js'),
 
     (new Extend\Locales(__DIR__.'/locale')),
 
-    // GetModelRelationship event is deprecated by
-    // https://github.com/flarum/core/pull/2100
     (new Extend\Model(Post::class))
         ->hasMany('diff', Diff::class, 'post_id'),
 
@@ -50,8 +52,6 @@ return [
 
 
         $events->subscribe(Listeners\PostActions::class);
-        $events->subscribe(Listeners\AddDiffRelationship::class);
-        $events->subscribe(Listeners\UserPreferences::class);
 
         //$app->register(Providers\ConsoleProvider::class);
     },
@@ -62,6 +62,9 @@ return [
     (new Extend\ApiSerializer(BasicPostSerializer::class))
         ->hasMany('diff', DiffSerializer::class),
 
+    (new Extend\ApiSerializer(PostSerializer::class))
+        ->mutate(SerializeDiffsOnPosts::class),
+
     (new Extend\Settings())
         ->serializeToForum('textFormattingForDiffPreviews', 'the-turk-diff.textFormatting', function ($value) {
             if ($value === '' || $value === null) {
@@ -71,4 +74,7 @@ return [
 
             return (bool) $value;
         }),
+
+    (new Extend\User())
+        ->registerPreference('diffRenderer', 'strval', 'sideBySide'),
 ];

@@ -1,6 +1,7 @@
 import Dropdown from 'flarum/components/Dropdown';
 import DiffList from './DiffList';
 import icon from 'flarum/helpers/icon';
+import DiffListState from '../states/DiffListState';
 
 /**
  * The `DiffDropdown` component is the entrance point for this extension.
@@ -8,14 +9,14 @@ import icon from 'flarum/helpers/icon';
  * It also contains DiffList components.
  */
 export default class DiffDropdown extends Dropdown {
-  static initAttrs(props) {
-    props.className = 'DiffDropdown';
-    props.buttonClassName = 'Button Button--link';
-    props.menuClassName = props.menuClassName;
-    props.label = app.translator.trans('the-turk-diff.forum.editedText');
-    props.icon = 'fas fa-history';
+  static initAttrs(attrs) {
+    attrs.className = 'DiffDropdown';
+    attrs.buttonClassName = 'Button Button--link';
+    attrs.menuClassName = attrs.menuClassName;
+    attrs.label = app.translator.trans('the-turk-diff.forum.editedText');
+    attrs.icon = 'fas fa-history';
 
-    super.initAttrs(props);
+    super.initAttrs(attrs);
   }
 
   oninit(vnode) {
@@ -30,16 +31,10 @@ export default class DiffDropdown extends Dropdown {
 
     /**
      * Create a new revision list.
-     * This approach may not work with newer Mithril versions.
      *
-     * @type {DiffList}
+     * @type {DiffListState}
      */
-    this.list = new DiffList({
-      post: this.post,
-      forModal: false,
-      selectedItem: null,
-      moreResults: null,
-    });
+    this.listState = new DiffListState(this.post, false, null);
   }
 
   getButton() {
@@ -71,7 +66,7 @@ export default class DiffDropdown extends Dropdown {
             })}
           </h4>
         </div>
-        {this.showing ? this.list.render() : ''}
+        {this.showing ? <DiffList state={this.listState}></DiffList> : ''}
       </div>
     );
   }
@@ -80,6 +75,6 @@ export default class DiffDropdown extends Dropdown {
    * Load revision list.
    */
   onclick() {
-    this.list.load();
+    this.listState.load();
   }
 }

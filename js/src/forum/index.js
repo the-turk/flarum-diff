@@ -24,7 +24,7 @@ app.initializers.add('ianm-diff', () => {
 
     // remove diffs cache when post is editing
     if (this.isEditing() && app.cache.diffs && app.cache.diffs[this.attrs.post.id()]) {
-      delete app.cache.diffs[this.props.post.id()];
+      delete app.cache.diffs[this.attrs.post.id()];
     }
   });
 

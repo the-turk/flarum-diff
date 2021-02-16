@@ -5,7 +5,6 @@ import DiffModal from './DiffModal';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 import extractText from 'flarum/utils/extractText';
 import touchDevice from '../utils/touchDevice';
-import redrawPost from '../utils/redrawPost';
 
 /**
  * The `DiffList` component displays a list of the post's revisions.
@@ -13,63 +12,9 @@ import redrawPost from '../utils/redrawPost';
  * It also contains DiffButton components.
  */
 export default class DiffList extends Component {
-  oninit(vnode) {
-    super.oninit(vnode);
-    /**
-     * Whether or not the revisions are loading.
-     *
-     * @type {Boolean}
-     */
-    this.loading = false;
-
-    /**
-     * The post that we're working with.
-     *
-     * @type {Post[]}
-     */
-    this.post = this.attrs.post;
-
-    /**
-     * Whether or not there are more results that can be loaded.
-     *
-     * @type {Boolean|Null}
-     */
-    if (null !== this.attrs.moreResults) {
-      this.moreResults = this.attrs.moreResults;
-    } else {
-      this.moreResults = false;
-    }
-
-    /**
-     * Whether if this list for the DiffModal Component or not.
-     * Because the DiffList also can be used for DiffDropdown.
-     *
-     * @type {Boolean}
-     */
-    this.forModal = this.attrs.forModal;
-
-    /**
-     * Whether there is a pre-selected revision or not.
-     * If user clicks a revision in this list while DiffModal open,
-     * we'll use this value to active & disable selected revision's
-     * DiffButton component.
-     *
-     * @type {Number|Null}
-     */
-    this.selectedItem = this.attrs.selectedItem;
-
-    if (!app.cache.diffs) {
-      /**
-       * Initialize the cache if it isn't already initialized.
-       *
-       * @type {Array}
-       */
-      app.cache.diffs = [];
-    }
-  }
-
   view() {
-    const pages = app.cache.diffs[this.post.id()] || [];
+    const state = this.attrs.state;
+    const pages = app.cache.diffs[state.post.id()] || [];
 
     return (
       <div className="DiffList-container">
@@ -90,24 +35,19 @@ export default class DiffList extends Component {
                     const tooltipClass = 'diffTooltip';
 
                     let diffButton = DiffButton.component({
-                      postDate: this.post.createdAt(),
+                      postDate: state.post.createdAt(),
                       subButton: false,
                       item,
                       onclick: () => {
                         if (!item.deletedAt()) {
-                          app.modal.show(
-                            new DiffModal({
-                              item,
-                              post: this.post,
-                              moreResults: this.moreResults,
-                            })
-                          );
+                          state.selectedItem = item;
+                          app.modal.show(DiffModal, { listState: state });
 
                           // fix for Chrome
                           // tooltips are not disappearing onclick
                           $('.' + tooltipClass).tooltip('hide');
 
-                          if (this.forModal) {
+                          if (state.forModal) {
                             // .DiffList-content container of clicked revision
                             const $listContainer = this.$('li#parentDiff' + item.id());
 
@@ -135,7 +75,7 @@ export default class DiffList extends Component {
                               .attr(
                                 'data-original-title',
                                 extractText(
-                                  item.revision() == this.post.revisionCount()
+                                  item.revision() == state.post.revisionCount()
                                     ? // we're hovering on latest revision's button
                                       app.translator.trans('the-turk-diff.forum.tooltips.mostRecent')
                                     : item.revision() == 0
@@ -164,7 +104,7 @@ export default class DiffList extends Component {
                       item.deletedAt() ? (
                         <li className="Diff SubDiff" id={'subDiff' + item.id()}>
                           {DiffButton.component({
-                            postDate: this.post.createdAt(),
+                            postDate: state.post.createdAt(),
                             subButton: true,
                             item,
                           })}
@@ -176,7 +116,7 @@ export default class DiffList extends Component {
                   });
                 })
               : ''}
-            {this.loading ? (
+            {state.loading ? (
               LoadingIndicator.component({
                 className: 'LoadingIndicator--block',
               })
@@ -192,99 +132,37 @@ export default class DiffList extends Component {
   }
 
   oncreate(vnode) {
-    if (this.forModal && this.selectedItem) {
-      let $selectedItem = this.$('li#parentDiff' + this.selectedItem);
+    super.oncreate(vnode);
+    const state = this.attrs.state;
+
+    if (state.forModal && state.selectedItem) {
+      let $selectedItem = this.$('li#parentDiff' + state.selectedItem);
       $selectedItem.find('button').prop('disabled', true);
       $selectedItem.addClass('active');
     }
 
     const $revisions = this.$('.DiffList-content');
-    const $scrollParent = $revisions.css('overflow') === 'auto' ? $revisions : $(window);
+    this.$scrollParent = $revisions.css('overflow') === 'auto' ? $revisions : $(window);
 
     // Lazy-loading implementation for the revision list
     // simply checks if we're bottom of the list
     // and if there are more results to show
-    const scrollHandler = () => {
+    this.scrollHandler = () => {
       const scrollTop = $scrollParent.scrollTop();
       const viewportHeight = $scrollParent.height();
       const contentTop = $scrollParent === $revisions ? 0 : $revisions.offset().top;
       const contentHeight = $revisions[0].scrollHeight;
 
-      if (this.moreResults && !this.loading && scrollTop + viewportHeight >= contentTop + contentHeight) {
-        this.loadMore();
+      if (state.moreResults && !state.loading && scrollTop + viewportHeight >= contentTop + contentHeight) {
+        state.loadMore();
       }
     };
 
-    $scrollParent.on('scroll', scrollHandler);
-
-    context.onunload = () => {
-      $scrollParent.off('scroll', scrollHandler);
-    };
+    this.$scrollParent.on('scroll', this.scrollHandler);
   }
 
-  /**
-   * Load revisions.
-   *
-   * @public
-   */
-  load() {
-    // don't do anthing if we already cached revisions for the post.
-    // lazy-loading will perform loadMore() if there are moreResults
-    if (app.cache.diffs[this.post.id()]) return this.redrawList();
-
-    this.loadMore();
-  }
-
-  /**
-   * Load the next page of revision results.
-   *
-   * @public
-   */
-  loadMore() {
-    this.loading = true;
-    this.redrawList();
-
-    // don't do anthing if we already cached ALL revisions for the post.
-    if (app.cache.diffs[this.post.id()] && app.cache.diffs[this.post.id()].length == this.post.revisionCount()) {
-      return;
-    }
-
-    // set URL parameters
-    const params = app.cache.diffs[this.post.id()]
-      ? {
-          id: this.post.id(),
-          page: {
-            offset: app.cache.diffs[this.post.id()].length * 10,
-          },
-        }
-      : {
-          id: this.post.id(),
-        };
-
-    return app.store
-      .find('diff', params)
-      .then(this.parseResults.bind(this))
-      .catch(() => {})
-      .then(() => {
-        this.loading = false;
-        this.redrawList();
-      });
-  }
-
-  /**
-   * Parse results and append them to the revision list.
-   *
-   * @param {Diff[]} results
-   * @return {Diff[]}
-   */
-  parseResults(results) {
-    app.cache.diffs[this.post.id()] = app.cache.diffs[this.post.id()] || [];
-
-    if (results.length) app.cache.diffs[this.post.id()].push(results);
-
-    this.moreResults = !!results.payload.links.next;
-
-    return results;
+  onremove(vnode) {
+    this.$scrollParent.off('scroll', this.scrollHandler);
   }
 
   /**
@@ -305,19 +183,5 @@ export default class DiffList extends Component {
     } else {
       $icon.removeClass('fa-caret-up').addClass('fa-caret-down');
     }
-  }
-
-  /**
-   * Redraw the list based on parent component.
-   */
-  redrawList() {
-    m.redraw();
-
-    // because we don't need to redraw the post
-    // to update DiffList in DiffModal.
-    // We just need it for updating DiffDropdown.
-    if (this.forModal) return;
-
-    return redrawPost(this.post);
   }
 }

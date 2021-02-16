@@ -1,0 +1,72 @@
+<?php
+
+namespace IanM\Diff\Api;
+
+use Flarum\Api\Serializer\PostSerializer;
+use Flarum\Extension\ExtensionManager;
+use Flarum\Post\Post;
+use IanM\Diff\Models\Diff;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+
+class SerializeDiffsOnPosts
+{
+    /**
+     * @var ExtensionManager
+     */
+    protected $extensions;
+
+    /**
+     * @param ExtensionManager  $extensions
+     */
+    public function __construct(ExtensionManager $extensions)
+    {
+        $this->extensions = $extensions;
+    }
+
+    /**
+     *
+     * @param PostSerializer $serializer 
+     * @param Post $model 
+     * @param array $attributes 
+     * @return void 
+     * @throws FileNotFoundException 
+     */
+    public function __invoke(PostSerializer $serializer, Post $model, array $attributes)
+    {
+        $isSelf = $serializer->getActor()->id === $model->user_id;
+
+        // integration with kvothe/reply-to-see extension
+        $replied = true;
+
+        if ($this->extensions->isEnabled('kvothe-reply-to-see')) {
+            $users = [];
+            $usersModel = $model['discussion']->participants()->get('id');
+
+            foreach ($usersModel as $user) {
+                $users[] = $user->id;
+            }
+
+            $replied = !$serializer->getActor()->isGuest() && in_array($serializer->getActor()->id, $users);
+        }
+
+        // set permission attributes
+        $attributes['canViewEditHistory'] =
+            $serializer->getActor()->can('viewEditHistory') && $replied;
+
+        $attributes['canDeleteEditHistory'] =
+            ($serializer->getActor()->can('deleteEditHistory')
+                || ($isSelf && $serializer->getActor()->can('selfDeleteEditHistory')));
+
+        $attributes['canRollbackEditHistory'] =
+            ($serializer->getActor()->can('rollbackEditHistory')
+                || ($isSelf && $serializer->getActor()->can('selfRollbackEditHistory')));
+
+        // get post's revision count
+        $diffSubject = Diff::where('post_id', $model->id);
+        $revisionCount = ($diffSubject->exists() ? $diffSubject->max('revision') : 0);
+
+        $attributes['revisionCount'] = $revisionCount;
+
+        return $attributes;
+    }
+}

@@ -67,14 +67,12 @@ class ListDiffController extends AbstractListController
             ['revision' => 'DESC'],
             $limit + 1,
             $offset
-        )
-            ->load($include)
-            ->all();
+        );
 
         $areMoreResults = false;
 
         if (count($diff) > $limit) {
-            array_pop($diff);
+            $diff->pop();
             $areMoreResults = true;
         }
 
@@ -86,6 +84,6 @@ class ListDiffController extends AbstractListController
             $areMoreResults ? null : 0
         );
 
-        return $diff;
+        return $diff->load($include);
     }
 }
