@@ -1,4 +1,4 @@
-import app from 'flarum/app';
+import app from 'flarum/common/app';
 import DiffSettingsPage from './DiffSettingsPage';
 
 app.initializers.add('ianm-diff', (app) => {

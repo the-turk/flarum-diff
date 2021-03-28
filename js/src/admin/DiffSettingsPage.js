@@ -1,7 +1,7 @@
-import app from 'flarum/app';
-import ExtensionPage from 'flarum/components/ExtensionPage';
-import Select from 'flarum/components/Select';
-import Switch from 'flarum/components/Switch';
+import app from 'flarum/common/app';
+import ExtensionPage from 'flarum/common/components/ExtensionPage';
+import Select from 'flarum/common/components/Select';
+import Switch from 'flarum/common/components/Switch';
 
 // just to make things easier
 const settingsPrefix = 'the-turk-diff.';

@@ -1,9 +1,9 @@
-import app from 'flarum/app';
-import Component from 'flarum/Component';
+import app from 'flarum/common/app';
+import Component from 'flarum/common/Component';
 import DiffButton from './DiffButton';
 import DiffModal from './DiffModal';
-import LoadingIndicator from 'flarum/components/LoadingIndicator';
-import extractText from 'flarum/utils/extractText';
+import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
+import extractText from 'flarum/common/utils/extractText';
 import touchDevice from '../utils/touchDevice';
 
 /**

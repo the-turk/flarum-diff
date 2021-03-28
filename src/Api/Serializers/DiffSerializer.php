@@ -12,7 +12,7 @@ use IanM\Diff\Models\Diff;
 use IanM\Diff\Repositories\DiffArchiveRepository;
 use Jfcherng\Diff\Differ;
 use Jfcherng\Diff\Factory\RendererFactory;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DiffSerializer extends AbstractSerializer
 {

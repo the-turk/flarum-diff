@@ -21,15 +21,20 @@ namespace IanM\Diff;
 use Flarum\Api\Serializer\BasicPostSerializer;
 use Flarum\Api\Serializer\PostSerializer;
 use Flarum\Extend;
+use Flarum\Foundation\Paths;
 use Flarum\Post\Post;
-use Illuminate\Contracts\Events\Dispatcher;
+use FoF\Console\Extend\EnableConsole;
+use FoF\Console\Extend\ScheduleCommand;
 use IanM\Diff\Api\Controllers;
 use IanM\Diff\Api\SerializeDiffsOnPosts;
 use IanM\Diff\Api\Serializers\DiffSerializer;
 use IanM\Diff\Console\ArchiveCommand;
 use IanM\Diff\Models\Diff;
+use Illuminate\Console\Scheduling\Schedule;
 
 return [
+    new EnableConsole(),
+
     (new Extend\Routes('api'))
         ->get('/diff', 'diff.index', Controllers\ListDiffController::class)
         ->delete('/diff/{id}', 'diff.delete', Controllers\DeleteDiffController::class)
@@ -48,13 +53,8 @@ return [
     (new Extend\Model(Post::class))
         ->hasMany('diff', Diff::class, 'post_id'),
 
-    static function (Dispatcher $events) {
-
-
-        $events->subscribe(Listeners\PostActions::class);
-
-        //$app->register(Providers\ConsoleProvider::class);
-    },
+    (new Extend\Event())
+        ->subscribe(Listeners\PostActions::class),
 
     (new Extend\Console())
         ->command(ArchiveCommand::class),
@@ -63,18 +63,19 @@ return [
         ->hasMany('diff', DiffSerializer::class),
 
     (new Extend\ApiSerializer(PostSerializer::class))
-        ->mutate(SerializeDiffsOnPosts::class),
+        ->attributes(SerializeDiffsOnPosts::class),
 
     (new Extend\Settings())
-        ->serializeToForum('textFormattingForDiffPreviews', 'the-turk-diff.textFormatting', function ($value) {
-            if ($value === '' || $value === null) {
-                // Default value
-                $value = true;
-            }
-
-            return (bool) $value;
-        }),
+        ->serializeToForum('textFormattingForDiffPreviews', 'the-turk-diff.textFormatting', 'boolVal', true),
 
     (new Extend\User())
         ->registerPreference('diffRenderer', 'strval', 'sideBySide'),
+
+    (new ScheduleCommand(function (Schedule $schedule) {
+        /** @var Paths $paths */
+        $paths = resolve(Paths::class);
+        $schedule->command(ArchiveCommand::class)
+            ->weeklyOn(2, '2:00')
+            ->appendOutputTo($paths->storage.(DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.'diff-archive-task.log'));
+    })),
 ];

@@ -1,6 +1,6 @@
-import Dropdown from 'flarum/components/Dropdown';
+import Dropdown from 'flarum/common/components/Dropdown';
 import DiffList from './DiffList';
-import icon from 'flarum/helpers/icon';
+import icon from 'flarum/common/helpers/icon';
 import DiffListState from '../states/DiffListState';
 
 /**

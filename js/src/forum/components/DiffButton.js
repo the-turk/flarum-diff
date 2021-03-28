@@ -1,9 +1,9 @@
-import Button from 'flarum/components/Button';
-import avatar from 'flarum/helpers/avatar';
-import icon from 'flarum/helpers/icon';
-import username from 'flarum/helpers/username';
-import humanTime from 'flarum/helpers/humanTime';
-import extractText from 'flarum/utils/extractText';
+import Button from 'flarum/common/components/Button';
+import avatar from 'flarum/common/helpers/avatar';
+import icon from 'flarum/common/helpers/icon';
+import username from 'flarum/common/helpers/username';
+import humanTime from 'flarum/common/helpers/humanTime';
+import extractText from 'flarum/common/utils/extractText';
 
 /**
  * The `DiffButton` component composes a button
