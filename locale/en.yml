@@ -1,6 +1,7 @@
 the-turk-diff:
     forum:
-        revisions:                    "{revisionCount} revision | {revisionCount} revisions"
+        #revisions:                    "{revisionCount} revision | {revisionCount} revisions"
+        revisions:                    "{revisionCount, plural, one {{revisionCount} revision} other {{revisionCount} revisions}"
         emptyText:                    No Revisions
         editedText:                   => core.forum.post.edited_text
         deletedText:                  (deleted)
@@ -37,7 +38,8 @@ the-turk-diff:
         editedInfo:                   => core.forum.post.edited_tooltip
         deletedInfo:                  "{username} deleted this content {ago}"
         createdInfo:                  "{username} created {ago}"
-        revisionInfo:                 "Edited {revisionCount} time, newest at the top|Edited {revisionCount} times, newest at the top"
+        #revisionInfo:                 "Edited {revisionCount} time, newest at the top|Edited {revisionCount} times, newest at the top"
+        revisionInfo:                 "Edited {revisionCount, plural, one {{revisionCount} time} other {{revisionCount} times}}, newest at the top"
         noDiff:                       No differences found between these two contents.
 
         differences:

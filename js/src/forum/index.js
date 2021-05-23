@@ -1,11 +1,11 @@
 import app from 'flarum/common/app';
 import { extend } from 'flarum/common/extend';
-import CommentPost from 'flarum/common/components/CommentPost';
+import CommentPost from 'flarum/forum/components/CommentPost';
 import Diff from './models/Diff';
 import Post from 'flarum/common/models/Post';
 import Model from 'flarum/common/Model';
 import DiffDropdown from './components/DiffDropdown';
-import DiscussionPage from 'flarum/common/components/DiscussionPage';
+import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 
 app.initializers.add('ianm-diff', () => {
   app.store.models.diff = Diff;

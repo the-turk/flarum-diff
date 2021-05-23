@@ -262,6 +262,7 @@ export default class DiffModal extends Modal {
     // we can use this class to customize all tooltips
     // provided by this extension
     const tooltipClass = 'diffTooltip';
+    const revisionCount = this.attrs.listState.post.revisionCount();
 
     return [
       <div className="diff-grid">
@@ -370,9 +371,7 @@ export default class DiffModal extends Modal {
         <div className="diff-grid-item diff-grid-info">
           <div className="revisionInfo">
             <h4>
-              {app.translator.transChoice('the-turk-diff.forum.revisions', this.attrs.listState.post.revisionCount(), {
-                revisionCount: this.attrs.listState.post.revisionCount(),
-              })}
+              {app.translator.trans('the-turk-diff.forum.revisions', { revisionCount })}
             </h4>
             <p class="diffInfoContainer" />
           </div>

@@ -1,6 +1,6 @@
 the-turk-diff:
     forum:
-        revisions:                   "{revisionCount} revizyon | {revisionCount} revizyon"
+        revisions:                   "{revisionCount} revizyon"
         emptyText:                   Düzenleme Bulunamadı
         editedText:                  => core.forum.post.edited_text
         deletedText:                 (silinmiş)
@@ -37,7 +37,7 @@ the-turk-diff:
         editedInfo:                  => core.forum.post.edited_tooltip
         deletedInfo:                 "{username}, bu içeriği {ago} sildi"
         createdInfo:                 "{username}, {ago} yazdı"
-        revisionInfo:                "{revisionCount} kere düzeltildi, yenisi en üstte|{revisionCount} kere düzeltildi, yenisi en üstte"
+        revisionInfo:                "{revisionCount} kere düzeltildi, yenisi en üstte"
         noDiff:                      İki içerik arasında gösterilecek bir değişiklik bulunamadı.
 
         differences:
