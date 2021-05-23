@@ -370,9 +370,7 @@ export default class DiffModal extends Modal {
         {/* Comparison Info Container */}
         <div className="diff-grid-item diff-grid-info">
           <div className="revisionInfo">
-            <h4>
-              {app.translator.trans('the-turk-diff.forum.revisions', { revisionCount })}
-            </h4>
+            <h4>{app.translator.trans('the-turk-diff.forum.revisions', { revisionCount })}</h4>
             <p class="diffInfoContainer" />
           </div>
         </div>
