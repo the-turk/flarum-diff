@@ -1,5 +1,5 @@
 import app from 'flarum/common/app';
-import ExtensionPage from 'flarum/common/components/ExtensionPage';
+import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
 

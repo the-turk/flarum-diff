@@ -1,6 +1,7 @@
 import app from 'flarum/common/app';
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
+import Tooltip from 'flarum/common/components/Tooltip';
 import username from 'flarum/common/helpers/username';
 import humanTime from 'flarum/common/helpers/humanTime';
 import avatar from 'flarum/common/helpers/avatar';
@@ -262,6 +263,28 @@ export default class DiffModal extends Modal {
     // we can use this class to customize all tooltips
     // provided by this extension
     const tooltipClass = 'diffTooltip';
+    const revisionCount = this.attrs.listState.post.revisionCount();
+
+    /**
+     * `type` is passed to `setDiffContent` and the tooltip.
+     */
+    const diffSwitches = [
+      {
+        type: 'inline',
+        icon: 'fas fa-grip-lines',
+        class: 'inlineView',
+      },
+      {
+        type: 'sideBySide',
+        icon: 'fas fa-columns',
+        class: 'sideBySideView',
+      },
+      {
+        type: 'combined',
+        icon: 'far fa-square',
+        class: 'combinedView',
+      },
+    ];
 
     return [
       <div className="diff-grid">
@@ -269,111 +292,30 @@ export default class DiffModal extends Modal {
         <div className="diff-grid-item diff-grid-controls">
           <div className="diffSwitcher">
             {this.attrs.listState.selectedItem.revision() != 0 && this.comparisonBetween.new.revision != this.comparisonBetween.old.revision
-              ? [
-                  <div className="tooltip-wrapper" data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.inline')}>
-                    {Button.component({
-                      icon: 'fas fa-grip-lines',
-                      onclick: () => {
-                        // fix for Chrome
-                        // tooltips are not disappearing onclick
-                        this.$('.' + tooltipClass).tooltip('hide');
-
-                        this.setDiffContent('inline');
-                      },
-                      className: 'Button Button--icon Button--link inlineView',
-                      oncreate: (vnode) =>
-                        touchDevice() === false
-                          ? $(vnode.dom)
-                              .parent()
-                              .tooltip({
-                                trigger: 'hover',
-                              })
-                              // this is a workaround for adding custom
-                              // classes into bootstrap tooltips
-                              // https://stackoverflow.com/a/29879041/12866913
-                              .data('bs.tooltip')
-                              .tip()
-                              .addClass(tooltipClass)
-                          : '',
-                    })}
-                  </div>,
-                  <div className="tooltip-wrapper" data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.sideBySide')}>
-                    {Button.component({
-                      icon: 'fas fa-columns',
-                      onclick: () => {
-                        this.$('.' + tooltipClass).tooltip('hide');
-                        this.setDiffContent('sideBySide');
-                      },
-                      className: 'Button Button--icon Button--link sideBySideView',
-                      oncreate: (vnode) =>
-                        touchDevice() === false
-                          ? $(vnode.dom)
-                              .parent()
-                              .tooltip({
-                                trigger: 'hover',
-                              })
-                              .data('bs.tooltip')
-                              .tip()
-                              .addClass(tooltipClass)
-                          : '',
-                    })}
-                  </div>,
-                  <div className="tooltip-wrapper" data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.combined')}>
-                    {Button.component({
-                      icon: 'far fa-square',
-                      onclick: () => {
-                        this.$('.' + tooltipClass).tooltip('hide');
-                        this.setDiffContent('combined');
-                      },
-                      className: 'Button Button--icon Button--link combinedView',
-                      oncreate: (vnode) =>
-                        touchDevice() === false
-                          ? $(vnode.dom)
-                              .parent()
-                              .tooltip({
-                                trigger: 'hover',
-                              })
-                              .data('bs.tooltip')
-                              .tip()
-                              .addClass(tooltipClass)
-                          : '',
-                    })}
-                  </div>,
-                ]
+              ? diffSwitches.map((switchData) => (
+                  <Tooltip text={app.translator.trans(`the-turk-diff.forum.tooltips.${switchData.type}`)}>
+                    <div className="tooltip-wrapper">
+                      <Button
+                        icon={switchData.icon}
+                        onclick={() => this.setDiffContent(switchData.type)}
+                        className={`Button Button--icon Button--link ${switchData.class}`}
+                      />
+                    </div>
+                  </Tooltip>
+                ))
               : ''}
-            <div className="tooltip-wrapper" data-original-title={app.translator.trans('the-turk-diff.forum.tooltips.preview')}>
-              {Button.component({
-                icon: 'far fa-eye',
-                onclick: () => {
-                  this.$('.' + tooltipClass).tooltip('hide');
-                  this.setDiffContent('preview');
-                },
-                className: 'Button Button--icon Button--link diffPreview',
-                oncreate: (vnode) =>
-                  touchDevice() === false
-                    ? $(vnode.dom)
-                        .parent()
-                        .tooltip({
-                          trigger: 'hover',
-                        })
-                        .attr('data-original-title', app.translator.trans('the-turk-diff.forum.tooltips.preview'))
-                        .data('bs.tooltip')
-                        .tip()
-                        .addClass(tooltipClass)
-                    : '',
-              })}
-            </div>
+            <Tooltip text={app.translator.trans('the-turk-diff.forum.tooltips.preview')}>
+              <div className="tooltip-wrapper">
+                <Button icon="far fa-eye" onclick={() => this.setDiffContent('preview')} className="Button Button--icon Button--link diffPreview" />
+              </div>
+            </Tooltip>
           </div>
         </div>
 
         {/* Comparison Info Container */}
         <div className="diff-grid-item diff-grid-info">
           <div className="revisionInfo">
-            <h4>
-              {app.translator.transChoice('the-turk-diff.forum.revisions', this.attrs.listState.post.revisionCount(), {
-                revisionCount: this.attrs.listState.post.revisionCount(),
-              })}
-            </h4>
+            <h4>{app.translator.trans('the-turk-diff.forum.revisions', { revisionCount })}</h4>
             <p class="diffInfoContainer" />
           </div>
         </div>

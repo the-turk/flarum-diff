@@ -56,14 +56,14 @@ export default class DiffDropdown extends Dropdown {
   }
 
   getMenu() {
+    const revisionCount = this.attrs.post.revisionCount();
+
     return (
       <div className={'Dropdown-menu ' + this.attrs.menuClassName}>
         <div className="DiffList-header">
           <h4>
             {/* edited 1 time | edited x times */}
-            {app.translator.transChoice('the-turk-diff.forum.revisionInfo', this.attrs.post.revisionCount(), {
-              revisionCount: this.attrs.post.revisionCount(),
-            })}
+            {app.translator.trans('the-turk-diff.forum.revisionInfo', { revisionCount })}
           </h4>
         </div>
         {this.showing ? <DiffList state={this.listState}></DiffList> : ''}

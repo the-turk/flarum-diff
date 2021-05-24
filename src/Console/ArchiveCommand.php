@@ -23,6 +23,7 @@ class ArchiveCommand extends Command
 
     public function handle()
     {
+        /** @var ArchiveDiffs */
         $job = resolve(ArchiveDiffs::class);
         $time = Carbon::now();
         $this->info("Archive post's revisions {$time}");
