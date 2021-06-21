@@ -1,3 +1,8 @@
+### 1.0.9
+- **Pull** commits from @ianm's incredible fork (I'd like to also send a shout out to @askvortsov1 and @davwheat).
+
+Noticed some issues on this release, work-in-progress.
+
 ### 1.0.8
 - **Remove** deprecated `GetModelRelationship` event related parts.
   + Thus, it requires Flarum 0.1.0-beta.13
