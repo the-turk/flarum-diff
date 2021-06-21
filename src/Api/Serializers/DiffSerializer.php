@@ -8,11 +8,11 @@ use Flarum\Extension\ExtensionManager;
 use Flarum\Post\CommentPost;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
-use TheTurk\Diff\Models\Diff;
-use TheTurk\Diff\Repositories\DiffArchiveRepository;
 use Jfcherng\Diff\Differ;
 use Jfcherng\Diff\Factory\RendererFactory;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use TheTurk\Diff\Models\Diff;
+use TheTurk\Diff\Repositories\DiffArchiveRepository;
 
 class DiffSerializer extends AbstractSerializer
 {
@@ -217,7 +217,7 @@ class DiffSerializer extends AbstractSerializer
                     'wrapperClasses' => ['TheTurkDiff', 'CustomDiff', 'diff-wrapper'],
                     // shows when there are no differences found between revisions
                     'resultForIdenticals' => '<div class="noDiff"><p>'
-                    . $this->translator->trans('the-turk-diff.forum.noDiff') .
+                    .$this->translator->trans('the-turk-diff.forum.noDiff').
                     '</p></div>',
                     // this option is just for Combined renderer
                     'mergeThreshold' => \TheTurk\Diff\Jobs\ArchiveDiffs::sanitizeFloat($this->settings->get(

@@ -15,7 +15,7 @@ class SerializeDiffsOnPosts
     protected $extensions;
 
     /**
-     * @param ExtensionManager  $extensions
+     * @param ExtensionManager $extensions
      */
     public function __construct(ExtensionManager $extensions)
     {
@@ -23,10 +23,10 @@ class SerializeDiffsOnPosts
     }
 
     /**
+     * @param PostSerializer $serializer
+     * @param Post           $model
+     * @param array          $attributes
      *
-     * @param PostSerializer $serializer 
-     * @param Post $model 
-     * @param array $attributes 
      * @return array
      */
     public function __invoke(PostSerializer $serializer, Post $model, array $attributes)

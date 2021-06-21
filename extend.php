@@ -23,13 +23,12 @@ use Flarum\Api\Serializer\PostSerializer;
 use Flarum\Extend;
 use Flarum\Foundation\Paths;
 use Flarum\Post\Post;
+use Illuminate\Console\Scheduling\Event;
 use TheTurk\Diff\Api\Controllers;
-use TheTurk\Diff\Api\Serializers\SerializeDiffsOnPosts;
 use TheTurk\Diff\Api\Serializers\DiffSerializer;
+use TheTurk\Diff\Api\Serializers\SerializeDiffsOnPosts;
 use TheTurk\Diff\Console\ArchiveCommand;
 use TheTurk\Diff\Models\Diff;
-use Illuminate\Console\Scheduling\Event;
-use Illuminate\Console\Scheduling\Schedule;
 
 return [
     (new Extend\Routes('api'))
@@ -38,14 +37,14 @@ return [
         ->post('/diff/{id}', 'diff.rollback', Controllers\RollbackToDiffController::class),
 
     (new Extend\Frontend('admin'))
-        ->css(__DIR__ . '/less/admin.less')
-        ->js(__DIR__ . '/js/dist/admin.js'),
+        ->css(__DIR__.'/less/admin.less')
+        ->js(__DIR__.'/js/dist/admin.js'),
 
     (new Extend\Frontend('forum'))
-        ->css(__DIR__ . '/less/forum.less')
-        ->js(__DIR__ . '/js/dist/forum.js'),
+        ->css(__DIR__.'/less/forum.less')
+        ->js(__DIR__.'/js/dist/forum.js'),
 
-    (new Extend\Locales(__DIR__ . '/locale')),
+    (new Extend\Locales(__DIR__.'/locale')),
 
     (new Extend\Model(Post::class))
         ->hasMany('diff', Diff::class, 'post_id'),
@@ -59,7 +58,7 @@ return [
             /** @var Paths $paths */
             $paths = resolve(Paths::class);
             $event->weeklyOn(2, '2:00')
-                ->appendOutputTo($paths->storage . (DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'diff-archive-task.log'));
+                ->appendOutputTo($paths->storage.(DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.'diff-archive-task.log'));
         }),
 
     (new Extend\ApiSerializer(BasicPostSerializer::class))
