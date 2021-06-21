@@ -1,12 +1,12 @@
 <?php
 
-namespace IanM\Diff\Jobs;
+namespace TheTurk\Diff\Jobs;
 
 use Carbon\Carbon;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Psr\Log\LoggerInterface;
-use IanM\Diff\Models\Diff;
-use IanM\Diff\Repositories\DiffArchiveRepository;
+use TheTurk\Diff\Models\Diff;
+use TheTurk\Diff\Repositories\DiffArchiveRepository;
 
 /**
  * We're using a linear equation (y=mx+b) where the x is post's revision count.

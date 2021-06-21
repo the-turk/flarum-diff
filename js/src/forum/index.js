@@ -7,7 +7,7 @@ import Model from 'flarum/common/Model';
 import DiffDropdown from './components/DiffDropdown';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 
-app.initializers.add('ianm-diff', () => {
+app.initializers.add('the-turk-diff', () => {
   app.store.models.diff = Diff;
   Post.prototype.revisionCount = Model.attribute('revisionCount');
   Post.prototype.canViewEditHistory = Model.attribute('canViewEditHistory');

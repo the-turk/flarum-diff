@@ -1,10 +1,10 @@
 <?php
 
-namespace IanM\Diff\Console;
+namespace TheTurk\Diff\Console;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use IanM\Diff\Jobs\ArchiveDiffs;
+use TheTurk\Diff\Jobs\ArchiveDiffs;
 
 class ArchiveCommand extends Command
 {

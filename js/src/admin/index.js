@@ -1,9 +1,9 @@
 import app from 'flarum/common/app';
 import DiffSettingsPage from './DiffSettingsPage';
 
-app.initializers.add('ianm-diff', (app) => {
+app.initializers.add('the-turk-diff', (app) => {
   app.extensionData
-    .for('ianm-diff')
+    .for('the-turk-diff')
     .registerPage(DiffSettingsPage)
     .registerPermission(
       {

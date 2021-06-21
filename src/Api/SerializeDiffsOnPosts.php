@@ -1,11 +1,11 @@
 <?php
 
-namespace IanM\Diff\Api;
+namespace TheTurk\Diff\Api;
 
 use Flarum\Api\Serializer\PostSerializer;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Post\Post;
-use IanM\Diff\Models\Diff;
+use TheTurk\Diff\Models\Diff;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class SerializeDiffsOnPosts

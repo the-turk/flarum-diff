@@ -11,23 +11,23 @@
  * @copyright  2020
  * @license    The MIT License
  *
- * @version    Release: 1.0.8
+ * @version    Release: 1.0.9
  *
  * @link       https://github.com/the-turk/flarum-diff
  */
 
-namespace IanM\Diff;
+namespace TheTurk\Diff;
 
 use Flarum\Api\Serializer\BasicPostSerializer;
 use Flarum\Api\Serializer\PostSerializer;
 use Flarum\Extend;
 use Flarum\Foundation\Paths;
 use Flarum\Post\Post;
-use IanM\Diff\Api\Controllers;
-use IanM\Diff\Api\SerializeDiffsOnPosts;
-use IanM\Diff\Api\Serializers\DiffSerializer;
-use IanM\Diff\Console\ArchiveCommand;
-use IanM\Diff\Models\Diff;
+use TheTurk\Diff\Api\Controllers;
+use TheTurk\Diff\Api\SerializeDiffsOnPosts;
+use TheTurk\Diff\Api\Serializers\DiffSerializer;
+use TheTurk\Diff\Console\ArchiveCommand;
+use TheTurk\Diff\Models\Diff;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
 

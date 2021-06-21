@@ -1,6 +1,6 @@
 <?php
 
-namespace IanM\Diff\Commands;
+namespace TheTurk\Diff\Commands;
 
 use Flarum\User\User;
 

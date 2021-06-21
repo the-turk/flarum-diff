@@ -1,12 +1,12 @@
 <?php
 
-namespace IanM\Diff\Api\Controllers;
+namespace TheTurk\Diff\Api\Controllers;
 
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\UrlGenerator;
 use Psr\Http\Message\ServerRequestInterface;
-use IanM\Diff\Api\Serializers\DiffSerializer;
-use IanM\Diff\Repositories\DiffRepository;
+use TheTurk\Diff\Api\Serializers\DiffSerializer;
+use TheTurk\Diff\Repositories\DiffRepository;
 use Illuminate\Support\Arr;
 use Tobscure\JsonApi\Document;
 

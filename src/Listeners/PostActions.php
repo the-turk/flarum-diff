@@ -1,6 +1,6 @@
 <?php
 
-namespace IanM\Diff\Listeners;
+namespace TheTurk\Diff\Listeners;
 
 use Carbon\Carbon;
 use Flarum\Extension\ExtensionManager;
@@ -8,8 +8,8 @@ use Flarum\Post\Event\Revised as PostRevised;
 use Flarum\Post\Event\Saving as PostSaving;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Contracts\Events\Dispatcher;
-use IanM\Diff\Jobs\ArchiveDiffs;
-use IanM\Diff\Models\Diff;
+use TheTurk\Diff\Jobs\ArchiveDiffs;
+use TheTurk\Diff\Models\Diff;
 
 class PostActions
 {

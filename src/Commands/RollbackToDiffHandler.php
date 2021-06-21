@@ -1,14 +1,14 @@
 <?php
 
-namespace IanM\Diff\Commands;
+namespace TheTurk\Diff\Commands;
 
 use Carbon\Carbon;
 use Flarum\Post\Command\EditPost;
 use Flarum\Post\PostRepository;
 use Flarum\User\Exception\PermissionDeniedException;
 use Illuminate\Contracts\Bus\Dispatcher;
-use IanM\Diff\Models\Diff;
-use IanM\Diff\Repositories\DiffArchiveRepository;
+use TheTurk\Diff\Models\Diff;
+use TheTurk\Diff\Repositories\DiffArchiveRepository;
 
 class RollbackToDiffHandler
 {

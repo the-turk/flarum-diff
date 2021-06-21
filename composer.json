@@ -1,5 +1,5 @@
 {
-  "name": "ianm/flarum-diff",
+  "name": "the-turk/flarum-diff",
   "description": "View post edit histories.",
   "keywords": [
     "flarum",
@@ -11,34 +11,47 @@
   ],
   "type": "flarum-extension",
   "license": "MIT",
-  "authors": [{
-    "name": "Hasan Özbey",
-    "email": "hasanoozbey@gmail.com",
-    "homepage": "https://github.com/the-turk"
-  }],
+  "authors": [
+    {
+      "name": "Hasan Özbey",
+      "email": "hasanoozbey@gmail.com",
+      "homepage": "https://github.com/the-turk"
+    },
+    {
+      "name": "IanM",
+      "homepage": "https://discuss.flarum.org/u/ianm"
+    },
+    {
+      "name": "Alexander Skvortsov",
+      "email": "askvortsov@flarum.org",
+      "homepage": "https://github.com/askvortsov1"
+    },
+    {
+      "name": "David Wheatley",
+      "email": "hi@davwheat.dev",
+      "homepage": "https://github.com/davwheat"
+    }
+  ],
   "support": {
-    "issues": "https://github.com/imorland/flarum-diff/issues",
-    "source": "https://github.com/imorland/flarum-diff",
+    "issues": "https://github.com/the-turk/flarum-diff/issues",
+    "source": "https://github.com/the-turk/flarum-diff",
     "forum": "https://discuss.flarum.org/d/22779-diff-for-flarum"
   },
   "require": {
     "flarum/core": "^1.0.0",
-    "jfcherng/php-diff": "^6.7.1",
+    "jfcherng/php-diff": "^6.10.0",
     "ext-json": "*"
   },
   "conflict": {
     "dem13n/nickname-changer": ">=0.1.0",
     "the-turk/flarum-edit-notifications": "<0.1.4"
   },
-  "replace": {
-    "the-turk/flarum-diff": "*"
-  },
   "suggest": {
     "the-turk/flarum-quiet-edits": "Recommended if you want to save storage volume"
   },
   "autoload": {
     "psr-4": {
-      "IanM\\Diff\\": "src/"
+      "TheTurk\\Diff\\": "src/"
     }
   },
   "extra": {

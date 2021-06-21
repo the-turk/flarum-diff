@@ -1,6 +1,6 @@
 <?php
 
-namespace IanM\Diff\Api\Serializers;
+namespace TheTurk\Diff\Api\Serializers;
 
 use Flarum\Api\Serializer\AbstractSerializer;
 use Flarum\Api\Serializer\BasicUserSerializer;
@@ -8,8 +8,8 @@ use Flarum\Extension\ExtensionManager;
 use Flarum\Post\CommentPost;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
-use IanM\Diff\Models\Diff;
-use IanM\Diff\Repositories\DiffArchiveRepository;
+use TheTurk\Diff\Models\Diff;
+use TheTurk\Diff\Repositories\DiffArchiveRepository;
 use Jfcherng\Diff\Differ;
 use Jfcherng\Diff\Factory\RendererFactory;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -67,7 +67,7 @@ class DiffSerializer extends AbstractSerializer
      *
      * @var string
      */
-    protected $type = 'diff'; //used on line app.store.models.$type
+    protected $type = 'diff'; // used on line app.store.models.$type
 
     /**
      * Get the default set of serialized attributes for a model.
@@ -220,7 +220,7 @@ class DiffSerializer extends AbstractSerializer
                     . $this->translator->trans('the-turk-diff.forum.noDiff') .
                     '</p></div>',
                     // this option is just for Combined renderer
-                    'mergeThreshold' => \IanM\Diff\Jobs\ArchiveDiffs::sanitizeFloat($this->settings->get(
+                    'mergeThreshold' => \TheTurk\Diff\Jobs\ArchiveDiffs::sanitizeFloat($this->settings->get(
                         'the-turk-diff.mergeThreshold',
                         0.8
                     )),
