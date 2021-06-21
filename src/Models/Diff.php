@@ -6,22 +6,22 @@ use Flarum\Database\AbstractModel;
 use Flarum\User\User;
 
 /**
- * @property int $id
- * @property int $revision
- * @property string $content
- * @property int $post_id
+ * @property int               $id
+ * @property int               $revision
+ * @property string            $content
+ * @property int               $post_id
  * @property \Flarum\Post\Post $post
- * @property int|null $rollbacked_to
- * @property int|null $actor_id
- * @property User|null $actor
- * @property int|null $deleted_user_id
- * @property int|null $rollbacked_user_id
- * @property User|null $deleted_user
- * @property User|null $rollbacked_user
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $deleted_at
- * @property \Carbon\Carbon $rollbacked_at
- * @property int $archive_id
+ * @property int|null          $rollbacked_to
+ * @property int|null          $actor_id
+ * @property User|null         $actor
+ * @property int|null          $deleted_user_id
+ * @property int|null          $rollbacked_user_id
+ * @property User|null         $deleted_user
+ * @property User|null         $rollbacked_user
+ * @property \Carbon\Carbon    $created_at
+ * @property \Carbon\Carbon    $deleted_at
+ * @property \Carbon\Carbon    $rollbacked_at
+ * @property int               $archive_id
  */
 class Diff extends AbstractModel
 {

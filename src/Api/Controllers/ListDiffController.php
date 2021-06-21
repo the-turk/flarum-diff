@@ -4,10 +4,10 @@ namespace TheTurk\Diff\Api\Controllers;
 
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\UrlGenerator;
+use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use TheTurk\Diff\Api\Serializers\DiffSerializer;
 use TheTurk\Diff\Repositories\DiffRepository;
-use Illuminate\Support\Arr;
 use Tobscure\JsonApi\Document;
 
 class ListDiffController extends AbstractListController
