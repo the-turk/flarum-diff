@@ -24,7 +24,7 @@ use Flarum\Extend;
 use Flarum\Foundation\Paths;
 use Flarum\Post\Post;
 use TheTurk\Diff\Api\Controllers;
-use TheTurk\Diff\Api\SerializeDiffsOnPosts;
+use TheTurk\Diff\Api\Serializers\SerializeDiffsOnPosts;
 use TheTurk\Diff\Api\Serializers\DiffSerializer;
 use TheTurk\Diff\Console\ArchiveCommand;
 use TheTurk\Diff\Models\Diff;

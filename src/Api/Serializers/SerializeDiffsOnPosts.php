@@ -1,12 +1,11 @@
 <?php
 
-namespace TheTurk\Diff\Api;
+namespace TheTurk\Diff\Api\Serializers;
 
 use Flarum\Api\Serializer\PostSerializer;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Post\Post;
 use TheTurk\Diff\Models\Diff;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class SerializeDiffsOnPosts
 {
@@ -28,8 +27,7 @@ class SerializeDiffsOnPosts
      * @param PostSerializer $serializer 
      * @param Post $model 
      * @param array $attributes 
-     * @return void 
-     * @throws FileNotFoundException 
+     * @return array
      */
     public function __invoke(PostSerializer $serializer, Post $model, array $attributes)
     {
