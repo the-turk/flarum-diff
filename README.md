@@ -48,8 +48,6 @@ composer update the-turk/flarum-edit-notifications:0.1.4
 
 ## Installation
 
-Use [Bazaar](https://discuss.flarum.org/d/5151) or install manually:
-
 ```bash
 composer require the-turk/flarum-diff
 ```
@@ -82,6 +80,6 @@ If you want to archive old revisions, please consider enabling _cron job option_
 
 - [Flarum Discuss post](https://discuss.flarum.org/d/22779-diff-for-flarum)
 - [Source code on GitHub](https://github.com/the-turk/flarum-diff)
-- [Changelog](https://github.com/the-turk/flarum-diff/blob/master/CHANGELOG.md)
+- [Changelog](https://github.com/the-turk/blob/master/CHANGELOG.md)
 - [Report an issue](https://github.com/the-turk/flarum-diff/issues)
 - [Download via Packagist](https://packagist.org/packages/the-turk/flarum-diff)

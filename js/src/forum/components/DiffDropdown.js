@@ -1,6 +1,7 @@
-import Dropdown from 'flarum/components/Dropdown';
+import Dropdown from 'flarum/common/components/Dropdown';
 import DiffList from './DiffList';
-import icon from 'flarum/helpers/icon';
+import icon from 'flarum/common/helpers/icon';
+import DiffListState from '../states/DiffListState';
 
 /**
  * The `DiffDropdown` component is the entrance point for this extension.
@@ -8,44 +9,38 @@ import icon from 'flarum/helpers/icon';
  * It also contains DiffList components.
  */
 export default class DiffDropdown extends Dropdown {
-  static initProps(props) {
-    props.className = 'DiffDropdown';
-    props.buttonClassName = 'Button Button--link';
-    props.menuClassName = props.menuClassName;
-    props.label = app.translator.trans('the-turk-diff.forum.editedText');
-    props.icon = 'fas fa-history';
+  static initAttrs(attrs) {
+    attrs.className = 'DiffDropdown';
+    attrs.buttonClassName = 'Button Button--link';
+    attrs.menuClassName = attrs.menuClassName;
+    attrs.label = app.translator.trans('the-turk-diff.forum.editedText');
+    attrs.icon = 'fas fa-history';
 
-    super.initProps(props);
+    super.initAttrs(attrs);
   }
 
-  init() {
-    super.init();
+  oninit(vnode) {
+    super.oninit(vnode);
 
     /**
      * The post that we're working with.
      *
      * @type {Post[]}
      */
-    this.post = this.props.post;
+    this.post = this.attrs.post;
 
     /**
      * Create a new revision list.
-     * This approach may not work with newer Mithril versions.
      *
-     * @type {DiffList}
+     * @type {DiffListState}
      */
-    this.list = new DiffList({
-      post: this.post,
-      forModal: false,
-      selectedItem: null,
-      moreResults: null,
-    });
+    this.listState = new DiffListState(this.post, false, null);
   }
 
   getButton() {
     const vdom = super.getButton();
 
-    vdom.attrs.title = this.props.label;
+    vdom.attrs.title = this.attrs.label;
     vdom.attrs.onclick = this.onclick.bind(this);
 
     return vdom;
@@ -53,25 +48,25 @@ export default class DiffDropdown extends Dropdown {
 
   getButtonContent() {
     return [
-      icon(this.props.icon, {
+      icon(this.attrs.icon, {
         className: 'Button-icon',
       }),
-      <span className="Button-label">{this.props.label}</span>,
+      <span className="Button-label">{this.attrs.label}</span>,
     ];
   }
 
   getMenu() {
+    const revisionCount = this.attrs.post.revisionCount();
+
     return (
-      <div className={'Dropdown-menu ' + this.props.menuClassName}>
+      <div className={'Dropdown-menu ' + this.attrs.menuClassName}>
         <div className="DiffList-header">
           <h4>
             {/* edited 1 time | edited x times */}
-            {app.translator.transChoice('the-turk-diff.forum.revisionInfo', this.props.post.revisionCount(), {
-              revisionCount: this.props.post.revisionCount(),
-            })}
+            {app.translator.trans('the-turk-diff.forum.revisionInfo', { revisionCount })}
           </h4>
         </div>
-        {this.showing ? this.list.render() : ''}
+        {this.showing ? <DiffList state={this.listState}></DiffList> : ''}
       </div>
     );
   }
@@ -80,6 +75,6 @@ export default class DiffDropdown extends Dropdown {
    * Load revision list.
    */
   onclick() {
-    this.list.load();
+    this.listState.load();
   }
 }

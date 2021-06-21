@@ -11,19 +11,35 @@
   ],
   "type": "flarum-extension",
   "license": "MIT",
-  "authors": [{
-    "name": "Hasan Özbey",
-    "email": "hasanoozbey@gmail.com",
-    "homepage": "https://github.com/the-turk"
-  }],
+  "authors": [
+    {
+      "name": "Hasan Özbey",
+      "email": "hasanoozbey@gmail.com",
+      "homepage": "https://github.com/the-turk"
+    },
+    {
+      "name": "IanM",
+      "homepage": "https://discuss.flarum.org/u/ianm"
+    },
+    {
+      "name": "Alexander Skvortsov",
+      "email": "askvortsov@flarum.org",
+      "homepage": "https://github.com/askvortsov1"
+    },
+    {
+      "name": "David Wheatley",
+      "email": "hi@davwheat.dev",
+      "homepage": "https://github.com/davwheat"
+    }
+  ],
   "support": {
     "issues": "https://github.com/the-turk/flarum-diff/issues",
-    "source": "https://github.com/the-turk/flarum-diff"
+    "source": "https://github.com/the-turk/flarum-diff",
+    "forum": "https://discuss.flarum.org/d/22779-diff-for-flarum"
   },
   "require": {
-    "flarum/core": ">=0.1.0-beta.13 <0.1.0-beta.14",
-    "fof/console": "^0.5",
-    "jfcherng/php-diff": "^6.7.1",
+    "flarum/core": "^1.0.0",
+    "jfcherng/php-diff": "^6.10.0",
     "ext-json": "*"
   },
   "conflict": {
@@ -41,6 +57,7 @@
   "extra": {
     "flarum-extension": {
       "title": "Diff",
+      "category": "feature",
       "icon": {
         "name": "fas fa-history",
         "backgroundColor": "#b72a2a",

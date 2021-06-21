@@ -2,15 +2,14 @@
   "name": "@the-turk/flarum-diff",
   "description": "View post edit histories.",
   "license": "MIT",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "dependencies": {
-    "flarum-webpack-config": "0.1.0-beta.10",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
+    "flarum-webpack-config": "0.1.0-beta.16.2",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^4.7.0"
   },
   "devDependencies": {
-    "husky": "^4.2.5",
-    "prettier": "^2.0.5"
+    "prettier": "^2.3.1"
   },
   "repository": {
     "type": "git",
@@ -21,10 +20,5 @@
     "build": "webpack --mode production",
     "format": "prettier --write src",
     "format-check": "prettier --check src"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run format"
-    }
   }
 }

@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Post\Event\Revised as PostRevised;
 use Flarum\Post\Event\Saving as PostSaving;
-use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Contracts\Events\Dispatcher;
 use TheTurk\Diff\Jobs\ArchiveDiffs;

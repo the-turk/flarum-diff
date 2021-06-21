@@ -11,48 +11,66 @@
  * @copyright  2020
  * @license    The MIT License
  *
- * @version    Release: 1.0.8
+ * @version    Release: 1.0.9
  *
  * @link       https://github.com/the-turk/flarum-diff
  */
 
 namespace TheTurk\Diff;
 
+use Flarum\Api\Serializer\BasicPostSerializer;
+use Flarum\Api\Serializer\PostSerializer;
 use Flarum\Extend;
-use Flarum\Foundation\Application;
+use Flarum\Foundation\Paths;
 use Flarum\Post\Post;
-use Illuminate\Contracts\Events\Dispatcher;
 use TheTurk\Diff\Api\Controllers;
+use TheTurk\Diff\Api\SerializeDiffsOnPosts;
+use TheTurk\Diff\Api\Serializers\DiffSerializer;
+use TheTurk\Diff\Console\ArchiveCommand;
 use TheTurk\Diff\Models\Diff;
+use Illuminate\Console\Scheduling\Event;
+use Illuminate\Console\Scheduling\Schedule;
 
 return [
     (new Extend\Routes('api'))
         ->get('/diff', 'diff.index', Controllers\ListDiffController::class)
         ->delete('/diff/{id}', 'diff.delete', Controllers\DeleteDiffController::class)
         ->post('/diff/{id}', 'diff.rollback', Controllers\RollbackToDiffController::class),
+
     (new Extend\Frontend('admin'))
-        ->css(__DIR__.'/less/admin.less')
-        ->js(__DIR__.'/js/dist/admin.js'),
+        ->css(__DIR__ . '/less/admin.less')
+        ->js(__DIR__ . '/js/dist/admin.js'),
+
     (new Extend\Frontend('forum'))
-        ->css(__DIR__.'/less/forum.less')
-        ->js(__DIR__.'/js/dist/forum.js'),
+        ->css(__DIR__ . '/less/forum.less')
+        ->js(__DIR__ . '/js/dist/forum.js'),
 
-    (new Extend\Locales(__DIR__.'/locale')),
+    (new Extend\Locales(__DIR__ . '/locale')),
 
-    // GetModelRelationship event is deprecated by
-    // https://github.com/flarum/core/pull/2100
     (new Extend\Model(Post::class))
         ->hasMany('diff', Diff::class, 'post_id'),
 
-    static function (Application $app) {
-        /** @var Dispatcher $events */
-        $events = $app['events'];
+    (new Extend\Event())
+        ->subscribe(Listeners\PostActions::class),
 
-        $events->subscribe(Listeners\PostActions::class);
-        $events->subscribe(Listeners\AddDiffRelationship::class);
-        $events->subscribe(Listeners\RegisterConsoleCommand::class);
-        $events->subscribe(Listeners\UserPreferences::class);
+    (new Extend\Console())
+        ->command(ArchiveCommand::class)
+        ->schedule(ArchiveCommand::class, function (Event $event) {
+            /** @var Paths $paths */
+            $paths = resolve(Paths::class);
+            $event->weeklyOn(2, '2:00')
+                ->appendOutputTo($paths->storage . (DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'diff-archive-task.log'));
+        }),
 
-        $app->register(Providers\ConsoleProvider::class);
-    },
+    (new Extend\ApiSerializer(BasicPostSerializer::class))
+        ->hasMany('diff', DiffSerializer::class),
+
+    (new Extend\ApiSerializer(PostSerializer::class))
+        ->attributes(SerializeDiffsOnPosts::class),
+
+    (new Extend\Settings())
+        ->serializeToForum('textFormattingForDiffPreviews', 'the-turk-diff.textFormatting', 'boolVal', true),
+
+    (new Extend\User())
+        ->registerPreference('diffRenderer', 'strval', 'sideBySide'),
 ];

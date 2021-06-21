@@ -5,7 +5,6 @@ namespace TheTurk\Diff\Commands;
 use Carbon\Carbon;
 use Flarum\Post\Command\EditPost;
 use Flarum\Post\PostRepository;
-use Flarum\User\AssertPermissionTrait;
 use Flarum\User\Exception\PermissionDeniedException;
 use Illuminate\Contracts\Bus\Dispatcher;
 use TheTurk\Diff\Models\Diff;
@@ -13,8 +12,6 @@ use TheTurk\Diff\Repositories\DiffArchiveRepository;
 
 class RollbackToDiffHandler
 {
-    use AssertPermissionTrait;
-
     /**
      * @var \Flarum\Post\PostRepository
      */

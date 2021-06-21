@@ -4,16 +4,14 @@ namespace TheTurk\Diff\Api\Controllers;
 
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\UrlGenerator;
-use Flarum\User\AssertPermissionTrait;
 use Psr\Http\Message\ServerRequestInterface;
 use TheTurk\Diff\Api\Serializers\DiffSerializer;
 use TheTurk\Diff\Repositories\DiffRepository;
+use Illuminate\Support\Arr;
 use Tobscure\JsonApi\Document;
 
 class ListDiffController extends AbstractListController
 {
-    use AssertPermissionTrait;
-
     /**
      * {@inheritdoc}
      */
@@ -56,9 +54,9 @@ class ListDiffController extends AbstractListController
     {
         $actor = $request->getAttribute('actor');
 
-        $this->assertCan($actor, 'viewEditHistory');
+        $actor->assertCan('viewEditHistory');
 
-        $postId = array_get($request->getQueryParams(), 'id');
+        $postId = Arr::get($request->getQueryParams(), 'id');
 
         $limit = $this->extractLimit($request);
         $offset = $this->extractOffset($request);
@@ -69,14 +67,12 @@ class ListDiffController extends AbstractListController
             ['revision' => 'DESC'],
             $limit + 1,
             $offset
-        )
-            ->load($include)
-            ->all();
+        );
 
         $areMoreResults = false;
 
         if (count($diff) > $limit) {
-            array_pop($diff);
+            $diff->pop();
             $areMoreResults = true;
         }
 
@@ -88,6 +84,6 @@ class ListDiffController extends AbstractListController
             $areMoreResults ? null : 0
         );
 
-        return $diff;
+        return $diff->load($include);
     }
 }
