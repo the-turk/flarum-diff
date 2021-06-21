@@ -1,5 +1,5 @@
 ### 1.0.9
-- **Pull** commits from @ianm's incredible fork (I'd like to also send a shout out to @askvortsov1 and @davwheat).
+- **Pull** commits from @imorland's incredible fork (I'd like to also send a shout out to @askvortsov1 and @davwheat).
 
 Noticed some issues on this release, work-in-progress.
 
