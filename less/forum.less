@@ -8,27 +8,16 @@
 @import './common/fofNightMode.less';
 
 // all tooltips are docked to body
-// because of z-index problems in dropdow list
+// because of z-index problems in dropdown list
 // https://stackoverflow.com/a/15981951/12866913
-body > div.diffTooltip {
-  // wait, does internet explorer support css3 colors?
-  // I'm shocked!
-  // https://caniuse.com/#feat=css3-colors
-  &.deletedDiffTooltip {
-    &.tooltip.left .tooltip-inner {
+body > .deletedDiffTooltip {
+  &.tooltip.left {
+    & .tooltip-inner {
       background-color: indianred;
     }
 
-    &.tooltip.left .tooltip-arrow {
+    & .tooltip-arrow {
       border-left-color: indianred;
     }
-  }
-
-  // tooltips for touch devices also skipped
-  // in DiffModal.js & DiffButton.js
-  // i'm not sure if i should implement it or not
-  // i'll se what i can do later
-  @media @phone {
-    display: none !important;
   }
 }

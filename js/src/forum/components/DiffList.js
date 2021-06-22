@@ -22,12 +22,11 @@ export default class DiffList extends Component {
             {pages.length
               ? pages.map((diffs) => {
                   return diffs.map((item) => {
-                    // we can use this class to customize all tooltips
-                    // provided by this extension
-                    const tooltipClass = 'diffTooltip';
+                    const tooltipClass = 'diffListTooltip';
 
                     let diffButton = (
                       <Tooltip
+                        showOnFocus={false}
                         position="left"
                         text={
                           item.revision() == state.post.revisionCount()
@@ -49,6 +48,9 @@ export default class DiffList extends Component {
                           item,
                           onclick: () => {
                             if (!item.deletedAt()) {
+                              // fix tooltips are not disappearing onclick
+                              $('.' + tooltipClass).remove();
+
                               state.selectedItem = item;
                               app.modal.show(DiffModal, { listState: state });
 

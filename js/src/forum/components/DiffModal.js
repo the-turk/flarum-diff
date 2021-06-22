@@ -260,9 +260,6 @@ export default class DiffModal extends Modal {
   }
 
   content() {
-    // we can use this class to customize all tooltips
-    // provided by this extension
-    const tooltipClass = 'diffTooltip';
     const revisionCount = this.attrs.listState.post.revisionCount();
 
     /**
@@ -293,7 +290,7 @@ export default class DiffModal extends Modal {
           <div className="diffSwitcher">
             {this.attrs.listState.selectedItem.revision() != 0 && this.comparisonBetween.new.revision != this.comparisonBetween.old.revision
               ? diffSwitches.map((switchData) => (
-                  <Tooltip text={app.translator.trans(`the-turk-diff.forum.tooltips.${switchData.type}`)}>
+                  <Tooltip showOnFocus={false} text={app.translator.trans(`the-turk-diff.forum.tooltips.${switchData.type}`)}>
                     <div className="tooltip-wrapper">
                       <Button
                         icon={switchData.icon}
@@ -304,7 +301,7 @@ export default class DiffModal extends Modal {
                   </Tooltip>
                 ))
               : ''}
-            <Tooltip text={app.translator.trans('the-turk-diff.forum.tooltips.preview')}>
+            <Tooltip showOnFocus={false} text={app.translator.trans('the-turk-diff.forum.tooltips.preview')}>
               <div className="tooltip-wrapper">
                 <Button icon="far fa-eye" onclick={() => this.setDiffContent('preview')} className="Button Button--icon Button--link diffPreview" />
               </div>
