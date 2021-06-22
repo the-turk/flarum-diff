@@ -11,7 +11,7 @@
  * @copyright  2020
  * @license    The MIT License
  *
- * @version    Release: 1.0.9
+ * @version    Release: 1.1.0
  *
  * @link       https://github.com/the-turk/flarum-diff
  */

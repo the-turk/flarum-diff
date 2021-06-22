@@ -2,7 +2,7 @@
   "name": "@the-turk/flarum-diff",
   "description": "View post edit histories.",
   "license": "MIT",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "dependencies": {
     "flarum-webpack-config": "0.1.0-beta.16.2",
     "webpack": "^4.46.0",
