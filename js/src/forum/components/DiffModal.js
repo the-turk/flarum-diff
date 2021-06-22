@@ -339,9 +339,7 @@ export default class DiffModal extends Modal {
             <div className="diffContainer" />
           </div>
         </div>
-        {LoadingIndicator.component({
-          className: 'DiffModal-loading' + (this.loading ? ' active' : ''),
-        })}
+        {this.loading ? <LoadingIndicator containerClassName="DiffModal-loading" size="large" /> : ''}
       </div>,
     ];
   }

@@ -178,12 +178,20 @@
     right: 0;
     bottom: 0;
     background: fade(@body-bg, 90%);
-    display: none;
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: flex;
+    -ms-flex-align: center;
+    -webkit-box-align: center;
+    align-items: center;
+    -ms-flex-pack: center;
+    -webkit-box-pack: center;
+    justify-content: center;
     border-radius: @border-radius @border-radius 0 0;
     z-index: 1010;
 
-    &.active {
-      display: block;
+    &.LoadingIndicator-container--block {
+      height: auto;
     }
   }
 
