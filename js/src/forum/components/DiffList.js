@@ -130,9 +130,9 @@ export default class DiffList extends Component {
     // simply checks if we're bottom of the list
     // and if there are more results to show
     this.scrollHandler = () => {
-      const scrollTop = $scrollParent.scrollTop();
-      const viewportHeight = $scrollParent.height();
-      const contentTop = $scrollParent === $revisions ? 0 : $revisions.offset().top;
+      const scrollTop = this.$scrollParent.scrollTop();
+      const viewportHeight = this.$scrollParent.height();
+      const contentTop = this.$scrollParent === $revisions ? 0 : $revisions.offset().top;
       const contentHeight = $revisions[0].scrollHeight;
 
       if (state.moreResults && !state.loading && scrollTop + viewportHeight >= contentTop + contentHeight) {
