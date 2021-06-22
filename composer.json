@@ -38,13 +38,9 @@
     "forum": "https://discuss.flarum.org/d/22779-diff-for-flarum"
   },
   "require": {
-    "flarum/core": "^1.0.0",
+    "flarum/core": "^1.0.2",
     "jfcherng/php-diff": "^6.10.0",
     "ext-json": "*"
-  },
-  "conflict": {
-    "dem13n/nickname-changer": ">=0.1.0",
-    "the-turk/flarum-edit-notifications": "<0.1.4"
   },
   "suggest": {
     "the-turk/flarum-quiet-edits": "Recommended if you want to save storage volume"

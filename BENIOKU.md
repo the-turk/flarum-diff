@@ -23,30 +23,11 @@ Ekran görüntüleri:
 
 ## Gereksinimler
 
-![php](https://img.shields.io/badge/php-%5E7.1.3-blue?style=flat-square) ![ext-iconv](https://img.shields.io/badge/ext-iconv-brightgreen?style=flat-square)
+![php](https://img.shields.io/badge/php-%E2%89%A57.1.3-blue?style=flat-square) ![ext-iconv](https://img.shields.io/badge/ext-iconv-brightgreen?style=flat-square)
 
 php sürümünüzü `php -v` komutunu çalıştırarak ve `iconv` pakedinin yüklü olup olmadığını `php --ri iconv` komutunu çalıştırarak (`iconv support => enabled` çıktısını görmelisiniz) öğrenebilirsiniz.
 
-Eğer `flarum/core` beta 12 ve üzeri bir sürümünü kullanıyorsanız, "Ön İzleme" modunda söz dizimi vurgulamasını kullanabilmek için `s9e/text-formatter` paketini v2.3.7 sürümüne yükseltmeniz gerekir:
-
-```
-composer update s9e/text-formatter:2.3.7
-```
-
-## Çakışmalar
-
-Bu eklenti aşağıdakilerle çakışmaktadır:
-
-- [dem13n/nickname-changer](https://discuss.flarum.org/d/21238-nickname-changer). Bunun yerine [fof/username-request](https://discuss.flarum.org/d/20956-friendsofflarum-username-request) eklentisini kullanabilirsiniz.
-
-- Eğer [the-turk/flarum-edit-notifications](https://discuss.flarum.org/d/22896-edit-notifications/17) eklentisini kullanıyorsanız, bu eklentinin v0.1.4 sürümüne yükseltme yapmanız gerekir.
-```bash
-composer update the-turk/flarum-edit-notifications:0.1.4
-```
-
 ## Kurulum
-
-[Bazaar](https://discuss.flarum.org/d/5151) kullanın ya da elle kurulum yapın:
 
 ```bash
 composer require the-turk/flarum-diff
