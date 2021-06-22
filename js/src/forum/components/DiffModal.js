@@ -370,10 +370,7 @@ export default class DiffModal extends Modal {
       error: 'the-turk-diff.forum.' + key + 'ErrorMessage',
     }[type];
 
-    app.alerts.show(Alert, {
-      type,
-      children: app.translator.trans(message),
-    });
+    app.alerts.show(Alert, { type }, app.translator.trans(message));
   }
 
   /**
