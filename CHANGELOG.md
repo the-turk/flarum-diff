@@ -1,3 +1,9 @@
+### 1.1.0
+- **Fix** tooltips won't disappear on Firefox. (issue #27)
+- **Fix** empty alert message appears after rollbacking to / deleting revision. (issue #28)
+- **Fix** `.LoadingIndicator-container` creates a blank space inside the `DiffModal` component. (issue #29)
+- **Fix** `$scrollParent is not defined` while scrolling through diff list. (issue #31)
+
 ### 1.0.9
 - **Pull** commits from @imorland's incredible fork (I'd like to also send a shout out to @askvortsov1 and @davwheat).
 
