@@ -145,7 +145,7 @@ export default class DiffList extends Component {
     this.$scrollParent.on('scroll', this.scrollHandler);
   }
 
-  onremove(vnode) {
+  onremove() {
     this.$scrollParent.off('scroll', this.scrollHandler);
   }
 

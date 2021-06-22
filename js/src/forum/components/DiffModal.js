@@ -6,13 +6,11 @@ import username from 'flarum/common/helpers/username';
 import humanTime from 'flarum/common/helpers/humanTime';
 import avatar from 'flarum/common/helpers/avatar';
 import extractText from 'flarum/common/utils/extractText';
-import touchDevice from '../utils/touchDevice';
 import redrawPost from '../utils/redrawPost';
 import Alert from 'flarum/common/components/Alert';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import Dropdown from 'flarum/common/components/Dropdown';
 import DiffList from './DiffList';
-import DiffListState from '../states/DiffListState';
 
 /**
  * The `DiffModal` component is the main component of this extension.
@@ -399,7 +397,6 @@ export default class DiffModal extends Modal {
     let diffContentHtml;
     const $diffContainer = this.$('.diffContainer');
     const $previewContainer = this.$('.previewContainer');
-    const $tooltip = this.$('.diffTooltip');
 
     // buttons
     const $sideBySideButton = this.$('.Button.sideBySideView');
