@@ -1,3 +1,6 @@
+### 1.1.1
+- **Fix** diff dropdown was closing after clicking on a deleted revision on pages those created by other extensions.
+
 ### 1.1.0
 - **Fix** tooltips won't disappear on Firefox. (issue #27)
 - **Fix** empty alert message appears after rollbacking to / deleting revision. (issue #28)

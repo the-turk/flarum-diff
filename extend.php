@@ -6,14 +6,6 @@
  * LICENSE: For the full copyright and license information,
  * please view the LICENSE file that was distributed
  * with this source code.
- *
- * @author     Hasan Özbey <hasanoozbey@gmail.com>
- * @copyright  2020
- * @license    The MIT License
- *
- * @version    Release: 1.1.0
- *
- * @link       https://github.com/the-turk/flarum-diff
  */
 
 namespace TheTurk\Diff;
