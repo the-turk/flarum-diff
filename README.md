@@ -25,7 +25,7 @@ Also, it won't load (and cache) anything until you click the "Edited" button so 
 
 ## Requirements
 
-![php](https://img.shields.io/badge/php-%E2%89%A57.1.3-blue?style=flat-square) ![ext-iconv](https://img.shields.io/badge/ext-iconv-brightgreen?style=flat-square)
+![php](https://img.shields.io/badge/php-%E2%89%A57.4-blue?style=flat-square) ![ext-iconv](https://img.shields.io/badge/ext-iconv-brightgreen?style=flat-square)
 
 You can check your php version by running `php -v` and check if `iconv` is installed by running `php --ri iconv` (which should display `iconv support => enabled`).
 
