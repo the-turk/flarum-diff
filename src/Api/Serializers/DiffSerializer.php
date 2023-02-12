@@ -8,6 +8,7 @@ use Flarum\Extension\ExtensionManager;
 use Flarum\Post\CommentPost;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\User;
 use Jfcherng\Diff\Differ;
 use Jfcherng\Diff\Factory\RendererFactory;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -130,7 +131,7 @@ class DiffSerializer extends AbstractSerializer
             }
 
             // set html attribute for the preview mode.
-            $attributes['previewHtml'] = $this->formatter($currentRevision);
+            $attributes['previewHtml'] = $this->formatter($currentRevision, $diff->actor);
 
             // find a revision to compare with current revision
             $compareWith = $diffSubject->where('revision', '<', $diff->revision)
@@ -254,15 +255,17 @@ class DiffSerializer extends AbstractSerializer
      * @param string $content
      * @return string
      */
-    public function formatter(string $content)
+    public function formatter(string $content, User $actor)
     {
         if ($this->settings->get('the-turk-diff.textFormatting', true)) {
             return $this->commentPost->getFormatter()->render(
                 $this->commentPost->getFormatter()->parse(
                     $content,
-                    $this->commentPost
+                    $this->commentPost,
+                    $actor
                 ),
-                $this->commentPost
+                $this->commentPost,
+                $this->request
             );
         }
 
